@@ -388,3 +388,168 @@ sb.auth.onAuthStateChange(() => {
 updateAccount();
 
 </script>
+
+    <script>
+// SEQUENCE LIZ MUSIC — SONG UPLOAD AND LIBRARY
+
+async function uploadSong() {
+    const { data: authData } = await sb.auth.getUser();
+    const user = authData.user;
+
+    if (!user) {
+        alert("Please sign in before uploading music.");
+        return;
+    }
+
+    const title = document.getElementById("songTitle").value.trim();
+    const artist = document.getElementById("artistName").value.trim();
+    const description = document.getElementById("songDescription").value.trim();
+    const lyrics = document.getElementById("songLyrics").value;
+    const audio = document.getElementById("audioFile").files[0];
+    const cover = document.getElementById("coverFile").files[0];
+
+    if (!title || !audio) {
+        alert("Please enter a song title and select an audio file.");
+        return;
+    }
+
+    const button = document.getElementById("uploadBtn");
+    button.disabled = true;
+    button.textContent = "Uploading...";
+
+    try {
+        const audioPath = user.id + "/" + crypto.randomUUID() + "-" +
+            audio.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+        const { error: audioError } = await sb.storage
+            .from("music")
+            .upload(audioPath, audio);
+
+        if (audioError) throw audioError;
+
+        let coverPath = null;
+
+        if (cover) {
+            const imagePath = user.id + "/" + crypto.randomUUID() + "-" +
+                cover.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+            const { error: coverError } = await sb.storage
+                .from("music")
+                .upload(imagePath, cover);
+
+            if (coverError) throw coverError;
+
+            coverPath = imagePath;
+        }
+
+        const { error: trackError } = await sb
+            .from("tracks")
+            .insert({
+                artist_id: user.id,
+                title: title,
+                artist_name: artist,
+                description: description,
+                audio_path: audioPath,
+                cover_path: coverPath,
+                lyrics: lyrics,
+                status: "pending"
+            });
+
+        if (trackError) throw trackError;
+
+        alert("Song uploaded successfully! It is awaiting approval.");
+
+        document.getElementById("songTitle").value = "";
+        document.getElementById("artistName").value = "";
+        document.getElementById("songDescription").value = "";
+        document.getElementById("songLyrics").value = "";
+        document.getElementById("audioFile").value = "";
+        document.getElementById("coverFile").value = "";
+
+    } catch (error) {
+        alert("Upload failed: " + error.message);
+    } finally {
+        button.disabled = false;
+        button.textContent = "Upload Song";
+    }
+}
+
+document.getElementById("uploadBtn").onclick = uploadSong;
+
+
+// LOAD APPROVED MUSIC
+
+async function loadTracks() {
+    const container = document.getElementById("tracks");
+    container.innerHTML = "<p>Loading music...</p>";
+
+    const { data, error } = await sb
+        .from("tracks")
+        .select("*")
+        .eq("status", "approved")
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        container.textContent = "Could not load music: " + error.message;
+        return;
+    }
+
+    container.innerHTML = "";
+
+    if (!data || data.length === 0) {
+        container.innerHTML = "<p>No approved songs yet.</p>";
+        return;
+    }
+
+    for (const track of data) {
+        const { data: audioData, error: audioError } = await sb.storage
+            .from("music")
+            .createSignedUrl(track.audio_path, 3600);
+
+        if (audioError) continue;
+
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const title = document.createElement("h3");
+        title.textContent = track.title;
+
+        const artist = document.createElement("p");
+        artist.textContent = track.artist_name || "Independent Artist";
+
+        const player = document.createElement("audio");
+        player.controls = true;
+        player.preload = "none";
+        player.src = audioData.signedUrl;
+
+        card.append(title, artist, player);
+
+        if (track.lyrics) {
+            const lyricsButton = document.createElement("button");
+            lyricsButton.textContent = "View Lyrics";
+            lyricsButton.onclick = () => {
+                document.getElementById("lyricsDisplay").textContent =
+                    track.lyrics;
+            };
+            card.appendChild(lyricsButton);
+        }
+
+        container.appendChild(card);
+    }
+}
+
+
+// SEARCH MUSIC
+
+document.getElementById("searchTracks").addEventListener("input", function() {
+    const search = this.value.toLowerCase();
+
+    document.querySelectorAll("#tracks .card").forEach(card => {
+        card.style.display = card.textContent.toLowerCase().includes(search)
+            ? ""
+            : "none";
+    });
+});
+
+loadTracks();
+</script>

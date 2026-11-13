@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090910">
+
+<title>SEQUENCE LIZ MUSIC</title>
+
+<meta name="description" content="SEQUENCE LIZ MUSIC — Discover music, stream songs, upload your music and share your lyrics.">
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg: #090910;
+    --panel: #151521;
+    --gold: #f5c451;
+    --text: #ffffff;
+    --muted: #a5a5b5;
+    --border: #29293a;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+}
+
+header {
+    background: #11111b;
+    border-bottom: 1px solid var(--border);
+    padding: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.logo {
+    color: var(--gold);
+    font-size: 20px;
+    font-weight: bold;
+}
+
+nav {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+nav a:hover {
+    color: var(--gold);
+}
+
+.hero {
+    padding: 55px 20px;
+    text-align: center;
+    background: linear-gradient(135deg, #17172a, #090910);
+}
+
+.hero h1 {
+    font-size: 34px;
+    margin-bottom: 15px;
+}
+
+.hero h1 span {
+    color: var(--gold);
+}
+
+.hero p {
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.container {
+    width: 92%;
+    max-width: 1100px;
+    margin: 30px auto;
+}
+
+.section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.section h2 {
+    margin-bottom: 18px;
+    color: var(--gold);
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 13px;
+    margin: 8px 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #0c0c15;
+    color: white;
+    font-size: 15px;
+}
+
+textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+button {
+    background: var(--gold);
+    color: #17120a;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 5px 3px 5px 0;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+.secondary {
+    background: #29293a;
+    color: white;
+}
+
+.muted {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+#tracks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 15px;
+}
+
+.card {
+    background: #10101a;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 15px;
+    overflow-wrap: anywhere;
+}
+
+.card h3 {
+    margin-bottom: 8px;
+}
+
+.card p {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+audio {
+    width: 100%;
+    margin-top: 12px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+footer {
+    text-align: center;
+    color: var(--muted);
+    padding: 30px 15px;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+}
+
+@media(max-width: 600px) {
+    .hero h1 {
+        font-size: 27px;
+    }
+
+    header {
+        justify-content: center;
+    }
+
+    nav {
+        justify-content: center;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">SEQUENCE LIZ MUSIC</div>
+
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#music">Music</a>
+        <a href="#account">Account</a>
+        <a href="#upload">Upload</a>
+    </nav>
+</header>
+
+<section class="hero" id="home">
+    <h1>Discover Your Next <span>Favourite Song</span></h1>
+    <p>Stream music, discover artists and share your sound with the world.</p>
+</section>
+
+<main class="container">
+  <!-- ACCOUNT SECTION -->
+<section class="section" id="account">
+    <h2>Artist & Listener Account</h2>
+
+    <div id="loggedOut">
+        <h3>Create an account or sign in</h3>
+
+        <input type="text" id="username" placeholder="Your username (for registration)">
+        <input type="email" id="email" placeholder="Email address">
+        <input type="password" id="password" placeholder="Password">
+
+        <button id="signupBtn">Create Account</button>
+        <button id="loginBtn" class="secondary">Sign In</button>
+    </div>
+
+    <div id="loggedIn" class="hidden">
+        <p id="userInfo"></p>
+        <button id="logoutBtn" class="secondary">Sign Out</button>
+    </div>
+</section>
+
+<!-- MUSIC UPLOAD SECTION -->
+<section class="section" id="upload">
+    <h2>Upload Your Music</h2>
+    <p class="muted">Share your original music with listeners.</p>
+
+    <input type="text" id="songTitle" placeholder="Song title">
+
+    <input type="text" id="artistName" placeholder="Artist name">
+
+    <textarea id="songDescription" placeholder="Song description"></textarea>
+
+    <label>Choose your audio file</label>
+    <input type="file" id="audioFile" accept="audio/*">
+
+    <label>Choose cover artwork (optional)</label>
+    <input type="file" id="coverFile" accept="image/*">
+
+    <label>Add your song lyrics (optional)</label>
+    <textarea id="songLyrics" placeholder="Paste your lyrics here"></textarea>
+
+    <button id="uploadBtn">Upload Song</button>
+
+    <p class="muted">
+        Uploaded songs will require approval before appearing in the public music library.
+    </p>
+</section>
+
+<!-- MUSIC LIBRARY -->
+<section class="section" id="music">
+    <h2>Discover Music</h2>
+
+    <input type="search" id="searchTracks" placeholder="Search songs or artists">
+
+    <div id="tracks">
+        <p class="muted">Your music library will appear here.</p>
+    </div>
+</section>
+
+<!-- LYRICS DISPLAY -->
+<section class="section" id="lyricsSection">
+    <h2>Song Lyrics</h2>
+    <div id="lyricsDisplay">
+        <p class="muted">Select a song to view its lyrics.</p>
+    </div>
+</section>
+
+</main>
+
+<footer>
+    <p>© 2026 SEQUENCE LIZ MUSIC. All rights reserved.</p>
+    <p>Discover music. Support artists. Share your sound.</p>
+</footer>
+<!-- SUPABASE CONNECTION -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://wehxrlxyqiidivvinjwj.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+"sb_publishable__U5zTR-UcFxxiq_uAHMVzA_G5F8lWrs";
+
+const sb = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+);
+
+// USER SIGNUP
+document.getElementById("signupBtn").onclick = async function() {
+    const username = document.getElementById("username").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!username || !email || !password) {
+        alert("Please enter your username, email and password.");
+        return;
+    }
+
+    const { error } = await sb.auth.signUp({
+        email,
+        password,
+        options: {
+            data: {
+                username: username,
+                display_name: username
+            }
+        }
+    });
+
+    if (error) {
+        alert(error.message);
+    } else {
+        alert("Registration submitted! Check your email if confirmation is required.");
+    }
+};
+
+// USER LOGIN
+document.getElementById("loginBtn").onclick = async function() {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    const { error } = await sb.auth.signInWithPassword({
+        email,
+        password
+    });
+
+    if (error) {
+        alert(error.message);
+    } else {
+        alert("Welcome to SEQUENCE LIZ MUSIC!");
+        await updateAccount();
+    }
+};
+
+// USER LOGOUT
+document.getElementById("logoutBtn").onclick = async function() {
+    const { error } = await sb.auth.signOut();
+
+    if (error) {
+        alert(error.message);
+    } else {
+        await updateAccount();
+    }
+};
+
+// UPDATE ACCOUNT DISPLAY
+async function updateAccount() {
+    const { data } = await sb.auth.getUser();
+    const user = data.user;
+
+    document.getElementById("loggedOut").classList.toggle("hidden", !!user);
+    document.getElementById("loggedIn").classList.toggle("hidden", !user);
+
+    if (user) {
+        document.getElementById("userInfo").textContent =
+            "Signed in as " + user.email;
+    }
+}
+
+// CHECK LOGIN WHEN WEBSITE OPENS
+sb.auth.onAuthStateChange(() => {
+    updateAccount();
+});
+
+updateAccount();
+
+</script>

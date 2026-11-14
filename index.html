@@ -635,9 +635,164 @@ async function getOfflineSong(trackId) {
 }
 // LOAD APPROVED MUSIC
 
+// LOAD APPROVED MUSIC — PRIVATE OFFLINE LISTENING
+
 async function loadTracks() {
     const container = document.getElementById("tracks");
     container.innerHTML = "<p>Loading music...</p>";
+
+    await removeExpiredOfflineSongs();
+
+    const { data, error } = await sb
+        .from("tracks")
+        .select("*")
+        .eq("status", "approved")
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        container.textContent = "Could not load music: " + error.message;
+        return;
+    }
+
+    container.innerHTML = "";
+
+    if (!data || data.length === 0) {
+        container.innerHTML = "<p>No approved songs yet.</p>";
+        return;
+    }
+
+    for (const track of data) {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const title = document.createElement("h3");
+        title.textContent = track.title;
+
+        const artist = document.createElement("p");
+        artist.textContent = track.artist_name || "Independent Artist";
+
+        const player = document.createElement("audio");
+        player.controls = false;
+        player.preload = "none";
+
+        const playButton = document.createElement("button");
+        playButton.textContent = "▶ Play";
+
+        const offlineButton = document.createElement("button");
+        offlineButton.textContent = "Download for Offline Listening";
+        offlineButton.className = "secondary";
+
+        const status = document.createElement("p");
+        status.className = "muted";
+        status.textContent = "Offline copy expires after 30 days.";
+
+        let localAudioUrl = null;
+
+        playButton.onclick = async () => {
+            if (!player.paused) {
+                player.pause();
+                playButton.textContent = "▶ Play";
+                return;
+            }
+
+            playButton.disabled = true;
+            status.textContent = "Preparing song...";
+
+            try {
+                if (!player.src) {
+                    if (navigator.onLine) {
+                        const { data: audioData, error: audioError } =
+                            await sb.storage
+                                .from("music")
+                                .createSignedUrl(track.audio_path, 3600);
+
+                        if (audioError) throw audioError;
+
+                        player.src = audioData.signedUrl;
+                    } else {
+                        const savedSong = await getOfflineSong(track.id);
+
+                        if (!savedSong) {
+                            throw new Error(
+                                "This song is not saved for offline listening."
+                            );
+                        }
+
+                        localAudioUrl = URL.createObjectURL(savedSong.audio);
+                        player.src = localAudioUrl;
+                    }
+                }
+
+                await player.play();
+
+                playButton.textContent = "⏸ Pause";
+                status.textContent = "Now playing";
+            } catch (error) {
+                status.textContent = error.message;
+            } finally {
+                playButton.disabled = false;
+            }
+        };
+
+        player.onended = () => {
+            playButton.textContent = "▶ Play";
+            status.textContent = "Song finished.";
+        };
+
+        player.onpause = () => {
+            if (player.currentTime > 0 && !player.ended) {
+                playButton.textContent = "▶ Play";
+            }
+        };
+
+        offlineButton.onclick = async () => {
+            offlineButton.disabled = true;
+            offlineButton.textContent = "Saving...";
+
+            try {
+                const { data: audioData, error: audioError } =
+                    await sb.storage
+                        .from("music")
+                        .createSignedUrl(track.audio_path, 3600);
+
+                if (audioError) throw audioError;
+
+                await saveOfflineSong(track, audioData.signedUrl);
+
+                status.textContent =
+                    "Saved inside SEQUENCE LIZ MUSIC for 30 days.";
+                offlineButton.textContent = "✓ Saved for Offline Listening";
+            } catch (error) {
+                status.textContent = "Could not save song: " + error.message;
+                offlineButton.disabled = false;
+                offlineButton.textContent = "Download for Offline Listening";
+            }
+        };
+
+        card.append(
+            title,
+            artist,
+            playButton,
+            offlineButton,
+            status,
+            player
+        );
+
+        if (track.lyrics) {
+            const lyricsButton = document.createElement("button");
+            lyricsButton.textContent = "View Lyrics";
+
+            lyricsButton.onclick = () => {
+                document.getElementById("lyricsDisplay").textContent =
+                    track.lyrics;
+            };
+
+            card.appendChild(lyricsButton);
+        }
+
+        container.appendChild(card);
+    }
+}
 
     const { data, error } = await sb
         .from("tracks")

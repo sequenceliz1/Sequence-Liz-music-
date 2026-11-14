@@ -552,6 +552,59 @@ async function loadTracks() {
 }
 
 
+        // SEQUENCE LIZ MUSIC TV — LIVE ARTIST AND SONG DISPLAY
+
+async function updateMusicTV() {
+    const tv = document.getElementById("musicTVTrack");
+
+    if (!tv) return;
+
+    tv.textContent = "Loading featured music...";
+
+    const { data, error } = await sb
+        .from("tracks")
+        .select("title, artist_name")
+        .eq("status", "approved")
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+    if (error) {
+        tv.textContent = "Music TV is temporarily unavailable.";
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        tv.textContent = "No approved songs available yet.";
+        return;
+    }
+
+    tv.innerHTML = "";
+
+    data.forEach(track => {
+        const item = document.createElement("div");
+
+        item.style.padding = "12px";
+        item.style.marginTop = "8px";
+        item.style.background = "#10101a";
+        item.style.borderRadius = "8px";
+
+        const artist = document.createElement("p");
+        artist.style.color = "#f5c451";
+        artist.style.fontWeight = "bold";
+        artist.textContent = track.artist_name || "Independent Artist";
+
+        const song = document.createElement("p");
+        song.style.color = "white";
+        song.textContent = "Now featuring: " + track.title;
+
+        item.append(artist, song);
+        tv.appendChild(item);
+    });
+}
+
+updateMusicTV();
+
+setInterval(updateMusicTV, 60000);
 // SEARCH MUSIC
 
 document.getElementById("searchTracks").addEventListener("input", function() {

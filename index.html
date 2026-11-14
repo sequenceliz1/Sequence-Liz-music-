@@ -566,7 +566,73 @@ async function removeExpiredOfflineSongs() {
 removeExpiredOfflineSongs().catch(error => {
     console.error("Offline storage cleanup:", error);
 });
+async function saveOfflineSong(track, audioUrl) {
+    const response = await fetch(audioUrl);
 
+    if (!response.ok) {
+        throw new Error("Could not save this song.");
+    }
+
+    const audioBlob = await response.blob();
+    const db = await openOfflineDB();
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(
+            OFFLINE_STORE_NAME,
+            "readwrite"
+        );
+
+        transaction.objectStore(OFFLINE_STORE_NAME).put({
+            trackId: track.id,
+            title: track.title,
+            artist: track.artist_name,
+            audio: audioBlob,
+            savedAt: Date.now(),
+            expiresAt: Date.now() + OFFLINE_DAYS * 24 * 60 * 60 * 1000
+        });
+
+        transaction.oncomplete = () => {
+            db.close();
+            resolve();
+        };
+
+        transaction.onerror = () => {
+            db.close();
+            reject(transaction.error);
+        };
+    });
+}
+
+async function getOfflineSong(trackId) {
+    const db = await openOfflineDB();
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(
+            OFFLINE_STORE_NAME,
+            "readonly"
+        );
+
+        const request = transaction
+            .objectStore(OFFLINE_STORE_NAME)
+            .get(trackId);
+
+        request.onsuccess = () => {
+            const song = request.result;
+            db.close();
+
+            if (!song || song.expiresAt <= Date.now()) {
+                resolve(null);
+            } else {
+                resolve(song);
+            }
+        };
+
+        request.onerror = () => {
+            db.close();
+            reject(request.error);
+        };
+    });
+}
 // LOAD APPROVED MUSIC
 
 async function loadTracks() {

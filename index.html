@@ -297,17 +297,32 @@ document.getElementById("saveNewPasswordBtn").onclick = async function () {
     return;
   }
 
+  const { data: userData } = await sb.auth.getUser();
+  const recoveredEmail = userData?.user?.email || "";
+
   const { error } = await sb.auth.updateUser({
     password: newPassword
   });
 
   if (error) {
     alert(error.message);
-  } else {
-    alert("Your password has been updated successfully!");
-    document.getElementById("resetPasswordBox").classList.add("hidden");
-    document.getElementById("newPassword").value = "";
+    return;
   }
+
+  await sb.auth.signOut();
+
+  document.body.classList.remove("password-reset-mode");
+  document.getElementById("resetPasswordBox").classList.add("hidden");
+  document.getElementById("newPassword").value = "";
+  document.getElementById("email").value = recoveredEmail;
+
+  await updateAccount();
+
+  document.getElementById("account").scrollIntoView({
+    behavior: "smooth"
+  });
+
+  alert("Your password has been changed successfully. Please sign in with your new password.");
 };
   // MUSIC UPLOAD
 async function uploadSong() {

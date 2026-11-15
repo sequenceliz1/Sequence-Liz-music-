@@ -150,10 +150,11 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 // ACCOUNT: SIGN UP
 document.getElementById("signupBtn").onclick = async function () {
   const username = document.getElementById("username").value.trim();
+  const accountRole = document.getElementById("accountRole").value;
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
 
-  if (!username || !email || !password) {
+  if (!username || !accountRole || !email || !password) {
     alert("Please enter your username, email and password.");
     return;
   }

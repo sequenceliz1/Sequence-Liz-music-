@@ -170,14 +170,20 @@ document.getElementById("signupBtn").onclick = async function () {
     return;
   }
 
-  const { error } = await sb.auth.signUp({
-    email,
-    password,
-    options: { data: { username, display_name: username } }
-  });
+const { error } = await sb.auth.signUp({
+  email,
+  password,
+  options: {
+    data: {
+      username,
+      display_name: username,
+      account_role: accountRole
+    }
+  }
+});
 
-  if (error) alert(error.message);
-  else alert("Registration submitted! Check your email if confirmation is required.");
+if (error) alert(error.message);
+else alert("Registration submitted! Check your email if confirmation is required.");
 };
 
 // ACCOUNT: SIGN IN

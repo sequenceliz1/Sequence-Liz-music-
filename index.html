@@ -38,6 +38,34 @@ audio{width:100%;margin-top:12px}
 .hidden{display:none!important}
 footer{text-align:center;color:var(--muted);padding:30px 15px;border-top:1px solid var(--border);margin-top:40px}
 @media(max-width:600px){.hero h1{font-size:27px}header{justify-content:center}nav{justify-content:center}}
+#resetPasswordBox {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #090910;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 25px;
+}
+
+#resetPasswordBox input {
+  max-width: 400px;
+}
+
+#resetPasswordBox h3 {
+  color: #f5c451;
+  margin-bottom: 15px;
+}
+
+body.password-reset-mode header,
+body.password-reset-mode .hero,
+body.password-reset-mode main > section,
+body.password-reset-mode footer {
+  display: none !important;
+}
 </style>
 </head>
 <body>

@@ -537,55 +537,6 @@ async function getOfflineSong(trackId) {
   });
 }
 
-// LOAD APPROVED MUSIC
-async function loadTracks() {
-  const container = document.getElementById("tracks");
-  container.innerHTML = "<p>Loading music...</p>";
-
-  try {
-    await removeExpiredOfflineSongs();
-  } catch (error) {
-    console.warn("Offline cleanup:", error.message);
-  }
-
-  const { data, error } = await sb
-    .from("tracks")
-    .select("*")
-    .eq("status", "approved")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    container.textContent = "Could not load music: " + error.message;
-    return;
-  }
-
-  container.innerHTML = "";
-
-  if (!data || data.length === 0) {
-    container.innerHTML = "<p>No approved songs yet.</p>";
-    return;
-  }
-
-  for (const track of data) {
-    const card = document.createElement("div");
-    card.className = "card";
-
-    const title = document.createElement("h3");
-    title.textContent = track.title;
-
-    const artist = document.createElement("p");
-    artist.textContent = track.artist_name || "Independent Artist";
-
-    const player = document.createElement("audio");
-    player.controls = false;
-    player.preload = "none";
-
-    const playButton = document.createElement("button");
-    playButton.textContent = "▶ Play";
-
-    const offlineButton = document.createElement("button");
-    offlineButton.textContent = "Download for Offline Listening";
-    offlineButton.className = "secondary";
 
     const status = document.createElement("p");
     status.className = "muted";

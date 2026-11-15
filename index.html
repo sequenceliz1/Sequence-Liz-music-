@@ -147,6 +147,16 @@ footer{text-align:center;color:var(--muted);padding:30px 15px;border-top:1px sol
 const SUPABASE_URL = "https://wehxrlxyqiidivvinjwj.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable__U5zTR-UcFxxiq_uAHMVzA_G5F8lWrs";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  const passwordInput = document.getElementById("password");
+const togglePassword = document.getElementById("togglePassword");
+
+togglePassword.onclick = function () {
+  if (passwordInput.type === "password") {
+    passwordInput.type = "text";
+  } else {
+    passwordInput.type = "password";
+  }
+};
 
 // ACCOUNT: SIGN UP
 document.getElementById("signupBtn").onclick = async function () {

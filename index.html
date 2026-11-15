@@ -201,7 +201,26 @@ document.getElementById("loginBtn").onclick = async function () {
   }
 };
 
-// ACCOUNT: SIGN OUT
+// ACCOUNT: FORGOT PASSWORD
+document.getElementById("forgotPasswordBtn").onclick = async function () {
+  const email = document.getElementById("email").value.trim();
+
+  if (!email) {
+    alert("Please enter your email address first.");
+    return;
+  }
+
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname
+  });
+
+  if (error) {
+    alert(error.message);
+  } else {
+    alert("Password reset request submitted. Check your email if email delivery is configured.");
+  }
+};
+  // ACCOUNT: SIGN OUT
 document.getElementById("logoutBtn").onclick = async function () {
   const { error } = await sb.auth.signOut();
   if (error) alert(error.message);

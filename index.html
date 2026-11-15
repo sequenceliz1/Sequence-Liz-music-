@@ -246,13 +246,16 @@ async function updateAccount() {
 }
 
 sb.auth.onAuthStateChange((event) => {
-  updateAccount();
-
   if (event === "PASSWORD_RECOVERY") {
-    document.getElementById("resetPasswordBox").classList.remove("hidden");
+    const resetBox = document.getElementById("resetPasswordBox");
+    resetBox.classList.remove("hidden");
+    resetBox.scrollIntoView({ behavior: "smooth" });
   }
+
+  setTimeout(() => {
+    updateAccount();
+  }, 0);
 });
-updateAccount();
 
 updateAccount();
 

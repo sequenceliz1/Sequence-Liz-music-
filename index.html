@@ -275,6 +275,7 @@ async function updateAccount() {
 
 sb.auth.onAuthStateChange((event) => {
   if (event === "PASSWORD_RECOVERY") {
+    document.body.classList.add("password-reset-mode");
     const resetBox = document.getElementById("resetPasswordBox");
     resetBox.classList.remove("hidden");
     resetBox.scrollIntoView({ behavior: "smooth" });

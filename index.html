@@ -530,29 +530,43 @@ async function getOfflineSong(trackId) {
       }
     };
 
-    request.onerror = () => {
-      db.close();
-      reject(request.error || new Error("Could not read offline song."));
-    };
-  });
+    request.onsuccess = () => {
+  const song = request.result;
+  db.close();
+  resolve(song || null);
+};
+
+request.onerror = () => {
+  db.close();
+  reject(request.error || new Error("Could not read offline song."));
+};
+});
 }
 
 
-    const status = document.createElement("p");
-    status.className = "muted";
-    status.textContent = "Offline copy expires after 30 days.";
+const status = document.createElement("p");
+status.className = "muted";
+status.textContent = "Offline copy expires after 30 days.";
 
-    let localAudioUrl = null;
+let localAudioUrl = null;
 
-    // Check whether this song is already saved on this device.
-    try {
-      const savedSong = await getOfflineSong(track.id);
-      if (savedSong) {
-        offlineButton.textContent = "✓ Saved for Offline Listening";
-      }
-    } catch (error) {
-      console.warn("Offline song check:", error.message);
+// Check whether this song is already saved on this device.
+try {
+  const savedSong = await getOfflineSong(track.id);
+
+  if (savedSong) {
+    offlineButton.textContent = "✓ Saved for Offline Listening";
+
+    if (savedSong.audioBlob) {
+      localAudioUrl = URL.createObjectURL(savedSong.audioBlob);
     }
+  }
+} catch (error) {
+  console.warn("Offline song check:", error.message);
+}
+
+
+    
 
     playButton.onclick = async () => {
       if (!player.paused) {

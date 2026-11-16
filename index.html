@@ -14,6 +14,46 @@
 header{position:sticky;top:0;z-index:10;background:#14141ef2;border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}.topbar{max-width:1100px;margin:auto;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}.dots{font-size:24px;min-width:45px;padding:7px;background:var(--panel2);color:white}.menu{position:absolute;right:15px;top:62px;width:min(330px,calc(100vw - 30px));max-height:80vh;overflow:auto;background:#20202d;border:1px solid var(--line);border-radius:15px;padding:12px;box-shadow:0 18px 45px #0009}.menu h4{color:var(--accent);margin:12px 8px 5px}.menu button{display:block;width:100%;text-align:left;background:transparent;color:var(--text);font-weight:500;padding:10px;border-radius:8px}.menu button:hover{background:var(--panel2)}
 main{max-width:1100px;margin:auto;padding:18px}.page-title{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:14px}.song-art{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:11px;background:var(--panel2)}.artist-line{display:flex;align-items:center;gap:9px;margin:9px 0}.avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;background:var(--panel2);border:1px solid var(--line)}.song-title{font-weight:800;margin:8px 0 3px}.player{position:sticky;bottom:0;background:#171722;border-top:1px solid var(--line);padding:12px;z-index:8}.player-inner{max-width:1100px;margin:auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.player input[type=range]{flex:1;min-width:100px}.player select{background:var(--panel2);color:white;border:1px solid var(--line);padding:8px;border-radius:8px}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.notice{padding:12px;border-radius:10px;background:#252238;color:#ded4ff;margin:12px 0}.chat-box{height:48vh;overflow:auto;background:#15151f;border:1px solid var(--line);border-radius:12px;padding:12px}.bubble{max-width:85%;padding:10px 12px;margin:8px 0;border-radius:12px;background:var(--panel2)}.bubble.mine{margin-left:auto;background:#46345f}.bubble img,.bubble video{max-width:100%;border-radius:9px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.small{font-size:12px}.danger{color:var(--bad)}.text-content{white-space:pre-wrap;line-height:1.6;overflow-wrap:anywhere}.lyrics-box{margin-top:10px;padding:12px;background:#15151f;border:1px solid var(--line);border-radius:10px}.lyrics-box summary{cursor:pointer;color:var(--accent);font-weight:700}footer{padding:20px;text-align:center;color:var(--muted);font-size:12px}
 </style>
+ .terms-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,.85);
+  display: grid;
+  place-items: center;
+  padding: 15px;
+}
+
+.terms-modal.hidden {
+  display: none !important;
+}
+
+.terms-box {
+  background: #1b1b27;
+  border: 1px solid #c49aff;
+  border-radius: 15px;
+  padding: 20px;
+  width: 100%;
+  max-width: 650px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.terms-box h2 {
+  color: #c49aff;
+}
+
+.terms-agreement {
+  margin: 18px 0;
+  line-height: 1.6;
+}
+
+.terms-agreement input {
+  width: 20px;
+  height: 20px;
+  accent-color: #c49aff;
+  vertical-align: middle;
+}
 </head>
 <body>
 

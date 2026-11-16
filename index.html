@@ -356,13 +356,12 @@ $("forgotBtn").onclick=async()=>{
   redirectTo:location.origin
  });
 
- msg(error?error.message:"Password reset email requested. Check your inbox.")
+ (error?error.message:"Password reset email requested. Check your inbox.")
 };
 
-$("termsLink").onclick = function(e) {
+$("termsgmsLink").onclick = function(e) {
   e.preventDefault();
-  $("termsContent").innerHTML = termsText();
-  $("termsModal").classList.remove("hidden");
+  openPage("terms");
 };
 
 $("closeTerms").onclick = function() {

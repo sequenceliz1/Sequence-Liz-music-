@@ -1,1 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090910">
+<title>SEQUENCE LIZ MUSIC</title>
+<meta name="description" content="SEQUENCE LIZ MUSIC — Discover music, stream songs, upload your music and share your lyrics.">
 
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#090910;--panel:#151521;--gold:#f5c451;--text:#fff;--muted:#a5a5b5;--border:#29293a}
+body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif;min-height:100vh}
+header{background:#11111b;border-bottom:1px solid var(--border);padding:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.logo{color:var(--gold);font-size:20px;font-weight:bold}
+nav{display:flex;gap:15px;flex-wrap:wrap}
+nav a{color:#fff;text-decoration:none;font-size:14px}
+nav a:hover{color:var(--gold)}
+.hero{padding:55px 20px;text-align:center;background:linear-gradient(135deg,#17172a,#090910)}
+.hero h1{font-size:34px;margin-bottom:15px}
+.hero h1 span{color:var(--gold)}
+.hero p{color:var(--muted);line-height:1.6}
+.container{width:92%;max-width:1100px;margin:30px auto}
+.section{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:25px}
+.section h2{margin-bottom:18px;color:var(--gold)}
+input,textarea,select{width:100%;padding:13px;margin:8px 0;border:1px solid var(--border);border-radius:8px;background:#0c0c15;color:#fff;font-size:15px}
+textarea{min-height:110px;resize:vertical}
+button{background:var(--gold);color:#17120a;border:none;padding:12px 18px;border-radius:8px;font-weight:bold;cursor:pointer;margin:5px 3px 5px 0}
+button:hover{opacity:.85}
+button:disabled{opacity:.55;cursor:not-allowed}
+.secondary{background:#29293a;color:#fff}
+.muted{color:var(--muted);font-size:13px}
+#tracks{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:15px}
+.card{background:#10101a;border:1px solid var(--border);border-radius:12px;padding:15px;overflow-wrap:anywhere}
+.card h3{margin-bottom:8px}
+.card p{color:var(--muted);font-size:13px;margin-bottom:10px}
+audio{width:100%;margin-top:12px}
+.video-card{background:#10101a;border:1px solid var(--border);border-radius:12px;padding:15px;margin:14px 0;overflow:hidden}
+.video-stage{position:relative;background:#000;border-radius:10px;overflow:hidden}
+.video-stage video{display:block;width:100%;max-height:520px;background:#000}
+.video-caption{position:absolute;left:5%;right:5%;bottom:8%;text-align:center;color:#fff;font-size:clamp(16px,3vw,25px);font-weight:bold;line-height:1.35;text-shadow:0 2px 5px #000,2px 0 4px #000,-2px 0 4px #000;white-space:pre-wrap;pointer-events:none}
+.video-description{color:var(--muted);margin:8px 0}
+.hidden{display:none!important}
+footer{text-align:center;color:var(--muted);padding:30px 15px;border-top:1px solid var(--border);margin-top:40px}
+@media(max-width:600px){.hero h1{font-size:27px}header{justify-content:center}nav{justify-content:center}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">SEQUENCE LIZ MUSIC</div>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#music">Music</a>
+    <a href="#account">Account</a>
+    <a href="#upload">Upload</a>
+    <a href="#videoUpload">Videos</a>
+  </nav>
+</header>
+
+<section class="hero" id="home">
+  <h1>Discover Your Next <span>Favourite Song</span></h1>
+  <p>Stream music, discover artists and share your sound with the world.</p>
+</section>
+
+<main class="container">
+
+<section class="section" id="account">
+  <h2>Artist &amp; Listener Account</h2>
+  <div id="loggedOut">
+    <h3>Create an account or sign in</h3>
+    <input type="text" id="username" placeholder="Your username (for registration)">
+    <input type="email" id="email" placeholder="Email address">
+    <input type="password" id="password" placeholder="Password">
+    <button id="signupBtn">Create Account</button>
+    <button id="loginBtn" class="secondary">Sign In</button>
+  </div>
+  <div id="loggedIn" class="hidden">
+    <p id="userInfo"></p>
+    <button id="logoutBtn" class="secondary">Sign Out</button>
+  </div>
+</section>
+
+<section class="section" id="upload">
+  <h2>Upload Your Music</h2>
+  <p class="muted">Share your original music with listeners.</p>
+  <input type="text" id="songTitle" placeholder="Song title">
+  <input type="text" id="artistName" placeholder="Artist name">
+  <textarea id="songDescription" placeholder="Song description"></textarea>
+  <label for="audioFile">Choose your audio file</label>
+  <input type="file" id="audioFile" accept="audio/*">
+  <label for="coverFile">Choose cover artwork (optional)</label>
+  <input type="file" id="coverFile" accept="image/*">
+  <label for="songLyrics">Add your song lyrics (optional)</label>
+  <textarea id="songLyrics" placeholder="Paste your lyrics here"></textarea>
+  <p class="muted">Lyrics are saved with the song and can be viewed by listeners.</p>
+  <button id="uploadBtn">Upload Song</button>
+  <p class="muted">Uploaded songs will require approval before appearing in the public music library.</p>
+</section>
+
+<section class="section" id="videoUpload">
+  <h2>🎬 Upload a Video</h2>
+  <p class="muted">Upload a music video or a talking video. Add timed lyrics, subtitles or spoken words to appear over the video as it plays.</p>
+  <input type="text" id="videoTitle" placeholder="Video title">
+  <input type="text" id="videoArtist" placeholder="Artist / creator name">
+  <label for="videoFile">Choose video file</label>
+  <input type="file" id="videoFile" accept="video/*">
+  <label for="videoText">On-screen lyrics or spoken words (optional)</label>
+  <textarea id="videoText" placeholder="Add one timed line per row, for example:
+[00:03] First lyric or spoken sentence
+[00:07] Second line appears here
+[00:12] Third line appears here"></textarea>
+  <p class="muted">Use [MM:SS] at the start of each line. The matching line will appear on the video at that time. For ordinary videos, enter subtitles or what the speaker says.</p>
+  <button id="uploadVideoBtn">Upload Video</button>
+  <p id="videoUploadStatus" class="muted" aria-live="polite"></p>
+</section>
+
+<section class="section" id="videoFeed">
+  <h2>📽️ Music & Creator Videos</h2>
+  <div id="videosList"><p class="muted">Loading videos...</p></div>
+</section>
+
+<section class="section" id="sequenceLizTV">
+  <h2>📺 SEQUENCE LIZ MUSIC TV</h2>
+  <div style="background:#090910;padding:18px;border-radius:10px;overflow:hidden">
+    <marquee scrollamount="4" style="color:#f5c451;font-weight:bold">
+      THANK YOU FOR VISITING SEQUENCE LIZ MUSIC — DISCOVER GREAT MUSIC FROM AMAZING ARTISTS!
+    </marquee>
+  </div>
+  <div id="musicTVTrack" style="margin-top:15px">
+    <p class="muted">Discover music from different artists.</p>
+  </div>
+</section>
+
+<section class="section" id="artistProfiles">
+  <h2>🎤 Discover Artists</h2>
+  <p class="muted">Discover artists and explore their music.</p>
+  <input type="search" id="searchArtists" placeholder="Search for an artist">
+  <div id="artistProfilesList">
+    <p class="muted">Artist profiles will appear here.</p>
+  </div>
+</section>
+
+<section class="section" id="music">
+  <h2>Discover Music</h2>
+  <input type="search" id="searchTracks" placeholder="Search songs or artists">
+  <div id="tracks">
+    <p class="muted">Your music library will appear here.</p>
+  </div>
+</section>
+
+<section class="section" id="lyricsSection">
+  <h2>Song Lyrics</h2>
+  <div id="lyricsDisplay">
+    <p class="muted">Select a song to view its lyrics.</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>© 2026 SEQUENCE LIZ MUSIC. All rights reserved.</p>
+  <p>Discover music. Support artists. Share your sound.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+"use strict";
+
+const SUPABASE_URL = "https://wehxrlxyqiidivvinjwj.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable__U5zTR-UcFxxiq_uAHMVzA_G5F8lWrs";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+// ACCOUNT: SIGN UP
+document.getElementById("signupBtn").onclick = async function () {
+  const username = document.getElementById("username").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if (!username || !email || !password) {
+    alert("Please enter your username, email and password.");
+    return;
+  }
+
+  const { error } = await sb.auth.signUp({
+    email,
+    password,
+    options: { data: { username, display_name: username } }
+  });
+
+  if (error) alert(error.message);
+  else alert("Registration submitted! Check your email if confirmation is required.");
+};
+
+// ACCOUNT: SIGN IN
+document.getElementById("loginBtn").onclick = async function () {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+
+  if (error) alert(error.message);
+  else {
+    alert("Welcome to SEQUENCE LIZ MUSIC!");
+    await updateAccount();
+  }
+};
+
+// ACCOUNT: SIGN OUT
+document.getElementById("logoutBtn").onclick = async function () {
+  const { error } = await sb.auth.signOut();
+  if (error) alert(error.message);
+  else await updateAccount();
+};
+
+async function updateAccount() {
+  const { data, error } = await sb.auth.getUser();
+  if (error) console.error("Account check:", error.message);
+  const user = data && data.user;
+
+  document.getElementById("loggedOut").classList.toggle("hidden", !!user);
+  document.getElementById("loggedIn").classList.toggle("hidden", !user);
+
+  if (user) {
+    document.getElementById("userInfo").textContent = "Signed in as " + user.email;
+  }
+}
+
+sb.auth.onAuthStateChange(() => {
+  updateAccount();
+});
+updateAccount();
+
+// MUSIC UPLOAD
+async function uploadSong() {
+  const { data: authData, error: authError } = await sb.auth.getUser();
+  if (authError) {
+    alert(authError.message);
+    return;
+  }
+
+  const user = authData.user;
+  if (!user) {
+    alert("Please sign in before uploading music.");
+    return;
+  }
+
+  const title = document.getElementById("songTitle").value.trim();
+  const artist = document.getElementById("artistName").value.trim();
+  const description = document.getElementById("songDescription").value.trim();
+  const lyrics = document.getElementById("songLyrics").value;
+  const audio = document.getElementById("audioFile").files[0];
+  const cover = document.getElementById("coverFile").files[0];
+
+  if (!title || !audio) {
+    alert("Please enter a song title and select an audio file.");
+    return;
+  }
+
+  const button = document.getElementById("uploadBtn");
+  button.disabled = true;
+  button.textContent = "Uploading...";
+
+  let uploadedAudioPath = null;
+  let uploadedCoverPath = null;
+
+  try {
+    const safeAudioName = audio.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    uploadedAudioPath = user.id + "/" + crypto.randomUUID() + "-" + safeAudioName;
+
+    const { error: audioError } = await sb.storage
+      .from("music")
+      .upload(uploadedAudioPath, audio);
+
+    if (audioError) throw audioError;
+
+    if (cover) {
+      const safeCoverName = cover.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      uploadedCoverPath = user.id + "/" + crypto.randomUUID() + "-" + safeCoverName;
+
+      const { error: coverError } = await sb.storage
+        .from("music")
+        .upload(uploadedCoverPath, cover);
+
+      if (coverError) throw coverError;
+    }
+
+    const { error: trackError } = await sb.from("tracks").insert({
+      artist_id: user.id,
+      title,
+      artist_name: artist,
+      description,
+      audio_path: uploadedAudioPath,
+      cover_path: uploadedCoverPath,
+      lyrics,
+      status: "pending"
+    });
+
+    if (trackError) throw trackError;
+
+    alert("Song uploaded successfully! It is awaiting approval.");
+
+    document.getElementById("songTitle").value = "";
+    document.getElementById("artistName").value = "";
+    document.getElementById("songDescription").value = "";
+    document.getElementById("songLyrics").value = "";
+    document.getElementById("audioFile").value = "";
+    document.getElementById("coverFile").value = "";
+  } catch (error) {
+    if (uploadedCoverPath) {
+      await sb.storage.from("music").remove([uploadedCoverPath]);
+    }
+    if (uploadedAudioPath) {
+      await sb.storage.from("music").remove([uploadedAudioPath]);
+    }
+    alert("Upload failed: " + error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Upload Song";
+  }
+}
+document.getElementById("uploadBtn").onclick = uploadSong;
+
+// PRIVATE OFFLINE STORAGE
+const OFFLINE_DB_NAME = "sequenceLizOffline";
+const OFFLINE_STORE_NAME = "songs";
+const OFFLINE_DAYS = 30;
+const OFFLINE_DURATION_MS = OFFLINE_DAYS * 24 * 60 * 60 * 1000;
+
+function openOfflineDB() {
+  return new Promise((resolve, reject) => {
+    if (!("indexedDB" in window)) {
+      reject(new Error("Offline storage is not supported by this browser."));
+      return;
+    }
+
+    const request = indexedDB.open(OFFLINE_DB_NAME, 1);
+
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(OFFLINE_STORE_NAME)) {
+        db.createObjectStore(OFFLINE_STORE_NAME, { keyPath: "trackId" });
+      }
+    };
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error("Could not open offline storage."));
+  });
+}
+
+async function removeExpiredOfflineSongs() {
+  const db = await openOfflineDB();
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(OFFLINE_STORE_NAME, "readwrite");
+    const store = transaction.objectStore(OFFLINE_STORE_NAME);
+    const request = store.openCursor();
+    const now = Date.now();
+
+    request.onsuccess = () => {
+      const cursor = request.result;
+      if (!cursor) return;
+
+      if (!cursor.value.expiresAt || cursor.value.expiresAt <= now) {
+        cursor.delete();
+      }
+      cursor.continue();
+    };
+
+    transaction.oncomplete = () => {
+      db.close();
+      resolve();
+    };
+    transaction.onerror = () => {
+      db.close();
+      reject(transaction.error || new Error("Could not clean offline storage."));
+    };
+    transaction.onabort = () => {
+      db.close();
+      reject(transaction.error || new Error("Offline cleanup was stopped."));
+    };
+  });
+}
+
+async function saveOfflineSong(track, audioUrl) {
+  const response = await fetch(audioUrl);
+  if (!response.ok) throw new Error("Could not retrieve the song file.");
+
+  const audioBlob = await response.blob();
+  if (!audioBlob.size) throw new Error("The song file is empty.");
+
+  const db = await openOfflineDB();
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(OFFLINE_STORE_NAME, "readwrite");
+
+    transaction.objectStore(OFFLINE_STORE_NAME).put({
+      trackId: track.id,
+      title: track.title,
+      artist: track.artist_name || "Independent Artist",
+      audio: audioBlob,
+      savedAt: Date.now(),
+      expiresAt: Date.now() + OFFLINE_DURATION_MS
+    });
+
+    transaction.oncomplete = () => {
+      db.close();
+      resolve();
+    };
+    transaction.onerror = () => {
+      db.close();
+      reject(transaction.error || new Error("Could not save the song."));
+    };
+    transaction.onabort = () => {
+      db.close();
+      reject(transaction.error || new Error("Saving the song was stopped."));
+    };
+  });
+}
+
+async function getOfflineSong(trackId) {
+  const db = await openOfflineDB();
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(OFFLINE_STORE_NAME, "readonly");
+    const request = transaction.objectStore(OFFLINE_STORE_NAME).get(trackId);
+
+    request.onsuccess = () => {
+      const song = request.result;
+      db.close();
+
+      if (!song || !song.expiresAt || song.expiresAt <= Date.now()) {
+        resolve(null);
+      } else {
+        resolve(song);
+      }
+    };
+
+    request.onerror = () => {
+      db.close();
+      reject(request.error || new Error("Could not read offline song."));
+    };
+  });
+}
+
+// LOAD APPROVED MUSIC
+async function loadTracks() {
+  const container = document.getElementById("tracks");
+  container.innerHTML = "<p>Loading music...</p>";
+
+  try {
+    await removeExpiredOfflineSongs();
+  } catch (error) {
+    console.warn("Offline cleanup:", error.message);
+  }
+
+  const { data, error } = await sb
+    .from("tracks")
+    .select("*")
+    .eq("status", "approved")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    container.textContent = "Could not load music: " + error.message;
+    return;
+  }
+
+  container.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    container.innerHTML = "<p>No approved songs yet.</p>";
+    return;
+  }
+
+  for (const track of data) {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const title = document.createElement("h3");
+    title.textContent = track.title;
+
+    const artist = document.createElement("p");
+    artist.textContent = track.artist_name || "Independent Artist";
+
+    const player = document.createElement("audio");
+    player.controls = false;
+    player.preload = "none";
+
+    const playButton = document.createElement("button");
+    playButton.textContent = "▶ Play";
+
+    const offlineButton = document.createElement("button");
+    offlineButton.textContent = "Download for Offline Listening";
+    offlineButton.className = "secondary";
+
+    const status = document.createElement("p");
+    status.className = "muted";
+    status.textContent = "Offline copy expires after 30 days.";
+
+    let localAudioUrl = null;
+
+    try {
+      const savedSong = await getOfflineSong(track.id);
+      if (savedSong) {
+        offlineButton.textContent = "✓ Saved for Offline Listening";
+      }
+    } catch (error) {
+      console.warn("Offline song check:", error.message);
+    }
+
+    playButton.onclick = async () => {
+      if (!player.paused) {
+        player.pause();
+        playButton.textContent = "▶ Play";
+        return;
+      }
+
+      playButton.disabled = true;
+      status.textContent = "Preparing song...";
+
+      try {
+        if (!navigator.onLine) {
+          const savedSong = await getOfflineSong(track.id);
+
+          if (!savedSong) {
+            throw new Error("This song is not saved for offline listening.");
+          }
+
+          if (localAudioUrl) URL.revokeObjectURL(localAudioUrl);
+          localAudioUrl = URL.createObjectURL(savedSong.audio);
+          player.src = localAudioUrl;
+        } else if (!player.src || localAudioUrl) {
+          const { data: audioData, error: audioError } = await sb.storage
+            .from("music")
+            .createSignedUrl(track.audio_path, 3600);
+
+          if (audioError) throw audioError;
+
+          if (localAudioUrl) {
+            URL.revokeObjectURL(localAudioUrl);
+            localAudioUrl = null;
+          }
+
+          player.src = audioData.signedUrl;
+        }
+
+        await player.play();
+        playButton.textContent = "⏸ Pause";
+        status.textContent = navigator.onLine ? "Now playing" : "Playing saved offline copy";
+      } catch (error) {
+        status.textContent = error.message || "Could not play this song.";
+      } finally {
+        playButton.disabled = false;
+      }
+    };
+
+    player.onended = () => {
+      playButton.textContent = "▶ Play";
+      status.textContent = "Song finished.";
+    };
+
+    player.onpause = () => {
+      if (player.currentTime > 0 && !player.ended) {
+        playButton.textContent = "▶ Play";
+      }
+    };
+
+    offlineButton.onclick = async () => {
+      offlineButton.disabled = true;
+      offlineButton.textContent = "Saving...";
+
+      try {
+        if (!navigator.onLine) {
+          throw new Error("Connect to the internet to save this song first.");
+        }
+
+        const { data: audioData, error: audioError } = await sb.storage
+          .from("music")
+          .createSignedUrl(track.audio_path, 3600);
+
+        if (audioError) throw audioError;
+
+      

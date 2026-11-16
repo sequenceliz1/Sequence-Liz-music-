@@ -361,7 +361,12 @@ $("forgotBtn").onclick=async()=>{
 
 $("termsLink").onclick = function(e) {
   e.preventDefault();
-  openPage("terms");
+  $("termsContent").innerHTML = termsText();
+  $("termsModal").classList.remove("hidden");
+};
+
+$("closeTerms").onclick = function() {
+  $("termsModal").classList.add("hidden");
 };
 
 $("menuBtn").onclick=()=>$("menu").classList.toggle("hidden");

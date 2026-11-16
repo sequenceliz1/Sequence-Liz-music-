@@ -553,8 +553,8 @@ try {
   if (savedSong) {
     offlineButton.textContent = "✓ Saved for Offline Listening";
 
-    if (savedSong.audioBlob) {
-      localAudioUrl = URL.createObjectURL(savedSong.audioBlob);
+    if (savedSong.audio) {
+  localAudioUrl = URL.createObjectURL(savedSong.audio);
     }
   }
 } catch (error) {

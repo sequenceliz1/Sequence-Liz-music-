@@ -295,9 +295,7 @@ $("loginBtn").onclick=async()=>{
  }
 };
 
-if (!$("agreeTerms").checked) {
-  return msg("Please agree to the Terms and Conditions before registering.");
-}
+
 
  const {data,error}=await db.auth.signUp({
   email,

@@ -359,13 +359,9 @@ $("forgotBtn").onclick=async()=>{
  (error?error.message:"Password reset email requested. Check your inbox.")
 };
 
-$("termsgmsLink").onclick = function(e) {
+$("termsLink").onclick = function(e) {
   e.preventDefault();
   openPage("terms");
-};
-
-$("closeTerms").onclick = function() {
-  $("termsModal").classList.add("hidden");
 };
 
 $("menuBtn").onclick=()=>$("menu").classList.toggle("hidden");

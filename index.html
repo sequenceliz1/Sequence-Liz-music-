@@ -470,4 +470,238 @@ async function openPage(page){
      `<details class="lyrics-box" open><summary>Video lyrics / captions</summary><div class="text-content">${safe(v.captions)}</div></details>`:
      `<p class="small muted">No video lyrics or captions provided.</p>`
     }
-   </a
+      </article>
+  `).join("")}</div>`);
+
+ }else if(page==="shows"){
+
+  section("Watch Shows / YouTube",`
+   <div class="card">
+    <h3>Watch Shows</h3>
+    <p class="muted">Discover music shows and videos.</p>
+    <p class="muted">Show streaming features can be connected here.</p>
+   </div>
+  `);
+
+ }else if(page==="family"||page==="chats"||page==="familycharts"){
+
+  const titles={
+   family:"Family Community",
+   chats:"Private Chats",
+   familycharts:"Family Charts"
+  };
+
+  section(titles[page],`
+   <div class="card">
+    <h3>${titles[page]}</h3>
+    <p class="muted">Welcome to the SEQUENCE LIZ MUSIC community.</p>
+    <p>Community features will appear here.</p>
+   </div>
+  `);
+
+ }else if(page==="studio"||page==="pictureai"||page==="creations"){
+
+  const titles={
+   studio:"AI Music Studio",
+   pictureai:"AI Picture-to-Video",
+   creations:"My Purchased AI Creations"
+  };
+
+  section(titles[page],`
+   <div class="card">
+    <h3>${titles[page]}</h3>
+    <p class="muted">Your AI creation workspace.</p>
+    <p>Connect the AI creation services to activate this feature.</p>
+   </div>
+  `);
+
+ }else if(page==="profile"){
+
+  section("My Profile",`
+   <div class="card">
+    <h3>${safe(profile?.display_name||"User")}</h3>
+    <p>Email: ${safe(currentUser.email||"")}</p>
+    <p>Account type: ${safe(profile?.role||"listener")}</p>
+    <p>User ID: ${safe(currentUser.id)}</p>
+   </div>
+  `);
+
+ }else if(page==="upload"||page==="artist"||page==="earnings"){
+
+  const titles={
+   upload:"Upload Music / Video",
+   artist:"Artist Dashboard",
+   earnings:"Earnings & Withdrawals"
+  };
+
+  section(titles[page],`
+   <div class="card">
+    <h3>${titles[page]}</h3>
+    <p class="muted">Your artist workspace is ready for its feature integration.</p>
+   </div>
+  `);
+
+ }else if(page==="settings"){
+
+  section("Account Settings",`
+   <div class="card">
+    <h3>Account Information</h3>
+    <p>${safe(currentUser.email||"")}</p>
+    <button onclick="document.getElementById('logoutBtn').click()">Log out</button>
+   </div>
+  `);
+
+ }else if(page==="terms"){
+
+  section("Terms & Conditions",`
+   <div class="card">
+    <h3>SEQUENCE LIZ MUSIC Terms</h3>
+    <p>Users must respect artists, creators and other members of this platform.</p>
+    <p>Users must only upload music and content they own or have permission to distribute.</p>
+   </div>
+  `);
+
+ }else if(page==="privacy"){
+
+  section("Privacy Policy",`
+   <div class="card">
+    <h3>Your Privacy</h3>
+    <p>SEQUENCE LIZ MUSIC uses account information to provide platform services.</p>
+    <p>Account information must be protected and handled responsibly.</p>
+   </div>
+  `);
+
+ }else if(page==="help"){
+
+  section("Help & Support",`
+   <div class="card">
+    <h3>Need Help?</h3>
+    <p>Welcome to SEQUENCE LIZ MUSIC support.</p>
+    <p>Contact the platform administrator for assistance.</p>
+   </div>
+  `);
+
+ }else{
+
+  section("SEQUENCE LIZ MUSIC",`
+   <div class="card">
+    <p>Welcome to your music platform.</p>
+   </div>
+  `);
+
+ }
+}
+
+
+// MUSIC PLAYER CONTROLS
+
+$("playBtn").onclick=()=>{
+ const audio=$("audio");
+
+ if(!audio.src){
+  alert("Select a song first.");
+  return;
+ }
+
+ if(audio.paused){
+  audio.play().catch(e=>console.warn(e));
+ }else{
+  audio.pause();
+ }
+};
+
+$("audio").onplay=()=>{
+ $("playBtn").textContent="Ⅱ";
+};
+
+$("audio").onpause=()=>{
+ $("playBtn").textContent="▶";
+};
+
+$("audio").ontimeupdate=()=>{
+ const a=$("audio");
+
+ if(a.duration){
+  $("seek").value=(a.currentTime/a.duration)*100;
+
+  const format=t=>{
+   const m=Math.floor(t/60);
+   const s=Math.floor(t%60);
+   return m+":"+String(s).padStart(2,"0");
+  };
+
+  $("timeLabel").textContent=
+   format(a.currentTime)+" / "+format(a.duration);
+ }
+};
+
+$("seek").oninput=()=>{
+ const a=$("audio");
+
+ if(a.duration){
+  a.currentTime=(Number($("seek").value)/100)*a.duration;
+ }
+};
+
+$("speed").onchange=()=>{
+ $("audio").playbackRate=Number($("speed").value);
+};
+
+$("repeatBtn").onclick=()=>{
+ repeat=!repeat;
+
+ $("audio").loop=repeat;
+
+ $("repeatBtn").textContent=
+  repeat?"Repeat: On":"Repeat: Off";
+};
+
+$("nextBtn").onclick=()=>{
+ if(tracks.length){
+  playTrack((playIndex+1)%tracks.length);
+ }
+};
+
+$("prevBtn").onclick=()=>{
+ if(tracks.length){
+  playTrack(
+   playIndex<=0?tracks.length-1:playIndex-1
+  );
+ }
+};
+
+$("audio").onended=()=>{
+ if(!repeat&&tracks.length){
+  playTrack((playIndex+1)%tracks.length);
+ }
+};
+
+
+// AUTOMATIC SESSION CHECK
+
+async function checkExistingSession(){
+
+ if(!db)return;
+
+ try{
+  const {data,error}=await db.auth.getSession();
+
+  if(error){
+   console.warn("Session check:",error.message);
+   return;
+  }
+
+  if(data.session?.user){
+   currentUser=data.session.user;
+  }
+
+ }catch(error){
+  console.error("Session error:",error);
+ }
+}
+
+checkExistingSession();
+
+</script>
+</body>
+</html>

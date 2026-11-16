@@ -530,11 +530,7 @@ async function getOfflineSong(trackId) {
       }
     };
 
-    request.onsuccess = () => {
-  const song = request.result;
-  db.close();
-  resolve(song || null);
-};
+    
 
 request.onerror = () => {
   db.close();

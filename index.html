@@ -235,6 +235,7 @@ async function loadProfile(){
    role:meta.role==="artist"?"artist":"listener"
   }).select().single();
 
+  
   if(insertError)console.warn("Profile creation:",insertError);
 
   profile=d||{

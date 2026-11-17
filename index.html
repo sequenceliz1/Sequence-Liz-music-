@@ -347,17 +347,45 @@ $("signupBtn").onclick = async function () {
   }
 };
 
-$("forgotBtn").onclick=async()=>{
- if(!db)return msg("The account service did not load. Reload and try again.");
- const email=$("email").value.trim();
- if(!email)return msg("Enter your email address first.");
+// FORGOT PASSWORD BUTTON
+$("forgotBtn").addEventListener("click", async function(event) {
+  event.preventDefault();
 
- const {error}=await db.auth.resetPasswordForEmail(email,{
-  redirectTo:location.origin
- });
+  if (!db) {
+    msg("Account service is not available. Please reload the page.");
+    return;
+  }
 
- (error?error.message:"Password reset email requested. Check your inbox.")
-};
+  const email = $("email").value.trim();
+
+  if (!email) {
+    msg("Please enter your email address first.");
+    return;
+  }
+
+  const button = $("forgotBtn");
+  button.disabled = true;
+
+  msg("Sending password reset email...");
+
+  try {
+    const { error } = await db.auth.resetPasswordForEmail(email, {
+      redirectTo: "https://sequenceliz1.github.io/Sequence-Liz-music-/"
+    });
+
+    if (error) {
+      msg("Reset failed: " + error.message);
+    } else {
+      msg("Reset email requested. Check your Gmail Inbox and Spam folder.");
+    }
+
+  } catch (err) {
+    msg("Something went wrong: " + err.message);
+
+  } finally {
+    button.disabled = false;
+  }
+});
 
 $("termsLink").onclick = function(e) {
   e.preventDefault();

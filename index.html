@@ -780,6 +780,46 @@ async function openPage(page){
    </div>
   `);
 
+ }else if(page==="promote"){
+
+ section("🌍 Global Video Promotion",`
+  <div class="card">
+   <h3>Promote Your Video</h3>
+
+   <label>Select platform</label>
+   <select id="promoPlatform">
+    <option>TikTok</option>
+    <option>YouTube</option>
+    <option>Instagram</option>
+    <option>Facebook</option>
+    <option>Snapchat</option>
+   </select>
+
+   <br><br>
+
+   <label>Paste your video link</label>
+   <input id="promoLink" type="url" placeholder="Paste your video link here">
+
+   <br><br>
+
+   <button type="button" id="openPromoLink">Open video link</button>
+
+   <p id="promoMessage" class="muted"></p>
+  </div>
+ `);
+
+ $("openPromoLink").onclick=()=>{
+  const link=$("promoLink").value.trim();
+
+  try{
+   const url=new URL(link);
+   if(!["https:","http:"].includes(url.protocol)) throw new Error();
+
+   window.open(url.href,"_blank","noopener,noreferrer");
+  }catch(e){
+   $("promoMessage").textContent="Please enter a valid video link.";
+  }
+ };
  }else if(page==="profile"){
 
   section("My Profile",`

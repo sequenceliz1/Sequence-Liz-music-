@@ -1,1 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SEQUENCE LIZ MUSIC — AI Studio</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;padding:20px;
+ background:#101018;color:#fff;
+ font-family:Arial,sans-serif
+}
+.container{max-width:650px;margin:auto}
+h1{color:#d7a7ff;text-align:center}
+.card{
+ background:#1b1b27;padding:20px;
+ border-radius:14px;margin:18px 0
+}
+button,.upload-label{
+ display:inline-block;border:0;border-radius:9px;
+ padding:13px 17px;margin:5px 3px;
+ background:#a855f7;color:white;
+ font-weight:bold;cursor:pointer
+}
+button:disabled{opacity:.45;cursor:not-allowed}
+.secondary{background:#373747}
+.upload-label{background:#2563eb}
+input[type=file]{display:none}
+audio{width:100%;margin-top:15px}
+#message{white-space:pre-wrap;line-height:1.5}
+.small{color:#bbb;font-size:13px}
+</style>
+</head>
+
+<body>
+<div class="container">
+<h1>SEQUENCE LIZ MUSIC</h1>
+<p style="text-align:center">AI MUSIC STUDIO</p>
+
+<div class="card">
+<h3>🎙️ Record Your Vocal</h3>
+<p class="small">Allow microphone access when your browser asks.</p>
+
+<button id="recordBtn">Start Recording</button>
+<button id="stopBtn" class="secondary" disabled>Stop Recording</button>
+
+<audio id="audioPlayer" controls></audio>
+<p id="recordInfo" class="small">No recording yet.</p>
+</div>
+
+<div class="card">
+<h3>📁 Upload Existing Vocal</h3>
+<label class="upload-label" for="vocalFile">Choose Audio File</label>
+<input id="vocalFile" type="file" accept="audio/*">
+<p id="fileInfo" class="small">No file selected.</p>
+</div>
+
+<div class="card">
+<h3>💾 Save Vocal Recording</h3>
+<p class="small">
+Your recording will be saved privately in your SEQUENCE LIZ MUSIC AI Studio account.
+</p>
+<button id="uploadBtn" disabled>Save to My AI Studio</button>
+<p id="message" aria-live="polite"></p>
+</div>
+</div>
+
+<script>
+(() => {
+const SUPABASE_URL =
+"https://wehxrlxyqiidivvinjwj.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable__U5zTR-UcFxxiq_uAHMVzA_G5F8lWrs";
+
+const db = window.supabase.createClient(
+ SUPABASE_URL,
+ SUPABASE_KEY
+);
+
+const $ = id => document.getElementById(id);
+
+let mediaRecorder = null;
+let recordedBlob = null;
+let selectedFile = null;
+let audioStream = null;
+
+function message(text){
+ $("message").textContent = text;
+}
+
+function setFile(file){
+ selectedFile = file;
+ recordedBlob = null;
+
+ if(file){
+  $("fileInfo").textContent =
+   "Selected: " + file.name;
+  $("audioPlayer").src = URL.createObjectURL(file);
+  $("uploadBtn").disabled = false;
+ }
+}
+
+async function checkLogin(){
+ const {data,error} = await db.auth.getSession();
+
+ if(error || !data.session){
+  message("Please log in to SEQUENCE LIZ MUSIC first, then open this page again.");
+  $("recordBtn").disabled = true;
+  $("vocalFile").disabled = true;
+  return null;
+ }
+
+ message("You are logged in. Your recordings can be saved securely.");
+ return data.session.user;
+}
+
+$("recordBtn").addEventListener("click", async () => {
+ try{
+  if(!navigator.mediaDevices ||
+     !navigator.mediaDevices.getUserMedia){
+   throw new Error("Microphone recording requires HTTPS and browser permission.");
+  }
+
+  if(!window.MediaRecorder){
+   throw new Error("Your browser does not support audio recording.");
+  }
+
+  audioStream = await navigator.mediaDevices.getUserMedia({
+   audio:true
+  });
+
+  let options = {};
+  if(MediaRecorder.isTypeSupported("audio/webm")){
+   options.mimeType = "audio/webm";
+  }
+
+  mediaRecorder = new MediaRecorder(audioStream,options);
+  const chunks = [];
+
+  mediaRecorder.ondataavailable = event => {
+   if(event.data.size > 0) chunks.push(event.data);
+  };
+
+  mediaRecorder.onstop = () => {
+   recordedBlob = new Blob(chunks,{
+    type:mediaRecorder.mimeType || "audio/webm"
+   });
+
+   selectedFile = null;
+
+   $("audioPlayer").src =
+    URL.createObjectURL(recordedBlob);
+
+   $("recordInfo").textContent =
+    "Recording ready: " +
+    Math.round(recordedBlob.size / 1024) + " KB";
+
+   $("uploadBtn").disabled = recordedBlob.size === 0;
+
+   if(audioStream){
+    audioStream.getTracks().forEach(track => track.stop());
+    audioStream = null;
+   }
+  };
+
+  mediaRecorder.start();
+
+  $("recordBtn").disabled = true;
+  $("stopBtn").disabled = false;
+  $("uploadBtn").disabled = true;
+
+  $("recordInfo").textContent = "Recording in progress...";
+  message("Recording started.");
+
+ }catch(error){
+  message("Recording error: " + error.message);
+ }
+});
+
+$("stopBtn").addEventListener("click", () => {
+ if(mediaRecorder && mediaRecorder.state === "recording"){
+  mediaRecorder.stop();
+  $("recordBtn").disabled = false;
+  $("stopBtn").disabled = true;
+  message("Recording stopped. You can listen before saving.");
+ }
+});
+
+$("vocalFile").addEventListener("change", event => {
+ const file = event.target.files[0];
+
+ if(!file) return;
+
+ if(!file.type.startsWith("audio/")){
+  message("Please select an audio file.");
+  event.target.value = "";
+  return;
+ }
+
+ if(file.size > 50 * 1024 * 1024){
+  message("This first version accepts audio files up to 50 MB.");
+  event.target.value = "";
+  return;
+ }
+
+ setFile(file);
+ message("Audio selected. Listen before saving.");
+});
+
+$("uploadBtn").addEventListener("click", async () => {
+ try{
+  const {data,error:authError} = await db.auth.getSession();
+
+  if(authError || !data.session){
+   throw new Error("Please log in again.");
+  }
+
+  const user = data.session.user;
+
+  const file = selectedFile || (
+   recordedBlob ?
+    new File(
+     [recordedBlob],
+     "recording.webm",
+     {type:recordedBlob.type}
+    ) : null
+  );
+
+  if(!file) throw new Error("Record or select an audio file first.");
+
+  if(file.size > 50 * 1024 * 1024){
+   throw new Error("File is larger than 50 MB.");
+  }
+
+  $("uploadBtn").disabled = true;
+  message("Uploading your vocal. Please wait...");
+
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+
+  const path =
+   user.id + "/vocal/" +
+   Date.now() + "_" + safeName;
+
+  const {data:uploadData,error:uploadError} =
+   await db.storage
+    .from("ai-studio")
+    .upload(path,file,{
+     cacheControl:"3600",
+     upsert:false,
+     contentType:file.type || "audio/webm"
+    });
+
+  if(uploadError) throw uploadError;
+
+  message(
+   "Success! Your vocal has been saved privately.\n\n" +
+   "File: " + uploadData.path +
+   "\n\nYou can now return to your AI Studio."
+  );
+
+ }catch(error){
+  message("Upload error: " + error.message);
+ }finally{
+  $("uploadBtn").disabled =
+   !(selectedFile || recordedBlob);
+ }
+});
+
+checkLogin();
+
+})();
+</script>
+</body>
+                                                                </html>

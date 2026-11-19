@@ -355,8 +355,14 @@ async function checkLogin() {
   $("loginNotice").classList.add("hidden");
   $("studioApp").classList.remove("hidden");
 
-  await loadSavedProjects();
-}
+  if (typeof loadSavedProjects === "function") {
+    try {
+      await loadSavedProjects();
+    } catch (err) {
+      console.error("Could not load saved projects:", err);
+    }
+  }
+} // This closes checkLogin
 
 function getAccessToken() {
   return db.auth.getSession().then(({data,error}) => {

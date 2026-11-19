@@ -365,3 +365,428 @@ $("useTranslationBtn").addEventListener("click", () => {
   if (!translationText.trim()) return status("translatorStatus", "Translate something first.", true);
   $("lyrics").value = translationText; status("translatorStatus", "Translated lyrics placed in the lyrics editor.");
 });
+  async function connectSupabase() {
+  if (!window.supabase || !window.supabase.createClient) {
+    throw new Error("Supabase library did not load. Check your internet connection and reload.");
+  }
+
+  if (!db) {
+    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    });
+
+    const { data } = db.auth.onAuthStateChange((_event, session) => {
+      currentUser = session?.user || null;
+
+      if (!currentUser) {
+        $("studioApp").classList.add("hidden");
+        $("connectionCard").classList.remove("hidden");
+        setConnection("Please log in first", "Sign in to SEQUENCE LIZ MUSIC in the main app, then reopen AI Studio.", true);
+      } else {
+        $("connectionCard").classList.add("hidden");
+        $("studioApp").classList.remove("hidden");
+      }
+    });
+
+    authListener = data?.subscription;
+  }
+
+  setConnection("Checking your account…", "Checking your saved login session.");
+
+  const result = await withTimeout(
+    db.auth.getSession(),
+    12000,
+    "The account check timed out. Check your connection and tap Reconnect."
+  );
+
+  if (result.error) throw result.error;
+
+  currentUser = result.data?.session?.user || null;
+
+  if (!currentUser) {
+    $("studioApp").classList.add("hidden");
+    setConnection(
+      "Please log in first",
+      "Open the main SEQUENCE LIZ MUSIC page, log in, and then return to AI Studio.",
+      true
+    );
+    return;
+  }
+
+  $("connectionCard").classList.add("hidden");
+  $("studioApp").classList.remove("hidden");
+
+  await loadSavedProjects();
+}
+
+$("retryBtn").addEventListener("click", async () => {
+  $("retryBtn").disabled = true;
+  setConnection("Reconnecting…", "Checking Supabase and your login session.");
+
+  try {
+    await connectSupabase();
+    status("connectionStatus", "Connection check completed.");
+  } catch (e) {
+    setConnection("Connection problem", e.message, true);
+  } finally {
+    $("retryBtn").disabled = false;
+  }
+});
+
+$("startRecordBtn").addEventListener("click", async () => {
+  try {
+    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+      throw new Error("Recording is not supported in this browser. Try a current version of Chrome.");
+    }
+
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const types = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"];
+    const mimeType = types.find(t => MediaRecorder.isTypeSupported(t));
+
+    recorder = mimeType
+      ? new MediaRecorder(stream, { mimeType })
+      : new MediaRecorder(stream);
+
+    recordedChunks = [];
+    recordedBlob = null;
+
+    recorder.ondataavailable = e => {
+      if (e.data?.size) recordedChunks.push(e.data);
+    };
+
+    recorder.onerror = e => {
+      status("recordStatus", e.error?.message || "Recording error.", true);
+      stream.getTracks().forEach(t => t.stop());
+    };
+
+    recorder.onstop = () => {
+      recordedBlob = new Blob(recordedChunks, {
+        type: recorder.mimeType || "audio/webm"
+      });
+
+      revokeUrl(vocalObjectURL);
+      vocalObjectURL = URL.createObjectURL(recordedBlob);
+
+      $("recordPreview").src = vocalObjectURL;
+      $("recordPreview").classList.remove("hidden");
+      $("vocalPlayer").src = vocalObjectURL;
+
+      stream.getTracks().forEach(t => t.stop());
+
+      $("startRecordBtn").disabled = false;
+      $("stopRecordBtn").disabled = true;
+
+      status("recordStatus", "Recording ready. Play it or save it to your project.");
+    };
+
+    recorder.start();
+
+    $("startRecordBtn").disabled = true;
+    $("stopRecordBtn").disabled = false;
+
+    status("recordStatus", "Recording… sing your song.");
+
+  } catch (e) {
+    status("recordStatus", e.message || "Could not start recording.", true);
+  }
+});
+
+$("stopRecordBtn").addEventListener("click", () => {
+  if (recorder && recorder.state !== "inactive") {
+    recorder.stop();
+  }
+});
+
+$("vocalUpload").addEventListener("change", () => {
+  recordedBlob = null;
+
+  const file = $("vocalUpload").files[0];
+  if (!file) return;
+
+  revokeUrl(vocalObjectURL);
+  vocalObjectURL = URL.createObjectURL(file);
+
+  $("vocalPlayer").src = vocalObjectURL;
+  $("recordPreview").classList.add("hidden");
+
+  status("vocalStatus", "Vocal selected: " + file.name);
+});
+
+$("playVocalBtn").addEventListener("click", async () => {
+  if (!$("vocalPlayer").src) {
+    return status("vocalStatus", "Record or upload a vocal first.", true);
+  }
+
+  try {
+    await $("vocalPlayer").play();
+  } catch (e) {
+    status("vocalStatus", e.message, true);
+  }
+});
+
+$("beatUpload").addEventListener("change", () => {
+  const file = $("beatUpload").files[0];
+  if (!file) return;
+
+  revokeUrl(beatObjectURL);
+  beatObjectURL = URL.createObjectURL(file);
+
+  $("beatPlayer").src = beatObjectURL;
+  status("mixStatus", "Instrumental selected: " + file.name);
+});
+
+$("vocalVolume").addEventListener("input", () => {
+  $("vocalPlayer").volume = Number($("vocalVolume").value);
+});
+
+$("beatVolume").addEventListener("input", () => {
+  $("beatPlayer").volume = Number($("beatVolume").value);
+});
+
+$("previewMixBtn").addEventListener("click", async () => {
+  if (!$("vocalPlayer").src || !$("beatPlayer").src) {
+    return status("mixStatus", "Choose or record your vocal and upload an instrumental first.", true);
+  }
+
+  try {
+    $("vocalPlayer").pause();
+    $("beatPlayer").pause();
+
+    $("vocalPlayer").currentTime = 0;
+    $("beatPlayer").currentTime = 0;
+
+    $("vocalPlayer").volume = Number($("vocalVolume").value);
+    $("beatPlayer").volume = Number($("beatVolume").value);
+
+    await Promise.all([
+      $("vocalPlayer").play(),
+      $("beatPlayer").play()
+    ]);
+
+    status("mixStatus", "Playing vocal and instrumental together. Use Stop Preview to stop both.");
+
+  } catch (e) {
+    status("mixStatus", e.message || "Could not play both audio files.", true);
+  }
+});
+
+function stopMix() {
+  $("vocalPlayer").pause();
+  $("beatPlayer").pause();
+  status("mixStatus", "Preview stopped.");
+}
+
+$("stopMixBtn").addEventListener("click", stopMix);
+
+$("vocalPlayer").addEventListener("ended", () => {
+  $("beatPlayer").pause();
+});
+
+async function loadSavedProjects() {
+  if (!currentUser) return;
+
+  const box = $("savedProjects");
+  box.innerHTML = "<p class='muted'>Loading saved projects…</p>";
+
+  const { data, error } = await withTimeout(
+    db.from("studio_projects")
+      .select("id,title,lyrics,vocal_path,beat_path,created_at")
+      .eq("user_id", currentUser.id)
+      .order("created_at", { ascending: false })
+      .limit(50),
+    15000,
+    "Loading saved projects timed out."
+  );
+
+  if (error) {
+    box.innerHTML = "";
+    const p = document.createElement("p");
+    p.className = "status";
+    p.textContent = "Could not load saved projects: " + error.message;
+    box.append(p);
+    return;
+  }
+
+  box.innerHTML = "";
+
+  if (!data?.length) {
+    box.innerHTML = "<p class='muted'>No saved recordings yet.</p>";
+    return;
+  }
+
+  for (const item of data) {
+    const div = document.createElement("div");
+    div.className = "project";
+
+    const title = document.createElement("strong");
+    title.textContent = item.title || "Untitled project";
+
+    const date = document.createElement("p");
+    date.className = "muted";
+    date.textContent = item.created_at
+      ? new Date(item.created_at).toLocaleString()
+      : "";
+
+    div.append(title, date);
+
+    if (item.lyrics) {
+      const lyrics = document.createElement("textarea");
+      lyrics.readOnly = true;
+      lyrics.value = item.lyrics;
+      lyrics.setAttribute("aria-label", "Saved lyrics");
+      div.append(lyrics);
+
+      const copy = document.createElement("button");
+      copy.type = "button";
+      copy.className = "secondary";
+      copy.textContent = "Copy saved lyrics";
+
+      copy.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(item.lyrics);
+          status("saveStatus", "Saved lyrics copied.");
+        } catch (_) {
+          status("saveStatus", "Clipboard unavailable. Select the lyrics manually.");
+        }
+      });
+
+      div.append(copy);
+    }
+
+    if (item.vocal_path) {
+      const link = document.createElement("a");
+      link.className = "button";
+      link.textContent = "Play / Open saved vocal";
+      link.href = "#";
+
+      link.addEventListener("click", async ev => {
+        ev.preventDefault();
+
+        const { data: blobData, error: downloadError } =
+          await db.storage.from(BUCKET).download(item.vocal_path);
+
+        if (downloadError) {
+          status("saveStatus", "Could not open recording: " + downloadError.message, true);
+          return;
+        }
+
+        const url = URL.createObjectURL(blobData);
+        const audio = document.createElement("audio");
+        audio.controls = true;
+        audio.src = url;
+        audio.style.display = "block";
+
+        div.append(audio);
+        link.classList.add("hidden");
+      });
+
+      div.append(link);
+    }
+
+    box.append(div);
+  }
+}
+
+$("refreshProjectsBtn").addEventListener("click", async () => {
+  const btn = $("refreshProjectsBtn");
+  btn.disabled = true;
+
+  try {
+    await loadSavedProjects();
+  } catch (e) {
+    status("saveStatus", e.message, true);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+$("saveProjectBtn").addEventListener("click", async () => {
+  const btn = $("saveProjectBtn");
+  btn.disabled = true;
+  status("saveStatus", "Saving project…");
+
+  try {
+    if (!currentUser) {
+      throw new Error("Your account is not connected. Tap Reconnect.");
+    }
+
+    const vocal = currentVocalFile();
+
+    if (!vocal) {
+      throw new Error("Record or upload a vocal before saving.");
+    }
+
+    const projectName =
+      $("projectName").value.trim() ||
+      $("songTitle").value.trim() ||
+      "Untitled song";
+
+    const ext = (vocal.name && vocal.name.includes("."))
+      ? vocal.name.split(".").pop().toLowerCase().replace(/[^a-z0-9]/g, "")
+      : "webm";
+
+    const path =
+      currentUser.id + "/" + Date.now() + "_" + safeFileName("vocal." + ext);
+
+    const { error: uploadError } = await db.storage
+      .from(BUCKET)
+      .upload(path, vocal, {
+        contentType: vocal.type || "audio/webm",
+        upsert: false
+      });
+
+    if (uploadError) {
+      throw new Error("Vocal upload failed: " + uploadError.message);
+    }
+
+    const row = {
+      user_id: currentUser.id,
+      title: projectName,
+      lyrics: $("lyrics").value || "",
+      vocal_path: path,
+      beat_path: null
+    };
+
+    const { error: insertError } = await db
+      .from("studio_projects")
+      .insert(row);
+
+    if (insertError) {
+      throw new Error("Recording uploaded, but project details could not be saved: " + insertError.message);
+    }
+
+    status("saveStatus", "Project and vocal saved successfully.");
+    await loadSavedProjects();
+
+  } catch (e) {
+    status("saveStatus", e.message || "Could not save project.", true);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+window.addEventListener("beforeunload", () => {
+  revokeUrl(vocalObjectURL);
+  revokeUrl(beatObjectURL);
+
+  if (authListener) {
+    authListener.unsubscribe();
+  }
+});
+
+connectSupabase().catch(e => {
+  setConnection(
+    "Could not connect",
+    e.message || "Unexpected connection error. Check your connection and tap Reconnect.",
+    true
+  );
+});
+
+})();
+</script>
+</body>
+</html>

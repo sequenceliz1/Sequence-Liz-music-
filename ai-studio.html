@@ -1,1 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101018">
+<title>SEQUENCE LIZ MUSIC — AI Studio</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#101018;--panel:#1b1b27;--panel2:#252536;--text:#f5f5fa;--muted:#aaaabd;--accent:#b58cff;--border:#38384d;--danger:#ff7777;--success:#6fe0a1}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif;line-height:1.5}
+header{padding:20px 16px;background:#171724;border-bottom:1px solid var(--border)}
+header h1{margin:0;font-size:23px}
+header p{margin:5px 0 0;color:var(--muted)}
+main{max-width:900px;margin:auto;padding:14px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:17px;margin:14px 0}
+h2{font-size:20px;margin:0 0 12px}
+h3{font-size:16px;margin:18px 0 8px}
+p{color:var(--muted)}
+label{display:block;margin:12px 0 6px}
+input,select,textarea{width:100%;padding:13px;border-radius:10px;border:1px solid var(--border);background:#11111b;color:white;font-size:16px}
+textarea{min-height:110px;resize:vertical}
+input[type=range]{padding:8px 0;accent-color:var(--accent)}
+button,.button{border:0;border-radius:10px;padding:12px 16px;background:var(--accent);color:#171322;font-weight:bold;font-size:15px;margin:6px 4px 6px 0;cursor:pointer;display:inline-block;text-decoration:none}
+button.secondary{background:var(--panel2);color:white;border:1px solid var(--border)}
+button.danger{background:#572c38;color:white}
+button:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.row>*{flex:1;min-width:0}
+.notice{background:#29243a;border:1px solid #51416d;padding:13px;border-radius:10px;color:#e7dafa}
+.status{font-size:14px;color:var(--success);min-height:22px;overflow-wrap:anywhere}
+.muted{color:var(--muted);font-size:13px}
+.line-item{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)}
+.line-item textarea{min-height:75px}
+audio{width:100%;margin-top:12px}
+hr{border:0;border-top:1px solid var(--border);margin:18px 0}
+.hidden{display:none!important}
+footer{text-align:center;padding:25px;color:var(--muted)}
+.project{padding:13px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere}
+.project:last-child{border-bottom:0}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+@media(max-width:600px){
+main{padding:10px}
+.line-item{grid-template-columns:1fr}
+.row>*{flex:1 1 100%}
+button{min-height:44px}
+}
+</style>
+</head>
+<body>
 
+<header>
+<h1>🎵 SEQUENCE LIZ MUSIC</h1>
+<p>AI Music Studio — Your voice. Your lyrics. Your sound.</p>
+<div class="top-actions">
+<a class="button secondary" href="index.html">← Back to Artist Music</a>
+<button id="retryBtn" class="secondary" type="button">Reconnect</button>
+</div>
+</header>
+
+<main>
+
+<section id="connectionCard" class="card">
+<h2 id="connectionTitle">Connecting to your account…</h2>
+<p id="connectionText">Please wait while SEQUENCE LIZ MUSIC checks your sign-in session.</p>
+<p id="connectionStatus" class="status"></p>
+</section>
+
+<div id="studioApp" class="hidden">
+
+<div class="notice">
+Keep your real voice as the lead vocal. Write and translate lyrics, record or upload your vocal, add an instrumental, preview both together, and save your project.
+<br><strong>Important:</strong> The preview is not a professionally mastered downloadable mix.
+</div>
+
+<section class="card">
+<h2>✍️ AI Songwriter</h2>
+
+<label for="songTitle">Song title</label>
+<input id="songTitle" maxlength="150" placeholder="Enter your song title">
+
+<label for="songTopic">What should the song be about?</label>
+<textarea id="songTopic" placeholder="Describe the story, message or idea of your song…"></textarea>
+
+<div class="row">
+<div>
+<label for="songGenre">Music genre</label>
+<select id="songGenre">
+<option>Afrobeats</option>
+<option>Afropop</option>
+<option>Gospel</option>
+<option>Highlife</option>
+<option>Hip-hop</option>
+<option>R&B</option>
+<option>Reggae</option>
+<option>Dancehall</option>
+<option>Pop</option>
+<option>Country</option>
+<option>Jazz</option>
+<option>Traditional</option>
+<option>Other</option>
+</select>
+</div>
+
+<div>
+<label for="songMood">Mood</label>
+<select id="songMood">
+<option>Inspirational</option>
+<option>Romantic</option>
+<option>Happy</option>
+<option>Emotional</option>
+<option>Sad</option>
+<option>Worship</option>
+<option>Celebration</option>
+<option>Motivational</option>
+<option>Peaceful</option>
+</select>
+</div>
+</div>
+
+<label for="songLanguage">Language to write in</label>
+<select id="songLanguage">
+<option>English</option>
+<option>Nigerian Pidgin</option>
+<option>Igbo</option>
+<option>Yoruba</option>
+<option>Hausa</option>
+<option>French</option>
+<option>Spanish</option>
+<option>Other</option>
+</select>
+
+<label for="songStructure">Song structure</label>
+<select id="songStructure">
+<option>Verse 1, Chorus, Verse 2, Chorus, Bridge, Final Chorus</option>
+<option>Verse 1, Chorus, Verse 2, Chorus</option>
+<option>Short song</option>
+<option>Free structure</option>
+</select>
+
+<label for="songInstructions">Extra instructions</label>
+<textarea id="songInstructions" placeholder="Tell the songwriter what to include or avoid…"></textarea>
+
+<button id="writeSongBtn" type="button">✨ Write My Song</button>
+<p id="writerStatus" class="status"></p>
+</section>
+
+<section class="card">
+<h2>📝 Your Lyrics</h2>
+
+<label for="lyrics">Edit your lyrics here</label>
+<textarea id="lyrics" placeholder="Your generated or original lyrics will appear here…"></textarea>
+
+<div class="row">
+<button id="copyLyricsBtn" class="secondary" type="button">Copy Lyrics</button>
+<button id="clearLyricsBtn" class="secondary" type="button">Clear Lyrics</button>
+</div>
+<p id="lyricsStatus" class="status"></p>
+</section>
+
+<section class="card">
+<h2>🌍 AI Lyrics Translator</h2>
+
+<label for="sourceLanguage">Original language</label>
+<select id="sourceLanguage">
+<option>English</option>
+<option>Igbo</option>
+<option>Yoruba</option>
+<option>Hausa</option>
+<option>Nigerian Pidgin</option>
+<option>French</option>
+<option>Spanish</option>
+<option>Other</option>
+</select>
+
+<label for="targetLanguage">Translate into</label>
+<select id="targetLanguage">
+<option>Igbo</option>
+<option>English</option>
+<option>Yoruba</option>
+<option>Hausa</option>
+<option>Nigerian Pidgin</option>
+<option>French</option>
+<option>Spanish</option>
+<option>Portuguese</option>
+<option>Arabic</option>
+<option>Swahili</option>
+<option>Other</option>
+</select>
+
+<label for="translationMode">Translation method</label>
+<select id="translationMode">
+<option value="line">Line by line</option>
+<option value="whole">Whole song</option>
+</select>
+
+<button id="translateBtn" type="button">🌐 Translate Lyrics</button>
+<p id="translatorStatus" class="status"></p>
+
+<h3>Original and translated lyrics</h3>
+<div id="translationResults">
+<p class="muted">Your translation will appear here.</p>
+</div>
+
+<div class="row">
+<button id="copyTranslationBtn" class="secondary" type="button">Copy Translation</button>
+<button id="useTranslationBtn" class="secondary" type="button">Use Translation as Lyrics</button>
+</div>
+</section>
+
+<section class="card">
+<h2>🎙️ Record Your Own Vocal</h2>
+<p>Record your real voice using your device microphone. Your browser may ask for microphone permission.</p>
+
+<button id="startRecordBtn" type="button">● Start Recording</button>
+<button id="stopRecordBtn" class="danger" type="button" disabled>■ Stop Recording</button>
+
+<p id="recordStatus" class="status"></p>
+<audio id="recordPreview" controls class="hidden"></audio>
+
+<label for="vocalUpload">Or upload an existing vocal recording</label>
+<input id="vocalUpload" type="file" accept="audio/*">
+
+<button id="playVocalBtn" class="secondary" type="button">Play Selected Vocal</button>
+<p id="vocalStatus" class="status"></p>
+</section>
+
+<section class="card">
+<h2>🎼 Instrumental / Beat</h2>
+
+<label for="beatUpload">Upload your instrumental</label>
+<input id="beatUpload" type="file" accept="audio/*">
+
+<label for="vocalVolume">Vocal volume</label>
+<input id="vocalVolume" type="range" min="0" max="1" step=".05" value="1">
+
+<label for="beatVolume">Instrumental volume</label>
+<input id="beatVolume" type="range" min="0" max="1" step=".05" value=".7">
+
+<button id="previewMixBtn" type="button">▶ Preview Vocal + Instrumental</button>
+<button id="stopMixBtn" class="secondary" type="button">Stop Preview</button>
+
+<p id="mixStatus" class="status"></p>
+<audio id="vocalPlayer" controls></audio>
+<audio id="beatPlayer" controls></audio>
+
+<p class="muted">This is a browser playback preview. It does not yet create an AI-generated beat, remove noise, master audio, or export a final mixed master.</p>
+</section>
+
+<section class="card">
+<h2>💾 Save My AI Studio Project</h2>
+
+<label for="projectName">Project name</label>
+<input id="projectName" maxlength="150" placeholder="My new song">
+
+<button id="saveProjectBtn" type="button">Save Project and Vocal</button>
+<p id="saveStatus" class="status"></p>
+
+<hr>
+
+<h3>My saved recordings</h3>
+<button id="refreshProjectsBtn" class="secondary" type="button">Refresh Saved Recordings</button>
+<div id="savedProjects">
+<p class="muted">Saved projects will appear here.</p>
+</div>
+</section>
+
+</div>
+</main>
+
+<footer>SEQUENCE LIZ MUSIC · Your voice, your creativity.</footer>
+
+<script>
+(() => {
+"use strict";
+
+const SUPABASE_URL = "https://wehxrlxyqiidivvinjwj.supabase.co";
+const SUPABASE_KEY = "sb_publishable__U5zTR-UcFxxiq_uAHMVzA_G5F8lWrs";
+const BUCKET = "ai-studio";
+
+const $ = id => document.getElementById(id);
+
+let db = null;
+let currentUser = null;
+let recorder = null;
+let recordedChunks = [];
+let recordedBlob = null;
+let vocalObjectURL = null;
+let beatObjectURL = null;
+let translationText = "";
+let authListener = null;
+
+function status(id,text,isError=false){
+const el=$(id);
+if(el){
+el.textContent=text||"";
+el.style.color=isError?"var(--danger)":"var(--success)";
+}
+}
+
+function setConnection(title,text,error=false){
+$("connectionTitle").textContent=title;
+$("connectionText").textContent=text;
+status("connectionStatus","");
+$("connectionTitle").style.color=error?"var(--danger)":"var(--text)";
+}
+
+function withTimeout(promise,ms,label){
+let timer;
+return Promise.race([
+promise,
+new Promise((_,reject)=>{
+timer=setTimeout(()=>reject(new Error(label)),ms);
+})
+]).finally(()=>clearTimeout(timer));
+}
+
+function safeFileName(name){
+return String(name||"recording").replace(/[^a-zA-Z0-9._-]/g,"_").slice(-100);
+}
+
+function currentVocalFile(){
+if(recordedBlob){
+const ext=recordedBlob.type.includes("mp4")?"m4a":"webm";
+return new File([recordedBlob],"recording."+ext,{type:recordedBlob.type||"audio/webm"});
+}
+return $("vocalUpload").files[0]||null;
+}
+
+function revokeUrl(url){
+if(url)URL.revokeObjectURL(url);
+}
+
+async function connectSupabase(){
+
+if(!window.supabase||!window.supabase.createClient){
+throw new Error("Supabase library did not load. Check your internet connection and reload.");
+}
+
+if(!db){
+
+db=window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY,
+{
+auth:{
+persistSession:true,
+autoRefreshToken:true,
+detectSessionInUrl:true
+}
+}
+);
+
+const {data}=db.auth.onAuthStateChange((_event,session)=>{
+currentUser=session?.user||null;
+
+if(!currentUser){
+$("studioApp").classList.add("hidden");
+$("connectionCard").classList.remove("hidden");
+setConnection(
+"Please log in first",
+"Sign in to SEQUENCE LIZ MUSIC in the main app, then reopen AI Studio.",
+true
+);
+}else{
+$("connectionCard").classList.add("hidden");
+$("studioApp").classList.remove("hidden");
+}
+});
+
+authListener=data?.subscription;
+}
+
+setConnection(
+"Checking your account…",
+"Checking your saved SEQUENCE LIZ MUSIC login session."
+);
+
+const result=await withTimeout(
+db.auth.getSession(),
+12000,
+"The account check timed out. Check your connection and tap Reconnect."
+);
+
+if(result.error)throw result.error;
+
+currentUser=result.data?.session?.user||null;
+
+if(!currentUser){
+$("studioApp").classList.add("hidden");
+setConnection(
+"Please log in first",
+"Your login session was not found. Open the main SEQUENCE LIZ MUSIC page, log in, and then return to AI Studio.",
+true
+);
+return;
+}
+
+$("connectionCard").classList.add("hidden");
+$("studioApp").classList.remove("hidden");
+
+await loadSavedProjects();
+}
+
+async function getAccessToken(){
+
+const result=await withTimeout(
+db.auth.getSession(),
+10000,
+"Session check timed out. Reconnect and try again."
+);
+
+if(result.error)throw result.error;
+
+const session=result.data?.session;
+
+if(!session?.access_token){
+throw new Error("Your login session has expired. Log in again through the main app.");
+}
+
+return session.access_token;
+}
+
+async function callAI(payload){
+
+if(!db||!currentUser){
+throw new Error("Your account is not connected. Tap Reconnect.");
+}
+
+const token=await getAccessToken();
+
+const {data,error}=await withTimeout(
+db.functions.invoke("ai-studio",{
+body:payload,
+headers:{Authorization:"Bearer "+token}
+}),
+60000,
+"The AI request took too long. Please try again."
+);
+
+if(error){
+
+let detail=error.message||"AI service request failed.";
+
+try{
+const ctx=error.context;
+if(ctx&&typeof ctx.json==="function"){
+const body=await ctx.json();
+detail=body.error||body.message||detail;
+}
+}catch(_){}
+
+throw new Error(detail);
+}
+
+if(!data||typeof data.text!=="string"||!data.text.trim()){
+throw new Error(data?.error||"The AI service returned an empty response.");
+}
+
+return data.text;
+}
+
+$("retryBtn").addEventListener("click",async()=>{
+$("retryBtn").disabled=true;
+setConnection("Reconnecting…","Checking Supabase and your login session.");
+
+try{
+await connectSupabase();
+status("connectionStatus","Connection check completed.");
+}catch(e){
+setConnection("Connection problem",e.message,true);
+}finally{
+$("retryBtn").disabled=false;
+}
+});
+
+$("writeSongBtn").addEventListener("click",async()=>{
+
+const topic=$("songTopic").value.trim();
+
+if(!topic){
+return status("writerStatus","Please describe what your song should be about.",true);
+}
+
+const btn=$("writeSongBtn");
+btn.disabled=true;
+status("writerStatus","Writing your song…");
+
+try{
+
+const text=await callAI({
+action:"songwrite",
+title:$("songTitle").value.trim(),
+topic:topic,
+genre:$("songGenre").value,
+mood:$("songMood").value,
+language:$("songLanguage").value,
+structure:$("songStructure").value,
+instructions:$("songInstructions").value.trim()
+});
+
+$("lyrics").value=text;
+status("writerStatus","Song draft created. You can edit it below.");
+
+}catch(e){
+status("writerStatus",e.message||"Songwriting failed.",true);
+}finally{
+btn.disabled=false;
+}
+});
+
+$("copyLyricsBtn").addEventListener("click",async()=>{
+
+const text=$("lyrics").value;
+
+if(!text.trim()){
+return status("lyricsStatus","There are no lyrics to copy.",true);
+}
+
+try{
+await navigator.clipboard.writeText(text);
+status("lyricsStatus","Lyrics copied.");
+}catch(_){
+$("lyrics").focus();
+$("lyrics").select();
+status("lyricsStatus","Select the highlighted lyrics and copy them manually.");
+}
+});
+
+$("clearLyricsBtn").addEventListener("click",()=>{
+
+if(confirm("Clear the lyrics editor?")){
+$("lyrics").value="";
+$("translationResults").innerHTML="<p class='muted'>Your translation will appear here.</p>";
+translationText="";
+status("lyricsStatus","Lyrics cleared.");
+}
+});
+
+function displayLineTranslations(original,translated){
+
+const box=$("translationResults");
+box.replaceChildren();
+
+const a=original.split(/\r?\n/);
+const b=translated.split(/\r?\n/);
+
+for(let i=0;i<Math.max(a.length,b.length);i++){
+
+const row=document.createElement("div");
+row.className="line-item";
+
+const left=document.createElement("textarea");
+left.readOnly=true;
+left.setAttribute("aria-label","Original line "+(i+1));
+left.value=a[i]||"";
+
+const right=document.createElement("textarea");
+right.readOnly=true;
+right.setAttribute("aria-label","Translated line "+(i+1));
+right.value=b[i]||"";
+
+row.append(left,right);
+box.append(row);
+}
+}
+
+$("translateBtn").addEventListener("click",async()=>{
+
+const lyrics=$("lyrics").value.trim();
+
+if(!lyrics){
+return status("translatorStatus","Write or generate lyrics first.",true);
+}
+
+const btn=$("translateBtn");
+btn.disabled=true;
+status("translatorStatus","Translating your lyrics…");
+
+try{
+
+translationText=await callAI({
+action:"translate",
+lyrics:lyrics,
+sourceLanguage:$("sourceLanguage").value,
+targetLanguage:$("targetLanguage").value,
+mode:$("translationMode").value
+});
+
+displayLineTranslations(lyrics,translationText);
+
+status("translatorStatus","Translation completed. Review the wording and dialect.");
+
+}catch(e){
+status("translatorStatus",e.message||"Translation failed.",true);
+}finally{
+btn.disabled=false;
+}
+});
+
+$("copyTranslationBtn").addEventListener("click",async()=>{
+
+if(!translationText.trim()){
+return status("translatorStatus","Translate something first.",true);
+}
+
+try{
+await navigator.clipboard.writeText(translationText);
+status("translatorStatus","Translation copied.");
+}catch(_){
+status("translatorStatus","Copy is unavailable. Select the translated lines manually.");
+}
+});
+
+$("useTranslationBtn").addEventListener("click",()=>{
+
+if(!translationText.trim()){
+return status("translatorStatus","Translate something first.",true);
+}
+
+$("lyrics").value=translationText;
+status("translatorStatus","Translated lyrics placed in the lyrics editor.");
+});
+
+$("startRecordBtn").addEventListener("click",async()=>{
+
+try{
+
+if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){
+throw new Error("Recording is not supported in this browser. Try a current version of Chrome.");
+}
+
+const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+
+const types=[
+"audio/webm;codecs=opus",
+"audio/webm",
+"audio/mp4"
+];
+
+const mimeType=types.find(t=>MediaRecorder.isTypeSupported(t));
+
+recorder=mimeType?
+new MediaRecorder(stream,{mimeType}):
+new MediaRecorder(stream);
+
+recordedChunks=[];
+recordedBlob=null;
+
+recorder.ondataavailable=e=>{
+if(e.data?.size)recordedChunks.push(e.data);
+};
+
+recorder.onerror=e=>{
+status("recordStatus",e.error?.message||"Recording error.",true);
+stream.getTracks().forEach(t=>t.stop());
+};
+
+recorder.onstop=()=>{
+
+recordedBlob=new Blob(recordedChunks,{
+type:recorder.mimeType||"audio/webm"
+});
+
+revokeUrl(vocalObjectURL);
+
+vocalObjectURL=URL.createObjectURL(recordedBlob);
+
+$("recordPreview").src=vocalObjectURL;
+$("recordPreview").classList.remove("hidden");
+
+$("vocalPlayer").src=vocalObjectURL;
+
+stream.getTracks().forEach(t=>t.stop());
+
+$("startRecordBtn").disabled=false;
+$("stopRecordBtn").disabled=true;
+
+status("recordStatus","Recording ready. Play it or save it to your project.");
+};
+
+recorder.start();
+
+$("startRecordBtn").disabled=true;
+$("stopRecordBtn").disabled=false;
+
+status("recordStatus","Recording… sing your song.");
+
+}catch(e){
+status("recordStatus",e.message||"Could not start recording.",true);
+}
+});
+
+$("stopRecordBtn").addEventListener("click",()=>{
+if(recorder&&recorder.state!=="inactive"){
+recorder.stop();
+}
+});
+
+$("vocalUpload").addEventListener("change",()=>{
+
+recordedBlob=null;
+
+const file=$("vocalUpload").files[0];
+
+if(!file)return;
+
+revokeUrl(vocalObjectURL);
+
+vocalObjectURL=URL.createObjectURL(file);
+
+$("vocalPlayer").src=vocalObjectURL;
+$("recordPreview").classList.add("hidden");
+
+status("vocalStatus","Vocal selected: "+file.name);
+});
+
+$("playVocalBtn").addEventListener("click",async()=>{
+
+if(!$("vocalPlayer").src){
+return status("vocalStatus","Record or upload a vocal first.",true);
+}
+
+try{
+await $("vocalPlayer").play();
+}catch(e){
+status("vocalStatus",e.message,true);
+}
+});
+
+$("beatUpload").addEventListener("change",()=>{
+
+const file=$("beatUpload").files[0];
+
+if(!file)return;
+
+revokeUrl(beatObjectURL);
+
+beatObjectURL=URL.createObjectURL(file);
+
+$("beatPlayer").src=beatObjectURL;
+
+status("mixStatus","Instrumental selected: "+file.name);
+});
+
+$("vocalVolume").addEventListener("input",()=>{
+$("vocalPlayer").volume=Number($("vocalVolume").value);
+});
+
+$("beatVolume").addEventListener("input",()=>

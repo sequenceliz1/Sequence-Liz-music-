@@ -225,6 +225,79 @@ Keep your real voice as the lead vocal. Write and translate lyrics, record or up
 <button id="playVocalBtn" class="secondary" type="button">Play Selected Vocal</button>
 <p id="vocalStatus" class="status"></p>
   </section>
+  <section class="card" id="beatGeneratorCard">
+  <h2>🎹 Free Beat Maker (Basic)</h2>
+
+  <p>
+    This free tool creates simple browser-made rhythm previews.
+    It is not AI-generated music or a professional studio instrumental.
+    You can create two variations, listen, choose one and save it to your project.
+  </p>
+
+  <label for="beatPrompt">Describe the sound you want</label>
+  <textarea id="beatPrompt" placeholder="Example: uplifting Afrobeats groove with warm bass, bright keys and a gentle bounce"></textarea>
+
+  <div class="row">
+    <div>
+      <label for="genGenre">Genre</label>
+      <select id="genGenre">
+        <option>Afrobeats</option>
+        <option>Gospel</option>
+        <option>Amapiano</option>
+        <option>R&amp;B</option>
+        <option>Hip-hop</option>
+        <option>Highlife</option>
+        <option>Dancehall</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="genMood">Mood</label>
+      <select id="genMood">
+        <option>Happy</option>
+        <option>Inspirational</option>
+        <option>Romantic</option>
+        <option>Emotional</option>
+        <option>Peaceful</option>
+        <option>Energetic</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div>
+      <label for="genBpm">Tempo (BPM)</label>
+      <input id="genBpm" type="number" min="60" max="180" value="105">
+    </div>
+
+    <div>
+      <label for="genInstrument">Main sound</label>
+      <select id="genInstrument">
+        <option>Warm keys</option>
+        <option>Soft piano</option>
+        <option>Bright synth</option>
+        <option>Plucked guitar</option>
+      </select>
+    </div>
+  </div>
+
+  <button id="generateBeatsBtn" type="button">
+    Create Two Beat Options
+  </button>
+
+  <p id="generatorStatus" class="status" aria-live="polite"></p>
+
+  <div id="generatedBeatOptions"></div>
+
+  <button id="saveGeneratedBeatBtn" type="button" disabled>
+    Save Selected Beat to My Project
+  </button>
+
+  <p class="muted">
+    Saving stores the generated audio in your private AI Studio storage.
+    This is not a paid download or purchase.
+  </p>
+  </section>
       <section class="card">
       <h2>🎼 Instrumental / Beat</h2>
       <label for="beatUpload">Upload your instrumental</label><input id="beatUpload" type="file" accept="audio/*">

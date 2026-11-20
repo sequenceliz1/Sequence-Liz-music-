@@ -1,1 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101018">
+<title>SEQUENCE LIZ MUSIC — Super Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<style>
+:root {
+  --bg:#101018;
+  --panel:#1b1b27;
+  --panel2:#242435;
+  --text:#f7f7fb;
+  --muted:#a9a9bb;
+  --accent:#c49aff;
+  --line:#343447;
+  --good:#62d69a;
+  --bad:#ff7777;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,sans-serif}
+button,input{font:inherit}
+button{border:0;border-radius:9px;padding:12px 15px;background:var(--accent);color:#171321;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+input{width:100%;padding:13px;border:1px solid var(--line);border-radius:9px;background:#11111a;color:white}
+.hidden{display:none!important}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.wrap{max-width:1100px;margin:auto;padding:18px}
+.login-area{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at top,#302345,#101018 60%)}
+.login-card{width:min(430px,100%);padding:25px;background:var(--panel);border:1px solid var(--line);border-radius:18px}
+.brand{font-size:19px;font-weight:900;letter-spacing:1px}
+.brand span{color:var(--accent)}
+.login-card h1{margin-top:28px}
+.field{margin:15px 0}
+.field label{display:block;margin-bottom:7px;color:var(--muted)}
+.password-row{display:flex;gap:8px}
+.password-row input{flex:1;min-width:0}
+.password-row button{min-width:48px}
+#loginMessage{min-height:22px;color:var(--muted);overflow-wrap:anywhere}
+header{background:#171722;border-bottom:1px solid var(--line)}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px;margin-top:18px}
+.sidebar,.panel,.stat{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:14px}
+.sidebar button{display:block;width:100%;margin:5px 0;text-align:left;background:transparent;color:var(--text);font-weight:normal}
+.sidebar button.active,.sidebar button:hover{background:var(--panel2);color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.stat strong{display:block;font-size:25px;margin-top:10px;color:var(--accent)}
+.stat span{color:var(--muted);font-size:13px}
+.panel{margin-top:14px}
+.panel h3{margin-top:0}
+.status{padding:10px;border-radius:8px;background:var(--panel2);color:var(--muted);overflow-wrap:anywhere}
+.good{color:var(--good)}
+.warning{color:#ffd27a}
+.danger{color:var(--bad)}
+.mobile-menu{display:none}
+@media(max-width:700px){
+ .layout{grid-template-columns:1fr}
+ .sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+ .sidebar button{font-size:13px}
+ .mobile-menu{display:block}
+}
+</style>
+</head>
+
+<body>
+
+<section id="loginScreen" class="login-area">
+ <div class="login-card">
+  <div class="brand">SEQUENCE <span>LIZ MUSIC</span></div>
+  <h1>Super Admin Login</h1>
+  <p class="muted">Private owner access only.</p>
+
+  <div class="field">
+   <label>Email address</label>
+   <input id="email" type="email" autocomplete="username"
+          placeholder="Your admin email">
+  </div>
+
+  <div class="field">
+   <label>Password</label>
+   <div class="password-row">
+    <input id="password" type="password"
+           autocomplete="current-password" placeholder="Password">
+    <button type="button" id="eyeBtn">👁</button>
+   </div>
+  </div>
+
+  <button id="loginBtn" style="width:100%">Secure Login</button>
+  <p id="loginMessage" role="status"></p>
+  <p class="small muted">Your existing SEQUENCE LIZ MUSIC account is used for authentication.</p>
+ </div>
+</section>
+
+<div id="dashboard" class="hidden">
+ <header>
+  <div class="wrap topbar">
+   <div class="brand">SEQUENCE <span>LIZ MUSIC</span> — ADMIN</div>
+   <div class="row">
+    <span id="adminEmail" class="muted small"></span>
+    <button id="logoutBtn">Log out</button>
+   </div>
+  </div>
+ </header>
+
+ <main class="wrap">
+  <h2>Super Admin Dashboard</h2>
+  <p class="muted">Private owner control centre.</p>
+
+  <div class="layout">
+   <nav class="sidebar" aria-label="Admin sections">
+    <button class="active" data-section="overview">Overview</button>
+    <button data-section="payments">Flutterwave Payments</button>
+    <button data-section="withdrawals">Withdrawals</button>
+    <button data-section="accounts">Bank Accounts</button>
+    <button data-section="engines">AI Engine Wallets</button>
+    <button data-section="studio">AI Studio Settings</button>
+    <button data-section="royalties">Artist Royalties</button>
+    <button data-section="users">Users & Artists</button>
+    <button data-section="reports">Reports & Activity</button>
+    <button data-section="settings">Platform Settings</button>
+   </nav>
+
+   <section id="sectionContent">
+    <h2>Overview</h2>
+
+    <div class="grid">
+     <div class="stat"><span>Registered users</span><strong>—</strong></div>
+     <div class="stat"><span>Artists</span><strong>—</strong></div>
+     <div class="stat"><span>Payments</span><strong>—</strong></div>
+     <div class="stat"><span>Platform earnings</span><strong>—</strong></div>
+    </div>
+
+    <div class="panel">
+     <h3>Security status</h3>
+     <p class="status good">Super Admin identity verified for this session.</p>
+     <p class="muted small">Financial data will appear after the secure backend and payment services are connected.</p>
+    </div>
+   </section>
+  </div>
+ </main>
+</div>
+
+<script>
+const SUPABASE_URL = "https://wehxrlxyqiidivvinjwj.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable__U5zTR-UcFxxiq_uAHMVzA_G5F8lWrs";
+
+const OWNER_ID = "b679ce3d-575e-4504-af6f-9554c25d313e";
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+const $ = id => document.getElementById(id);
+
+function loginMessage(message, isError=false) {
+  $("loginMessage").textContent = message;
+  $("loginMessage").className = isError ? "danger" : "muted";
+}
+
+function showLogin(message="") {
+  $("dashboard").classList.add("hidden");
+  $("loginScreen").classList.remove("hidden");
+  loginMessage(message);
+}
+
+async function verifyAdmin(user) {
+  if (!user || user.id !== OWNER_ID) {
+    throw new Error("This account is not authorised as the Super Admin owner.");
+  }
+
+  const {data, error} = await db.rpc("is_super_admin");
+
+  if (error) {
+    throw new Error("Admin security check failed: " + error.message);
+  }
+
+  if (data !== true) {
+    throw new Error("Super Admin permission was not confirmed.");
+  }
+
+  return true;
+}
+
+async function openDashboard(user) {
+  await verifyAdmin(user);
+
+  $("loginScreen").classList.add("hidden");
+  $("dashboard").classList.remove("hidden");
+  $("adminEmail").textContent = user.email || "";
+}
+
+$("eyeBtn").onclick = () => {
+  const input = $("password");
+  const show = input.type === "password";
+  input.type = show ? "text" : "password";
+  $("eyeBtn").textContent = show ? "🙈" : "👁";
+};
+
+$("loginBtn").onclick = async () => {
+  const email = $("email").value.trim();
+  const password = $("password").value;
+
+  if (!email || !password) {
+    return loginMessage("Enter your email and password.", true);
+  }
+
+  $("loginBtn").disabled = true;
+  loginMessage("Checking your secure admin access...");
+
+  try {
+    const {data, error} = await db.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) throw error;
+
+    await openDashboard(data.user);
+  } catch (error) {
+    await db.auth.signOut();
+    showLogin(error.message || "Admin login failed.");
+  } finally {
+    $("loginBtn").disabled = false;
+  }
+};
+
+$("logoutBtn").onclick = async () => {
+  await db.auth.signOut();
+  showLogin("You have been logged out.");
+};
+
+const sectionText = {
+  overview: {
+    title:"Overview",
+    body:"Your platform overview will be connected to live database records."
+  },
+  payments: {
+    title:"Flutterwave Payments",
+    body:"Payment references, temporary payment accounts, currencies, verified collections and refunds will be connected here."
+  },
+  withdrawals: {
+    title:"Withdrawals",
+    body:"Artist and owner withdrawals, account verification, payout records and transfer statuses will be connected here."
+  },
+  accounts: {
+    title:"Receiving & Bank Accounts",
+    body:"Artists will have one USD account and one local-country account. The Super Admin can manage multiple supported receiving accounts."
+  },
+  engines: {
+    title:"AI Engine Wallets",
+    body:"Soundverse and RoEx balances, API status, usage costs, funding records and low-balance alerts will be connected here."
+  },
+  studio: {
+    title:"AI Studio Settings",
+    body:"AI Music Studio prices, preview rules, generation settings and purchase records will be managed here."
+  },
+  royalties: {
+    title:"Artist Royalties",
+    body:"Music and music-video revenue share: artist 80%, platform 20%. SEQUENCE FAMILY share: creator 90%, platform 10%."
+  },
+  users: {
+    title:"Users & Artists",
+    body:"User profiles, artist accounts, uploads and moderation tools will be connected here."
+  },
+  reports: {
+    title:"Reports & Activity",
+    body:"Financial records, security events, provider usage and admin activity will be connected here."
+  },
+  settings: {
+    title:"Platform Settings",
+    body:"Platform branding, announcements, themes and supported payment settings will be managed here."
+  }
+};
+
+document.querySelectorAll("[data-section]").forEach(button => {
+  button.onclick = () => {
+    document.querySelectorAll("[data-section]").forEach(item =>
+      item.classList.remove("active")
+    );
+    button.classList.add("active");
+
+    const section = sectionText[button.dataset.section];
+
+    $("sectionContent").innerHTML = `
+      <h2>${section.title}</h2>
+      <div class="panel">
+        <p>${section.body}</p>
+        <p class="status warning">
+          Backend connection required — no financial action is enabled yet.
+        </p>
+      </div>
+    `;
+  };
+});
+
+async function checkExistingSession() {
+  const {data, error} = await db.auth.getSession();
+
+  if (error || !data.session) {
+    showLogin();
+    return;
+  }
+
+  try {
+    await openDashboard(data.session.user);
+  } catch (error) {
+    await db.auth.signOut();
+    showLogin(error.message);
+  }
+}
+
+db.auth.onAuthStateChange((event, session) => {
+  if (event === "SIGNED_OUT") {
+    showLogin();
+  }
+});
+
+checkExistingSession();
+</script>
+
+</body>
+  </html>

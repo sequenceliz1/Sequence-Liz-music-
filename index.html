@@ -700,7 +700,7 @@ async function publicUrl(bucket,path){
 async function loadTracks(){
  const {data,error}=await db.from("tracks")
   .select("id,title,artist_name,audio_path,cover_path,lyrics,created_at,profiles(display_name,avatar_url)")
-  .eq("status","published")
+  .eq("status","approved")
   .order("created_at",{ascending:false})
   .limit(100);
 

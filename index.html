@@ -716,7 +716,7 @@ async function loadTracks(){
 function trackCard(t,i){
  const avatar=t.profiles?.avatar_url||"";
  const cover=t.cover_path?
-  db.storage.from(BUCKETS.covers).getPublicUrl(t.cover_path).data.publicUrl:"";
+  db.storage.from("music").getPublicUrl(t.cover_path).data.publicUrl:"";
 
  return `<article class="card">
   <img class="song-art" src="${cover||"https://placehold.co/500x500/242435/ffffff?text=SEQUENCE+LIZ"}" alt="Song cover">

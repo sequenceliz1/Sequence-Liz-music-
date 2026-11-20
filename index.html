@@ -1151,6 +1151,128 @@ async function checkExistingSession(){
 }
 
 checkExistingSession();
+  /* FULL PLAYER DISPLAY CONNECTION */
+
+function updateFullPlayerArtwork() {
+  if (typeof tracks === "undefined" || playIndex < 0) return;
+
+  const song = tracks[playIndex];
+  if (!song) return;
+
+  const cover = song.cover_path
+    ? db.storage.from("music").getPublicUrl(song.cover_path).data.publicUrl
+    : "https://placehold.co/600x600/292438/ffffff?text=SEQUENCE+LIZ";
+
+  $("nowCover").src = cover;
+
+  $("nowArtist").textContent =
+    song.artist_name ||
+    song.profiles?.display_name ||
+    "SEQUENCE LIZ MUSIC";
+}
+
+/* Update artwork when the selected song changes */
+setInterval(updateFullPlayerArtwork, 700);
+
+/* Current playback time */
+audio.addEventListener("timeupdate", () => {
+  if (!audio.duration) return;
+
+  $("elapsedTime").textContent = fmt(audio.currentTime);
+});
+
+/* Shuffle control */
+let shuffleEnabled = false;
+
+$("shuffleBtn").onclick = () => {
+  shuffleEnabled = !shuffleEnabled;
+  $("shuffleBtn").classList.toggle("active", shuffleEnabled);
+};
+
+/* Keep repeat button labels together */
+$("repeatBtn").onclick = () => {
+  repeat = !repeat;
+
+  $("repeatBtn").classList.toggle("active", repeat);
+  $("repeatTextBtn").textContent =
+    "Repeat: " + (repeat ? "On" : "Off");
+};
+
+/* Repeat text button */
+$("repeatTextBtn").onclick = () => {
+  repeat = !repeat;
+
+  $("repeatBtn").classList.toggle("active", repeat);
+  $("repeatTextBtn").textContent =
+    "Repeat: " + (repeat ? "On" : "Off");
+};
+
+/* Favourite button */
+$("likeSongBtn").onclick = () => {
+  if (playIndex < 0 || !tracks[playIndex]) return;
+
+  const id = String(tracks[playIndex].id);
+  let ids = JSON.parse(
+    localStorage.getItem("sequenceLizFavourites") || "[]"
+  );
+
+  if (ids.includes(id)) {
+    ids = ids.filter(item => item !== id);
+    $("likeSongBtn").textContent = "♡";
+  } else {
+    ids.push(id);
+    $("likeSongBtn").textContent = "♥";
+  }
+
+  localStorage.setItem(
+    "sequenceLizFavourites",
+    JSON.stringify(ids)
+  );
+};
+
+/* Share currently playing song */
+$("shareSongBtn").onclick = async () => {
+  if (playIndex < 0 || !tracks[playIndex]) return;
+
+  const song = tracks[playIndex];
+
+  const shareData = {
+    title: song.title,
+    text: "Listen to " + song.title + " on SEQUENCE LIZ MUSIC",
+    url: location.href
+  };
+
+  if (navigator.share) {
+    try {
+      await navigator.share(shareData);
+    } catch (error) {}
+  } else {
+    alert("Copy this page address to share the song: " + location.href);
+  }
+};
+
+/* Offline save is not enabled by this button yet */
+$("downloadSongBtn").onclick = () => {
+  alert("In-platform offline saving will be activated after its secure storage and expiry system is configured.");
+};
+
+/* Keep artwork and artist updated when song changes */
+const originalPlayTrack = window.playTrack;
+
+window.playTrack = async function(index) {
+  await originalPlayTrack(index);
+  updateFullPlayerArtwork();
+
+  const song = tracks[index];
+  if (song) {
+    const ids = JSON.parse(
+      localStorage.getItem("sequenceLizFavourites") || "[]"
+    );
+
+    $("likeSongBtn").textContent =
+      ids.includes(String(song.id)) ? "♥" : "♡";
+  }
+};
 
 </script>
 </body>

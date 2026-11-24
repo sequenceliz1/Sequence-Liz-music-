@@ -645,19 +645,20 @@ $("signupBtn").onclick = async function () {
 
   try {
     const { data, error } = await db.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          display_name: name,
-          role: role
-        }
-      }
-    });
-
-    if (error) {
-      return msg(error.message);
+  email,
+  password,
+  options: {
+    emailRedirectTo: "https://sequenceliz1.github.io/Sequence-Liz-music-/",
+    data: {
+      display_name: name,
+      role: role
     }
+  }
+});
+
+if (error) {
+  return msg(error.message);
+}
 
     msg(data.session
       ? "Account created successfully!"

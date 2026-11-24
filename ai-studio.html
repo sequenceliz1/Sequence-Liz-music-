@@ -239,7 +239,7 @@ $("writeLyricsButton").addEventListener("click", async () => {
       mood: $("songMood").value,
       language: $("songLanguage").value.trim() || "English",
       structure: $("songStructure").value.trim(),
-            instructions: $("songInstructions").value.trim()
+                  instructions: $("songInstructions").value.trim()
     });
     const lyrics = result.text || result.lyrics || result.content || "";
     if (!lyrics) throw new Error("The AI returned no lyrics.");

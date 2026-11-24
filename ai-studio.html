@@ -1,1586 +1,471 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#101018">
-
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#11111a">
 <title>SEQUENCE LIZ MUSIC — AI Studio</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-:root {
-  --bg:#101018;
-  --panel:#1a1a25;
-  --panel2:#222230;
-  --gold:#e6b84c;
-  --text:#ffffff;
-  --muted:#aaaab8;
-  --border:#353544;
-  --green:#36c98b;
-  --red:#ff6262;
-}
-
-* {
-  box-sizing:border-box;
-}
-
-body {
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Arial, sans-serif;
-}
-
-button,input,textarea,select {
-  font:inherit;
-}
-
-button {
-  cursor:pointer;
-}
-
-header {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding:17px;
-  background:#171722;
-  border-bottom:1px solid var(--border);
-}
-
-.brand {
-  font-size:17px;
-  font-weight:800;
-  color:var(--gold);
-  letter-spacing:1px;
-}
-
-.header-actions {
-  display:flex;
-  gap:8px;
-}
-
-.small-btn {
-  border:1px solid var(--border);
-  background:var(--panel2);
-  color:white;
-  padding:10px 13px;
-  border-radius:10px;
-}
-
-main {
-  width:100%;
-  max-width:950px;
-  margin:auto;
-  padding:18px;
-}
-
-.hero {
-  text-align:center;
-  padding:28px 12px 20px;
-}
-
-.hero h1 {
-  font-size:30px;
-  margin:0 0 10px;
-}
-
-.hero h1 span {
-  color:var(--gold);
-}
-
-.hero p {
-  color:var(--muted);
-  line-height:1.6;
-  max-width:600px;
-  margin:auto;
-}
-
-.connection {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:14px;
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:12px;
-  margin:18px 0;
-  font-size:13px;
-  color:var(--muted);
-}
-
-.status-dot {
-  width:10px;
-  height:10px;
-  border-radius:50%;
-  background:#e6b84c;
-}
-
-.section-title {
-  margin:25px 0 14px;
-  font-size:19px;
-}
-
-.mode-grid {
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:14px;
-}
-
-.mode-card {
-  min-width:0;
-  padding:22px 14px;
-  background:linear-gradient(145deg,#252535,#171722);
-  border:1px solid var(--border);
-  border-radius:17px;
-  text-align:center;
-}
-
-.mode-card.active {
-  border:2px solid var(--gold);
-}
-
-.mode-icon {
-  font-size:34px;
-  margin-bottom:10px;
-}
-
-.mode-card h3 {
-  margin:5px 0;
-  color:var(--gold);
-}
-
-.mode-card p {
-  font-size:12px;
-  line-height:1.5;
-  color:var(--muted);
-}
-
-.mode-button {
-  width:100%;
-  padding:13px 8px;
-  border:0;
-  border-radius:10px;
-  background:var(--gold);
-  color:#17130a;
-  font-weight:800;
-  margin-top:12px;
-}
-
-.panel {
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:15px;
-  padding:17px;
-  margin-top:17px;
-}
-
-.panel h2 {
-  font-size:19px;
-  margin:0 0 8px;
-}
-
-.panel-description {
-  color:var(--muted);
-  font-size:13px;
-  line-height:1.5;
-}
-
-label {
-  display:block;
-  font-size:13px;
-  font-weight:700;
-  margin:17px 0 7px;
-}
-
-input,textarea,select {
-  display:block;
-  width:100%;
-  min-width:0;
-  padding:13px;
-  border:1px solid var(--border);
-  border-radius:10px;
-  background:#11111a;
-  color:white;
-  outline:none;
-}
-
-input:focus,textarea:focus,select:focus {
-  border-color:var(--gold);
-}
-
-textarea {
-  min-height:105px;
-  resize:vertical;
-  line-height:1.5;
-}
-
-input[type="file"] {
-  font-size:12px;
-}
-
-input[type="range"] {
-  padding:0;
-  accent-color:var(--gold);
-}
-
-.two-columns {
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:12px;
-}
-
-.upload-box {
-  border:1px dashed #77778a;
-  background:#151520;
-  border-radius:12px;
-  padding:17px;
-  text-align:center;
-}
-
-.upload-box p {
-  color:var(--muted);
-  font-size:12px;
-  line-height:1.5;
-}
-
-.primary-button {
-  width:100%;
-  border:0;
-  border-radius:11px;
-  padding:15px;
-  background:var(--gold);
-  color:#17130a;
-  font-weight:900;
-  margin-top:19px;
-}
-
-.secondary-button {
-  width:100%;
-  border:1px solid var(--border);
-  border-radius:11px;
-  padding:13px;
-  background:var(--panel2);
-  color:white;
-  margin-top:10px;
-}
-
-.result-card {
-  background:#151520;
-  border:1px solid var(--border);
-  border-radius:13px;
-  padding:15px;
-  margin-top:13px;
-}
-
-.result-card h3 {
-  margin:0 0 8px;
-}
-
-.result-card p {
-  font-size:12px;
-  color:var(--muted);
-}
-
-.result-card audio {
-  width:100%;
-  margin-top:10px;
-}
-
-.hidden {
-  display:none !important;
-}
-
-.notice {
-  padding:12px;
-  border-radius:10px;
-  background:#292536;
-  color:#e8d6a5;
-  font-size:12px;
-  line-height:1.5;
-  margin-top:13px;
-}
-
-footer {
-  text-align:center;
-  color:var(--muted);
-  font-size:12px;
-  padding:30px 15px;
-}
-
-@media(max-width:520px) {
-  main {
-    padding:13px;
-  }
-
-  .hero h1 {
-    font-size:25px;
-  }
-
-  .mode-grid {
-    gap:9px;
-  }
-
-  .mode-card {
-    padding:17px 10px;
-  }
-
-  .two-columns {
-    grid-template-columns:1fr;
-  }
-}
+:root{--bg:#101018;--panel:#1b1b27;--panel2:#242433;--gold:#e6b84c;--text:#fff;--muted:#b5b5c2;--line:#383849;--green:#42c77a;--red:#ff7777}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+header{position:sticky;top:0;z-index:5;background:#171722;border-bottom:1px solid var(--line);padding:13px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.brand{font-weight:900;color:var(--gold);letter-spacing:.5px;font-size:14px}.header-actions{display:flex;gap:7px}
+main{max-width:920px;margin:auto;padding:16px}.hero{text-align:center;padding:23px 5px 15px}.hero h1{font-size:30px;margin:0 0 9px}.hero h1 span{color:var(--gold)}.hero p,.muted,.help{color:var(--muted);line-height:1.55;font-size:13px}
+.connection{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0 18px;font-size:13px;display:flex;align-items:center;gap:9px}.dot{width:9px;height:9px;border-radius:50%;background:var(--red);flex:none}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}.tab,.small-btn,.secondary{border:1px solid var(--line);background:var(--panel2);color:#fff;border-radius:10px;padding:11px 8px}.tab.active{border:2px solid var(--gold);color:var(--gold);font-weight:bold}
+.panel,.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin:13px 0}.panel h2{font-size:20px;margin:0 0 6px}.panel h3{font-size:16px;margin:20px 0 8px}.help{margin:5px 0 13px}
+label{display:block;font-size:13px;font-weight:bold;margin:14px 0 7px}
+input,textarea,select{display:block;width:100%;border:1px solid var(--line);border-radius:9px;background:#11111a;color:#fff;padding:12px;outline:none}
+textarea{min-height:100px;resize:vertical}input:focus,textarea:focus,select:focus{border-color:var(--gold)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.primary{width:100%;border:0;border-radius:10px;padding:14px;background:var(--gold);color:#17130a;font-weight:900;margin-top:15px}
+.secondary{width:100%;margin-top:9px}.small-btn{padding:9px 10px;font-size:12px}
+button:disabled{opacity:.5;cursor:not-allowed}
+.notice{background:#2a2633;border:1px solid #554b38;border-radius:10px;padding:12px;color:#f0dfb4;font-size:12px;line-height:1.55;margin:13px 0}
+.status{white-space:pre-wrap;overflow-wrap:anywhere;background:#14141e;border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px;font-size:13px;line-height:1.5}
+.hidden{display:none!important}audio{width:100%;margin-top:8px}.result{padding:12px;border:1px solid var(--line);border-radius:10px;margin:10px 0;background:#151520}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
+@media(max-width:600px){main{padding:11px}.hero h1{font-size:25px}.tabs{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.header-actions{gap:5px}.small-btn{padding:8px 7px}}
 </style>
 </head>
-
 <body>
-
 <header>
   <div class="brand">SEQUENCE LIZ MUSIC</div>
-
   <div class="header-actions">
-    <button class="small-btn" id="backButton" type="button">
-      ← Back
-    </button>
-
-    <button class="small-btn" id="reconnectButton" type="button">
-      ↻ Reconnect
-    </button>
-    <button class="small-btn" id="roexCheckBtn" type="button">
-  Check RoEx Connection
-    </button>
+    <button class="small-btn" id="backButton" type="button">← Back</button>
+    <button class="small-btn" id="reconnectButton" type="button">↻ Reconnect</button>
   </div>
 </header>
-  <p id="roexCheckStatus" class="muted" role="status" aria-live="polite"></p>
 
 <main>
-
   <section class="hero">
     <h1>AI MUSIC <span>STUDIO</span></h1>
-
-    <p>
-      Create your sound. Produce your music.
-      Keep your real voice. Build professional instrumentals
-      and finished productions.
-    </p>
+    <p>Create lyrics, translate songs and prepare your vocal recordings. Your real singing voice remains your lead vocal.</p>
   </section>
 
-  <div class="connection">
-    <span class="status-dot" id="connectionDot"></span>
-    <span id="connectionStatus" aria-live="polite">
-      Checking studio connection...
-    </span>
+  <div class="connection" aria-live="polite">
+    <span class="dot" id="connectionDot"></span>
+    <span id="connectionStatus">Connecting to your account…</span>
   </div>
 
-  <h2 class="section-title">Choose Your Studio</h2>
+  <nav class="tabs" aria-label="AI Studio sections">
+    <button class="tab active" data-panel="writer" type="button">✍️ Songwriter</button>
+    <button class="tab" data-panel="translator" type="button">🌍 Translator</button>
+    <button class="tab" data-panel="vocal" type="button">🎙️ My Vocal</button>
+    <button class="tab" data-panel="production" type="button">🎚️ Production</button>
+  </nav>
 
-  <section class="mode-grid">
-
-    <div class="mode-card active" id="musicModeCard">
-      <div class="mode-icon">🎙️</div>
-      <h3>MUSIC</h3>
-      <p>
-        Upload or record your vocals.
-        Describe your beat and let the production engine
-        prepare your song.
-      </p>
-
-      <button class="mode-button" id="openMusicButton" type="button">
-        OPEN MUSIC STUDIO
-      </button>
+  <section class="panel" id="writer">
+    <h2>AI Songwriter</h2>
+    <p class="help">Turn your idea into original song lyrics. You can edit the result before using it.</p>
+    <label for="songTitle">Song title</label><input id="songTitle" maxlength="150" placeholder="Enter a song title">
+    <label for="songTopic">What is the song about?</label><textarea id="songTopic" maxlength="3000" placeholder="Describe the story, message or idea for your song…"></textarea>
+    <div class="grid">
+      <div><label for="songGenre">Genre</label><select id="songGenre"><option>Afrobeats</option><option>Afropop</option><option>Amapiano</option><option>Gospel</option><option>Hip Hop</option><option>R&amp;B</option><option>Dancehall</option><option>Highlife</option></select></div>
+      <div><label for="songMood">Mood</label><select id="songMood"><option>Inspirational</option><option>Energetic</option><option>Romantic</option><option>Emotional</option><option>Spiritual</option><option>Party</option><option>Relaxed</option></select></div>
     </div>
-
-    <div class="mode-card" id="instrumentalModeCard">
-      <div class="mode-icon">🎹</div>
-      <h3>INSTRUMENTAL</h3>
-      <p>
-        Describe the instrumental you want.
-        Generate alternative arrangements
-        and preview your beats.
-      </p>
-
-      <button class="mode-button" id="openInstrumentalButton" type="button">
-        OPEN INSTRUMENTAL
-      </button>
+    <div class="grid">
+      <div><label for="songLanguage">Language</label><input id="songLanguage" value="English" maxlength="100"></div>
+      <div><label for="songStructure">Song structure</label><input id="songStructure" placeholder="Verse, chorus, bridge…" maxlength="300"></div>
     </div>
-
+    <label for="songInstructions">Extra instructions (optional)</label><textarea id="songInstructions" maxlength="2000" placeholder="Any special message, rhyme style or direction?"></textarea>
+    <button class="primary" id="writeLyricsButton" type="button">✨ WRITE MY LYRICS</button>
+    <label for="songLyrics">Your generated lyrics (editable)</label><textarea id="songLyrics" placeholder="Your lyrics will appear here. You can also paste your own lyrics."></textarea>
+    <div class="status hidden" id="writerStatus" role="status"></div>
   </section>
 
-  <section class="panel" id="musicSection">
-
-    <h2>🎙️ Music Production</h2>
-
-    <p class="panel-description">
-      Start with your own voice. Describe your preferred
-      production style and let the studio prepare your song.
-    </p>
-
-    <label for="songTitle">Song title</label>
-    <input id="songTitle" type="text"
-      placeholder="Enter your song title">
-
-    <label for="songLyrics">Lyrics</label>
-    <textarea id="songLyrics"
-      placeholder="Paste your lyrics here, or leave blank if you want help writing them..."></textarea>
-
-    <button class="secondary-button" id="writeLyricsButton" type="button">
-      ✨ HELP ME WRITE LYRICS
-    </button>
-
-    <h3 class="section-title">Your Real Vocal</h3>
-
-    <div class="upload-box">
-      <label for="vocalUpload">Upload your recorded vocal</label>
-      <input id="vocalUpload" type="file"
-        accept="audio/*">
-
-      <p>Choose an audio recording from your device.</p>
+  <section class="panel hidden" id="translator">
+    <h2>Lyrics Translator</h2>
+    <p class="help">Translate lyrics while keeping the meaning, emotion and song structure.</p>
+    <label for="sourceLyrics">Lyrics to translate</label><textarea id="sourceLyrics" maxlength="12000" placeholder="Paste your lyrics here…"></textarea>
+    <div class="grid">
+      <div><label for="sourceLanguage">Translate from</label><input id="sourceLanguage" value="English" maxlength="100"></div>
+      <div><label for="targetLanguage">Translate into</label><input id="targetLanguage" value="Igbo" maxlength="100"></div>
     </div>
-
-    <button class="secondary-button" id="recordButton" type="button">
-      🎙️ START RECORDING
-    </button>
-
-    <button class="secondary-button hidden" id="stopRecordButton" type="button">
-      ■ STOP RECORDING
-    </button>
-
-    <div id="recordingStatus" class="notice hidden"
-      aria-live="polite">
-      Recording status will appear here.
-    </div>
-
-    <div id="vocalPreviewArea" class="hidden">
-      <label>Your vocal preview</label>
-      <audio id="vocalPreview" controls></audio>
-    </div>
-
-    <h3 class="section-title">Describe Your Production</h3>
-
-    <label for="musicGenre">Music genre</label>
-    <select id="musicGenre">
-      <option value="Afrobeat">Afrobeat</option>
-      <option value="Afropop">Afropop</option>
-      <option value="Amapiano">Amapiano</option>
-      <option value="Gospel">Gospel</option>
-      <option value="Hip Hop">Hip Hop</option>
-      <option value="R&B">R&B</option>
-      <option value="Dancehall">Dancehall</option>
-      <option value="Highlife">Highlife</option>
-      <option value="Other">Other</option>
-    </select>
-
-    <label for="beatDescription">Describe the beat you want</label>
-    <textarea id="beatDescription"
-      placeholder="Example: Powerful Afrobeat, heavy kick, deep bass, African log drums, shakers, energetic percussion and catchy piano melody..."></textarea>
-
-    <div class="two-columns">
-      <div>
-        <label for="musicBpm">BPM</label>
-        <input id="musicBpm" type="number"
-          min="50" max="220" value="105">
-      </div>
-
-      <div>
-        <label for="musicMood">Mood</label>
-        <select id="musicMood">
-          <option value="Energetic">Energetic</option>
-          <option value="Romantic">Romantic</option>
-          <option value="Emotional">Emotional</option>
-          <option value="Spiritual">Spiritual</option>
-          <option value="Party">Party</option>
-          <option value="Relaxed">Relaxed</option>
-        </select>
-      </div>
-    </div>
-
-    <label for="backingRequest">Backing vocals and harmonies</label>
-    <textarea id="backingRequest"
-      placeholder="Example: Add harmonies to my real voice, soft backing vocals on the chorus, and powerful vocal layers..."></textarea>
-
-    <label for="extraEffects">Extra production instructions</label>
-    <textarea id="extraEffects"
-      placeholder="Describe the bass, kick, log drums, instruments, reverb, delay and other effects you want..."></textarea>
-
-    <button class="primary-button" id="mixMasterButton" type="button">
-      MIX & MASTER MY SONG
-    </button>
-
-    <div class="notice">
-      Your real vocal remains the lead vocal. AI production,
-      vocal processing and mastering require the connected
-      production engine.
-    </div>
-
+    <label for="translationMode">Translation style</label><select id="translationMode"><option value="line">Line by line</option><option value="whole">Whole song</option></select>
+    <button class="primary" id="translateButton" type="button">🌍 TRANSLATE LYRICS</button>
+    <label for="translatedLyrics">Translated lyrics</label><textarea id="translatedLyrics" placeholder="Your translation will appear here…"></textarea>
+    <div class="status hidden" id="translatorStatus" role="status"></div>
   </section>
 
-  <section class="panel hidden" id="instrumentalSection">
-
-    <h2>🎹 Instrumental Studio</h2>
-
-    <p class="panel-description">
-      Describe your ideal instrumental and let the production
-      engine create alternative arrangements.
-    </p>
-
-    <label for="instrumentalTitle">Instrumental title</label>
-    <input id="instrumentalTitle" type="text"
-      placeholder="Give your instrumental a name">
-
-    <label for="instrumentalGenre">Genre</label>
-    <select id="instrumentalGenre">
-      <option value="Afrobeat">Afrobeat</option>
-      <option value="Amapiano">Amapiano</option>
-      <option value="Afropop">Afropop</option>
-      <option value="Gospel">Gospel</option>
-      <option value="Hip Hop">Hip Hop</option>
-      <option value="R&B">R&B</option>
-      <option value="Dancehall">Dancehall</option>
-      <option value="Highlife">Highlife</option>
-      <option value="Other">Other</option>
-    </select>
-
-    <label for="instrumentalDescription">
-      Describe the instrumental you want
-    </label>
-
-    <textarea id="instrumentalDescription"
-      placeholder="Example: A powerful Afrobeat instrumental with heavy kick, deep bass, African log drums, shakers, energetic percussion and catchy piano..."></textarea>
-
-    <div class="two-columns">
-      <div>
-        <label for="instrumentalBpm">BPM</label>
-        <input id="instrumentalBpm" type="number"
-          min="50" max="220" value="110">
-      </div>
-
-      <div>
-        <label for="instrumentalMood">Mood</label>
-        <select id="instrumentalMood">
-          <option value="Energetic">Energetic</option>
-          <option value="Romantic">Romantic</option>
-          <option value="Emotional">Emotional</option>
-          <option value="Spiritual">Spiritual</option>
-          <option value="Party">Party</option>
-          <option value="Relaxed">Relaxed</option>
-        </select>
-      </div>
-    </div>
-
-    <label for="instrumentChoices">Preferred instruments</label>
-    <textarea id="instrumentChoices"
-      placeholder="Example: Log drums, piano, guitar, deep bass, shakers and powerful kick..."></textarea>
-
-    <button class="primary-button" id="createInstrumentalButton" type="button">
-      CREATE & MASTER INSTRUMENTAL
-    </button>
-
+  <section class="panel hidden" id="vocal">
+    <h2>Your Real Vocal</h2>
+    <p class="help">Upload an existing vocal recording or record directly from your device. The vocal file is saved inside your own private account folder.</p>
+    <label for="vocalUpload">Choose an audio file (maximum 50 MB)</label><input id="vocalUpload" type="file" accept="audio/*">
+    <button class="secondary" id="recordButton" type="button">🎙️ START RECORDING</button>
+    <button class="secondary hidden" id="stopRecordButton" type="button">■ STOP RECORDING</button>
+    <div class="status hidden" id="recordingStatus" role="status"></div>
+    <div id="vocalPreviewArea" class="hidden"><label>Listen to your selected vocal</label><audio id="vocalPreview" controls></audio></div>
+    <label for="vocalTitle">Recording name (optional)</label><input id="vocalTitle" maxlength="120" placeholder="e.g. My new song vocal">
+    <button class="primary" id="saveVocalButton" type="button">SAVE MY VOCAL PRIVATELY</button>
+    <div class="status hidden" id="vocalStatus" role="status"></div>
+    <div class="notice">Saving a vocal does not start AI production or charge you. It only stores your recording in the private <b>ai-studio</b> bucket. Your bucket policies must allow each signed-in user to upload only inside their own user-ID folder.</div>
   </section>
 
-  <section class="panel hidden" id="resultsSection">
-
-    <h2>🎧 Your Production Versions</h2>
-
-    <p class="panel-description">
-      Listen to both 30-second previews and choose your preferred version.
-    </p>
-
-    <div id="versionOne" class="result-card">
-      <h3>VERSION 1</h3>
-      <p>First production arrangement</p>
-      <audio id="versionOneAudio" controls></audio>
+  <section class="panel hidden" id="production">
+    <h2>Music Production</h2>
+    <p class="help">The intended production workflow is to keep your original lead vocal, prepare the instrumental, clean the vocal and mix/master the final song.</p>
+    <div class="notice"><b>Production is not switched on yet.</b> I inspected the Edge Function file you supplied. It currently supports Songwriter, Translator and Super Admin-only Soundverse actions. It does not contain the artist-facing <code>produce_music</code> action or a RoEx vocal-processing/mix-and-master workflow. The old page called those actions anyway, so the buttons could not complete production. This replacement does not pretend that they work.</div>
+    <p class="help">You can save your vocal in the My Vocal tab while the production backend is completed and provider costs, licensing and the one-preview-per-day rule are enforced server-side.</p>
+    <div class="status">Real lead vocal preservation: required<br>Vocal cleanup / RoEx processing: not connected to this Edge Function yet<br>Instrumental + vocal mixing/mastering: not connected yet<br>Artist preview generation: not enabled yet<br>Full-song payment and download: not enabled yet</div>
+    <div id="roexArea" class="card">
+      <h3>RoEx connection check</h3>
+      <p class="help">This checks the separate <code>swift-api</code> function already referenced by the previous AI Studio page. It does not process or upload audio.</p>
+      <button class="secondary" id="roexCheckButton" type="button">CHECK ROEX CONNECTION</button>
+      <div class="status hidden" id="roexStatus" role="status"></div>
     </div>
-
-    <div id="versionTwo" class="result-card">
-      <h3>VERSION 2</h3>
-      <p>Alternative production arrangement</p>
-      <audio id="versionTwoAudio" controls></audio>
-    </div>
-
-    <div class="notice" id="productionStatus" aria-live="polite">
-      Your production status will appear here.
-    </div>
-
-    <button class="primary-button" id="purchaseDownloadButton" type="button">
-      PURCHASE & DOWNLOAD
-    </button>
-
   </section>
 
+  <section class="panel hidden" id="adminTools">
+    <h2>Super Admin — Soundverse Tools</h2>
+    <p class="help">This section appears only when the signed-in account passes the database <code>is_super_admin()</code> check. The Edge Function also checks admin permission on every request.</p>
+    <button class="secondary" id="soundverseCheckButton" type="button">CHECK SOUNDVERSE CONNECTION (NO GENERATION)</button>
+    <div class="status hidden" id="soundverseCheckStatus" role="status"></div>
+    <label for="instrumentPrompt">Instrumental prompt</label><textarea id="instrumentPrompt" maxlength="1024" placeholder="Describe the instrumental you want…"></textarea>
+    <button class="primary" id="soundverseGenerateButton" type="button">GENERATE INSTRUMENTAL</button>
+    <div class="status hidden" id="soundverseJobStatus" role="status"></div>
+    <label for="soundverseJobId">Soundverse job ID</label><input id="soundverseJobId" placeholder="Job ID returned after generation">
+    <button class="secondary" id="soundverseStatusButton" type="button">CHECK GENERATION STATUS</button>
+    <div class="status hidden" id="soundverseAssets" role="status"></div>
+    <label for="soundverseFileId">Generated audio file ID</label><input id="soundverseFileId" placeholder="Choose/copy a file_id from the status result">
+    <button class="secondary" id="soundverseSaveButton" type="button">SAVE GENERATED AUDIO TO PRIVATE STORAGE</button>
+    <div class="status hidden" id="soundverseSaveStatus" role="status"></div>
+    <div id="soundversePlayerArea" class="hidden"><label>Saved audio (temporary playback link)</label><audio id="soundversePlayer" controls></audio></div>
+    <div class="notice">Soundverse generation can incur provider costs. These controls are admin-only and are not the artist free-preview workflow.</div>
+  </section>
 </main>
-
-<footer>
-  SEQUENCE LIZ MUSIC · Your voice. Your creativity.
-</footer>
+<footer>SEQUENCE LIZ MUSIC · Your voice. Your creativity.</footer>
 
 <script>
-  // ============================================
-// SEQUENCE LIZ MUSIC — AI STUDIO
-// PART 2: SUPABASE CONNECTION, MODES & RECORDING
-// ============================================
+"use strict";
+const SUPABASE_URL = "https://wehxrlxyqiidivvinjwj.supabase.co";
+const SUPABASE_KEY = "sb_publishable__U5zTR-UcFxxiq_uAHMVzA_G5F8lWrs";
+const AI_FUNCTION = "ai-studio-v2-html";
+const MAIN_SITE = "https://sequenceliz1.github.io/Sequence-Liz-music-/";
+const $ = (id) => document.getElementById(id);
+let db = null, currentUser = null, selectedVocalFile = null;
+let recorder = null, recordingStream = null, recordedChunks = [], vocalPreviewUrl = null;
 
-const SUPABASE_URL =
-  "https://wehxrlxyqiidivvinjwj.supabase.co";
-
-const SUPABASE_KEY =
-  "sb_publishable__U5zTR-UcFxxiq_uAHMVzA_G5F8lWrs";
-
-let db = null;
-let currentUser = null;
-
-let selectedVocalFile = null;
-let recordedVocalBlob = null;
-let mediaRecorder = null;
-let recordedChunks = [];
-let recordingStream = null;
-
-let vocalPreviewURL = null;
-
-// --------------------------------------------
-// SHORTCUTS
-// --------------------------------------------
-
-function studioElement(id) {
-  return document.getElementById(id);
+function showStatus(id, message) {
+  const el = $(id);
+  if (!el) return;
+  el.textContent = message;
+  el.classList.remove("hidden");
 }
-
-function studioMessage(message) {
-  const status = studioElement("productionStatus");
-
-  if (status) {
-    status.textContent = message;
-    status.classList.remove("hidden");
-  } else {
-    alert(message);
-  }
+function setConnection(message, ok = false) {
+  $("connectionStatus").textContent = message;
+  $("connectionDot").style.background = ok ? "#42c77a" : "#ff7777";
 }
-
-function setConnectionStatus(message, connected = false) {
-  const status = studioElement("connectionStatus");
-  const dot = studioElement("connectionDot");
-
-  if (status) status.textContent = message;
-
-  if (dot) {
-    dot.style.background = connected ? "#22c55e" : "#ef4444";
-  }
+function setBusy(button, busy, normalText, waitingText = "PLEASE WAIT…") {
+  button.disabled = busy;
+  button.textContent = busy ? waitingText : normalText;
 }
-
-// --------------------------------------------
-// CONNECT TO SUPABASE
-// --------------------------------------------
-
-function connectStudio() {
-  if (!window.supabase) {
-    setConnectionStatus("Supabase library did not load.");
-    studioMessage("The Supabase library did not load. Check your internet connection and reload.");
-    return;
-  }
-
-  if (
-    !SUPABASE_URL ||
-    !SUPABASE_KEY ||
-    SUPABASE_KEY === "YOUR_CURRENT_SUPABASE_PUBLISHABLE_KEY"
-  ) {
-    setConnectionStatus("Supabase key needs to be added.");
-    studioMessage("Add your current Supabase publishable key in Part 2.");
-    return;
-  }
-
-  try {
-    db = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
-
-    checkStudioSession();
-  } catch (error) {
-    console.error("Supabase connection error:", error);
-    setConnectionStatus("Connection could not be created.");
-  }
-}
-
-// --------------------------------------------
-// CHECK LOGIN SESSION
-// --------------------------------------------
-
-async function checkStudioSession() {
-  if (!db) return;
-
-  setConnectionStatus("Checking account...");
-
-  try {
-    const { data, error } = await db.auth.getSession();
-
-    if (error) throw error;
-
-    currentUser = data.session?.user || null;
-
-    if (currentUser) {
-      setConnectionStatus("Connected to your account.", true);
-    } else {
-      setConnectionStatus("Please log in to the main website.");
-
-      studioMessage(
-        "Please log in to SEQUENCE LIZ MUSIC first, then return to the AI Studio."
-      );
-    }
-
-    db.auth.onAuthStateChange((event, session) => {
-      currentUser = session?.user || null;
-
-      if (currentUser) {
-        setConnectionStatus("Account connected.", true);
-      } else {
-        setConnectionStatus("You are not logged in.");
-      }
-    });
-
-  } catch (error) {
-    console.error("Session error:", error);
-    setConnectionStatus("Could not check your account.");
-  }
-}
-
-// --------------------------------------------
-// RECONNECT BUTTON
-// --------------------------------------------
-
-const reconnectButton = studioElement("reconnectButton");
-
-if (reconnectButton) {
-  reconnectButton.addEventListener("click", () => {
-    connectStudio();
+function activateTab(name) {
+  document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b.dataset.panel === name));
+  ["writer","translator","vocal","production","adminTools"].forEach(id => {
+    const el = $(id);
+    if (el && id !== "adminTools") el.classList.toggle("hidden", id !== name);
   });
 }
-  const roexCheckButton = document.getElementById("roexCheckBtn");
-const roexCheckStatus = document.getElementById("roexCheckStatus");
+document.querySelectorAll(".tab").forEach(button => button.addEventListener("click", () => activateTab(button.dataset.panel)));
+$("backButton").addEventListener("click", () => location.href = MAIN_SITE);
 
-if (roexCheckButton) {
-  roexCheckButton.addEventListener("click", async () => {
-    roexCheckButton.disabled = true;
-    roexCheckStatus.textContent = "Checking RoEx connection...";
-
+async function refreshSession() {
+  if (!db) throw new Error("Supabase client is not ready.");
+  const { data, error } = await db.auth.getSession();
+  if (error) throw error;
+  currentUser = data.session?.user || null;
+  if (!currentUser) {
+    setConnection("Not logged in. Sign in on the main website, then return here.");
+    $("adminTools").classList.add("hidden");
+    return false;
+  }
+  setConnection("Signed in as " + (currentUser.email || "your account"), true);
+  await checkAdminAccess();
+  return true;
+}
+async function checkAdminAccess() {
+  $("adminTools").classList.add("hidden");
+  try {
+    const { data, error } = await db.rpc("is_super_admin");
+    if (!error && data === true) $("adminTools").classList.remove("hidden");
+  } catch (e) {
+    console.warn("Admin access check unavailable:", e);
+  }
+}
+async function connectStudio() {
+  try {
+    if (!window.supabase) throw new Error("Supabase library did not load. Check your internet connection.");
+    if (!db) db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    await refreshSession();
+  } catch (e) {
+    setConnection("Connection problem: " + e.message);
+  }
+}
+async function invokeAI(payload) {
+  const signedIn = await refreshSession();
+  if (!signedIn) throw new Error("Please sign in to the main SEQUENCE LIZ MUSIC website first.");
+  const { data, error } = await db.functions.invoke(AI_FUNCTION, { body: payload });
+  if (error) {
+    let message = error.message || "AI service request failed.";
     try {
-      if (!db) {
-        throw new Error("Supabase is not connected.");
+      const context = error.context;
+      if (context && typeof context.json === "function") {
+        const details = await context.json();
+        message = details.error || details.message || message;
       }
-
-      const { data: sessionData, error: sessionError } =
-        await db.auth.getSession();
-
-      if (sessionError || !sessionData.session) {
-        throw new Error("Please reconnect your account first.");
-      }
-
-      const { data, error } = await db.functions.invoke("swift-api", {
-        body: {},
-        headers: {
-          Authorization: "Bearer " + sessionData.session.access_token
-        }
-      });
-
-      if (error) {
-        let message = error.message;
-
-        try {
-          const details = await error.context.json();
-          message = details.error || details.message || message;
-        } catch (_) {}
-
-        throw new Error(message);
-      }
-
-      if (!data || !data.success) {
-        throw new Error(data?.error || "RoEx connection failed.");
-      }
-
-      roexCheckStatus.textContent =
-        "SUCCESS! RoEx development account connected. " +
-        JSON.stringify(data.account);
-
-    } catch (error) {
-      roexCheckStatus.textContent =
-        "Connection failed: " + error.message;
-    } finally {
-      roexCheckButton.disabled = false;
-    }
-  });
-}
-
-// --------------------------------------------
-// BACK TO MAIN WEBSITE
-// --------------------------------------------
-
-const backButton = studioElement("backButton");
-
-if (backButton) {
-  backButton.addEventListener("click", () => {
-    window.location.href =
-      "https://sequenceliz1.github.io/Sequence-Liz-music-/";
-  });
-}
-
-// --------------------------------------------
-// SELECT MUSIC MODE
-// --------------------------------------------
-
-const musicModeCard = studioElement("musicModeCard");
-const instrumentalModeCard = studioElement("instrumentalModeCard");
-
-const musicSection = studioElement("musicSection");
-const instrumentalSection = studioElement("instrumentalSection");
-
-function showMusicMode() {
-  if (musicSection) musicSection.classList.remove("hidden");
-  if (instrumentalSection) instrumentalSection.classList.add("hidden");
-
-  if (musicModeCard) musicModeCard.classList.add("active");
-  if (instrumentalModeCard) instrumentalModeCard.classList.remove("active");
-}
-
-function showInstrumentalMode() {
-  if (instrumentalSection) instrumentalSection.classList.remove("hidden");
-  if (musicSection) musicSection.classList.add("hidden");
-
-  if (instrumentalModeCard) instrumentalModeCard.classList.add("active");
-  if (musicModeCard) musicModeCard.classList.remove("active");
-}
-
-if (musicModeCard) {
-  musicModeCard.addEventListener("click", showMusicMode);
-}
-
-if (instrumentalModeCard) {
-  instrumentalModeCard.addEventListener("click", showInstrumentalMode);
-}
-
-// --------------------------------------------
-// SELECT VOCAL AUDIO FILE
-// --------------------------------------------
-
-const vocalUpload = studioElement("vocalUpload");
-
-if (vocalUpload) {
-  vocalUpload.addEventListener("change", (event) => {
-    const file = event.target.files?.[0];
-
-    if (!file) return;
-
-    const allowedTypes = [
-      "audio/mpeg",
-      "audio/mp3",
-      "audio/wav",
-      "audio/x-wav",
-      "audio/mp4",
-      "audio/aac",
-      "audio/ogg",
-      "audio/webm"
-    ];
-
-    const isAudio =
-      file.type.startsWith("audio/") ||
-      /\.(mp3|wav|m4a|aac|ogg|webm)$/i.test(file.name);
-
-    if (!isAudio) {
-      studioMessage("Please select a valid audio file.");
-      vocalUpload.value = "";
-      return;
-    }
-
-    const maximumSize = 50 * 1024 * 1024;
-
-    if (file.size > maximumSize) {
-      studioMessage("Your audio file is too large. Maximum size is 50 MB.");
-      vocalUpload.value = "";
-      return;
-    }
-
-    selectedVocalFile = file;
-    recordedVocalBlob = null;
-
-    showVocalPreview(file);
-
-    studioMessage("Your vocal file has been selected successfully.");
-  });
-}
-
-// --------------------------------------------
-// VOCAL PREVIEW
-// --------------------------------------------
-
-function showVocalPreview(file) {
-  const previewArea = studioElement("vocalPreviewArea");
-  const preview = studioElement("vocalPreview");
-
-  if (!previewArea || !preview) return;
-
-  if (vocalPreviewURL) {
-    URL.revokeObjectURL(vocalPreviewURL);
+    } catch (_) {}
+    throw new Error(message);
   }
-
-  vocalPreviewURL = URL.createObjectURL(file);
-
-  preview.src = vocalPreviewURL;
-  previewArea.classList.remove("hidden");
-}
-
-// --------------------------------------------
-// RECORD VOCAL
-// --------------------------------------------
-
-const recordButton = studioElement("recordButton");
-const stopRecordButton = studioElement("stopRecordButton");
-const recordingStatus = studioElement("recordingStatus");
-
-async function startVocalRecording() {
-  if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
-    studioMessage(
-      "Audio recording is not supported by this browser. Try the latest Chrome browser."
-    );
-    return;
-  }
-
-  try {
-    recordingStream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: false
-      }
-    });
-
-    recordedChunks = [];
-
-    let options = {};
-
-    if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) {
-      options.mimeType = "audio/webm;codecs=opus";
-    } else if (MediaRecorder.isTypeSupported("audio/webm")) {
-      options.mimeType = "audio/webm";
-    }
-
-    mediaRecorder = new MediaRecorder(recordingStream, options);
-
-    mediaRecorder.addEventListener("dataavailable", (event) => {
-      if (event.data && event.data.size > 0) {
-        recordedChunks.push(event.data);
-      }
-    });
-
-    mediaRecorder.addEventListener("stop", () => {
-      const mimeType = mediaRecorder.mimeType || "audio/webm";
-
-      recordedVocalBlob = new Blob(recordedChunks, {
-        type: mimeType
-      });
-
-      selectedVocalFile = null;
-
-      const extension = mimeType.includes("ogg") ? "ogg" : "webm";
-
-      const recordedFile = new File(
-        [recordedVocalBlob],
-        `sequence-vocal-${Date.now()}.${extension}`,
-        { type: mimeType }
-      );
-
-      showVocalPreview(recordedFile);
-
-      if (recordingStatus) {
-        recordingStatus.textContent = "Recording completed.";
-      }
-
-      studioMessage("Your vocal recording is ready for the next studio step.");
-
-      if (recordButton) recordButton.disabled = false;
-      if (stopRecordButton) stopRecordButton.disabled = true;
-
-      recordingStream?.getTracks().forEach(track => track.stop());
-      recordingStream = null;
-    });
-
-    mediaRecorder.start();
-
-    if (recordButton) recordButton.disabled = true;
-    if (stopRecordButton) stopRecordButton.disabled = false;
-
-    if (recordingStatus) {
-      recordingStatus.textContent = "Recording your voice...";
-    }
-
-  } catch (error) {
-    console.error("Recording error:", error);
-
-    studioMessage(
-      "Microphone access was not granted. Allow microphone permission and try again."
-    );
-
-    if (recordButton) recordButton.disabled = false;
-    if (stopRecordButton) stopRecordButton.disabled = true;
-  }
-}
-
-function stopVocalRecording() {
-  if (mediaRecorder && mediaRecorder.state === "recording") {
-    mediaRecorder.stop();
-  }
-}
-
-if (recordButton) {
-  recordButton.addEventListener("click", startVocalRecording);
-}
-
-if (stopRecordButton) {
-  stopRecordButton.disabled = true;
-  stopRecordButton.addEventListener("click", stopVocalRecording);
-}
-
-// --------------------------------------------
-// GET THE SELECTED VOCAL
-// PART 3 WILL USE THIS FUNCTION
-// --------------------------------------------
-
-function getSelectedVocal() {
-  if (selectedVocalFile) {
-    return selectedVocalFile;
-  }
-
-  if (recordedVocalBlob) {
-    return new File(
-      [recordedVocalBlob],
-      `sequence-recording-${Date.now()}.webm`,
-      { type: recordedVocalBlob.type || "audio/webm" }
-    );
-  }
-
-  return null;
-}
-
-// --------------------------------------------
-// INITIALIZE STUDIO
-// --------------------------------------------
-
-connectStudio();
-
-showMusicMode();
-  // ============================================
-// SEQUENCE LIZ MUSIC — AI STUDIO
-// PART 3: AI REQUESTS AND AUDIO PRODUCTION
-// ============================================
-
-// --------------------------------------------
-// UPLOAD VOCAL TO PRIVATE SUPABASE STORAGE
-// --------------------------------------------
-
-async function uploadStudioVocal(file) {
-  if (!db || !currentUser) {
-    throw new Error("Please log in before uploading your vocal.");
-  }
-
-  if (!file) {
-    throw new Error("Please record or upload your vocal first.");
-  }
-
-  const extension = file.name.split(".").pop() || "webm";
-
-  const filePath =
-    `${currentUser.id}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
-
-  const { data, error } = await db.storage
-    .from("ai-studio")
-    .upload(filePath, file, {
-      contentType: file.type || "audio/webm",
-      upsert: false
-    });
-
-  if (error) {
-    throw new Error("Vocal upload failed: " + error.message);
-  }
-
-  return data.path;
-}
-
-// --------------------------------------------
-// CALL AI STUDIO EDGE FUNCTION
-// --------------------------------------------
-
-async function callStudioEngine(payload) {
-  if (!db || !currentUser) {
-    throw new Error("Please log in to use the AI Studio.");
-  }
-
-  const { data, error } = await db.functions.invoke("ai-studio", {
-    body: payload
-  });
-
-  if (error) {
-    throw new Error(
-      "AI Studio service error: " + error.message
-    );
-  }
-
-  if (!data) {
-    throw new Error("The AI service returned an empty response.");
-  }
-
-  if (data.error) {
-    throw new Error(data.error);
-  }
-
+  if (!data) throw new Error("The AI service returned an empty response.");
+  if (data.error) throw new Error(data.error);
   return data;
 }
 
-// --------------------------------------------
-// WRITE SONG LYRICS
-// --------------------------------------------
-
-const writeLyricsButton =
-  studioElement("writeLyricsButton");
-
-if (writeLyricsButton) {
-  writeLyricsButton.addEventListener("click", async () => {
-    const title = studioElement("songTitle")?.value.trim() || "";
-    const genre = studioElement("musicGenre")?.value || "";
-    const mood = studioElement("musicMood")?.value || "";
-    const description =
-      studioElement("beatDescription")?.value.trim() || "";
-
-    if (!title && !genre && !description) {
-      studioMessage("Enter a song title, genre or song idea first.");
-      return;
-    }
-
-    writeLyricsButton.disabled = true;
-    writeLyricsButton.textContent = "WRITING LYRICS...";
-
-    try {
-      const result = await callStudioEngine({
-        action: "songwrite",
-        title,
-        genre,
-        mood,
-        description
-      });
-
-      const lyrics =
-        result.lyrics ||
-        result.text ||
-        result.content;
-
-      if (!lyrics) {
-        throw new Error("The AI did not return any lyrics.");
-      }
-
-      const lyricsBox = studioElement("songLyrics");
-
-      if (lyricsBox) {
-        lyricsBox.value = lyrics;
-      }
-
-      studioMessage("Your lyrics have been generated.");
-
-    } catch (error) {
-      console.error("Lyrics error:", error);
-      studioMessage(error.message);
-
-    } finally {
-      writeLyricsButton.disabled = false;
-      writeLyricsButton.textContent = "WRITE MY LYRICS";
-    }
-  });
-}
-
-// --------------------------------------------
-// DISPLAY TWO GENERATED VERSIONS
-// --------------------------------------------
-
-function displayStudioVersions(result) {
-  const versions = result.versions || [
-    result.version1,
-    result.version2
-  ];
-
-  if (!versions[0] || !versions[1]) {
-    throw new Error(
-      "The AI engine must return two finished versions."
-    );
-  }
-
-  const firstAudio =
-    versions[0].audio_url || versions[0].url;
-
-  const secondAudio =
-    versions[1].audio_url || versions[1].url;
-
-  if (!firstAudio || !secondAudio) {
-    throw new Error(
-      "The AI engine did not return playable audio links."
-    );
-  }
-
-  const firstCard = studioElement("versionOne");
-  const secondCard = studioElement("versionTwo");
-
-  const firstPlayer = studioElement("versionOneAudio");
-  const secondPlayer = studioElement("versionTwoAudio");
-
-  if (firstCard) firstCard.classList.remove("hidden");
-  if (secondCard) secondCard.classList.remove("hidden");
-
-  if (firstPlayer) {
-    firstPlayer.src = firstAudio;
-    firstPlayer.load();
-  }
-
-  if (secondPlayer) {
-    secondPlayer.src = secondAudio;
-    secondPlayer.load();
-  }
-
-  studioElement("resultsSection")?.classList.remove("hidden");
-
-  return {
-    firstAudio,
-    secondAudio
-  };
-}
-
-// --------------------------------------------
-// MIX AND MASTER ARTIST'S REAL VOCAL
-// --------------------------------------------
-
-const mixMasterButton =
-  studioElement("mixMasterButton");
-
-if (mixMasterButton) {
-  mixMasterButton.addEventListener("click", async () => {
-    const vocal = getSelectedVocal();
-
-    const title =
-      studioElement("songTitle")?.value.trim() || "";
-
-    const lyrics =
-      studioElement("songLyrics")?.value.trim() || "";
-
-    const genre =
-      studioElement("musicGenre")?.value || "";
-
-    const description =
-      studioElement("beatDescription")?.value.trim() || "";
-
-    const bpm =
-      Number(studioElement("musicBpm")?.value || 100);
-
-    const mood =
-      studioElement("musicMood")?.value || "";
-
-    const backing =
-      studioElement("backingRequest")?.value.trim() || "";
-
-    const effects =
-      studioElement("extraEffects")?.value.trim() || "";
-
-    if (!vocal) {
-      studioMessage("Please record or upload your vocal first.");
-      return;
-    }
-
-    if (!title) {
-      studioMessage("Enter your song title first.");
-      return;
-    }
-
-    mixMasterButton.disabled = true;
-    mixMasterButton.textContent = "PREPARING YOUR SONG...";
-
-    try {
-      studioMessage("Uploading your vocal...");
-
-      const vocalPath = await uploadStudioVocal(vocal);
-
-      studioMessage("Sending your production instructions to the AI engine...");
-
-      const result = await callStudioEngine({
-        action: "produce_music",
-
-        title,
-        lyrics,
-        genre,
-        description,
-        bpm,
-        mood,
-        backing,
-        effects,
-
-        vocal_path: vocalPath,
-
-        user_id: currentUser.id,
-
-        requirements: {
-          preserve_original_lead_vocal: true,
-          generate_instrumental: true,
-          clean_vocal: true,
-          mix_and_master: true,
-          generate_two_versions: true
-        }
-      });
-
-      displayStudioVersions(result);
-
-      studioMessage(
-        "Your two production versions are ready for preview."
-      );
-
-    } catch (error) {
-      console.error("Music production error:", error);
-      studioMessage(error.message);
-
-    } finally {
-      mixMasterButton.disabled = false;
-      mixMasterButton.textContent = "MIX & MASTER MY SONG";
-    }
-  });
-}
-
-// --------------------------------------------
-// CREATE INSTRUMENTAL
-// --------------------------------------------
-
-const createInstrumentalButton =
-  studioElement("createInstrumentalButton");
-
-if (createInstrumentalButton) {
-  createInstrumentalButton.addEventListener("click", async () => {
-    const title =
-      studioElement("instrumentalTitle")?.value.trim() || "";
-
-    const genre =
-      studioElement("instrumentalGenre")?.value || "";
-
-    const description =
-      studioElement("instrumentalDescription")?.value.trim() || "";
-
-    const bpm =
-      Number(studioElement("instrumentalBpm")?.value || 100);
-
-    const mood =
-      studioElement("instrumentalMood")?.value || "";
-
-    const instruments =
-      studioElement("instrumentChoices")?.value.trim() || "";
-
-    if (!description && !genre) {
-      studioMessage("Describe the instrumental you want first.");
-      return;
-    }
-
-    createInstrumentalButton.disabled = true;
-    createInstrumentalButton.textContent = "CREATING INSTRUMENTAL...";
-
-    try {
-      const result = await callStudioEngine({
-        action: "create_instrumental",
-
-        title,
-        genre,
-        description,
-        bpm,
-        mood,
-        instruments,
-
-        user_id: currentUser.id,
-
-        requirements: {
-          instrumental_only: true,
-          generate_two_versions: true,
-          mix_and_master: true
-        }
-      });
-
-      displayStudioVersions(result);
-
-      studioMessage(
-        "Your two instrumental versions are ready for preview."
-      );
-
-    } catch (error) {
-      console.error("Instrumental error:", error);
-      studioMessage(error.message);
-
-    } finally {
-      createInstrumentalButton.disabled = false;
-      createInstrumentalButton.textContent =
-        "CREATE & MASTER INSTRUMENTAL";
-    }
-  });
-}
-
-// --------------------------------------------
-// 30-SECOND PREVIEW LIMIT
-// --------------------------------------------
-
-function limitPreviewTo30Seconds(audioElement) {
-  if (!audioElement) return;
-
-  audioElement.addEventListener("timeupdate", () => {
-    if (audioElement.currentTime >= 30) {
-      audioElement.pause();
-      audioElement.currentTime = 0;
-
-      studioMessage(
-        "Your 30-second preview has ended. Purchase access is required for the full version."
-      );
-    }
-  });
-}
-
-limitPreviewTo30Seconds(
-  studioElement("versionOneAudio")
-);
-
-limitPreviewTo30Seconds(
-  studioElement("versionTwoAudio")
-);
-
-// --------------------------------------------
-// END OF PART 3
-// PART 4 WILL CLOSE THE PAGE AND COMPLETE
-// THE REMAINING STUDIO SETUP.
-// --------------------------------------------
-  // ============================================
-// SEQUENCE LIZ MUSIC — AI STUDIO
-// PART 4: FINAL SETUP AND SAFETY CHECKS
-// ============================================
-
-// --------------------------------------------
-// PREVENT ACCIDENTAL MULTIPLE SUBMISSIONS
-// --------------------------------------------
-
-function setButtonLoading(button, loading, normalText, loadingText) {
-  if (!button) return;
-
-  button.disabled = loading;
-  button.textContent = loading ? loadingText : normalText;
-}
-
-// --------------------------------------------
-// PREVIEW PLAYER SETUP
-// --------------------------------------------
-
-const studioAudioPlayers = [
-  studioElement("versionOneAudio"),
-  studioElement("versionTwoAudio")
-].filter(Boolean);
-
-studioAudioPlayers.forEach(player => {
-  player.preload = "metadata";
-
-  player.addEventListener("play", () => {
-    studioAudioPlayers.forEach(otherPlayer => {
-      if (otherPlayer !== player) {
-        otherPlayer.pause();
-      }
+$("reconnectButton").addEventListener("click", connectStudio);
+$("writeLyricsButton").addEventListener("click", async () => {
+  const button = $("writeLyricsButton");
+  setBusy(button, true, "✨ WRITE MY LYRICS", "WRITING LYRICS…");
+  try {
+    const topic = $("songTopic").value.trim();
+    if (!topic) throw new Error("Describe what your song should be about first.");
+    const result = await invokeAI({
+      action: "songwrite",
+      title: $("songTitle").value.trim(),
+      topic,
+      genre: $("songGenre").value,
+      mood: $("songMood").value,
+      language: $("songLanguage").value.trim() || "English",
+      structure: $("songStructure").value.trim(),
+            instructions: $("songInstructions").value.trim()
     });
-  });
-
-  player.addEventListener("error", () => {
-    studioMessage(
-      "This audio preview could not be loaded. Please try again."
-    );
-  });
+    const lyrics = result.text || result.lyrics || result.content || "";
+    if (!lyrics) throw new Error("The AI returned no lyrics.");
+    $("songLyrics").value = lyrics;
+    showStatus("writerStatus", "Lyrics generated successfully. Review and edit them before using.");
+  } catch (e) {
+    showStatus("writerStatus", "Songwriter error: " + e.message);
+  } finally {
+    setBusy(button, false, "✨ WRITE MY LYRICS");
+  }
 });
 
-// --------------------------------------------
-// PURCHASE AND DOWNLOAD SAFETY
-// --------------------------------------------
-
-const purchaseDownloadButton =
-  studioElement("purchaseDownloadButton");
-
-if (purchaseDownloadButton) {
-  purchaseDownloadButton.addEventListener("click", () => {
-    studioMessage(
-      "Full downloads are not enabled yet. A secure payment provider and server-side payment verification must be connected before downloads can be unlocked."
-    );
-  });
-}
-
-// --------------------------------------------
-// CHECK REQUIRED STUDIO ELEMENTS
-// --------------------------------------------
-
-function checkStudioElements() {
-  const requiredElements = [
-    "connectionStatus",
-    "musicModeCard",
-    "instrumentalModeCard",
-    "songTitle",
-    "songLyrics",
-    "vocalUpload",
-    "recordButton",
-    "stopRecordButton",
-    "mixMasterButton",
-    "instrumentalTitle",
-    "instrumentalDescription",
-    "createInstrumentalButton",
-    "versionOneAudio",
-    "versionTwoAudio",
-    "purchaseDownloadButton"
-  ];
-
-  const missing = requiredElements.filter(
-    id => !studioElement(id)
-  );
-
-  if (missing.length) {
-    console.error(
-      "Missing AI Studio elements:",
-      missing
-    );
-
-    studioMessage(
-      "Some studio elements are missing. Check that all four code parts were pasted correctly."
-    );
-
-    return false;
+$("translateButton").addEventListener("click", async () => {
+  const button = $("translateButton");
+  setBusy(button, true, "🌍 TRANSLATE LYRICS", "TRANSLATING…");
+  try {
+    const lyrics = $("sourceLyrics").value.trim();
+    if (!lyrics) throw new Error("Paste lyrics to translate first.");
+    const result = await invokeAI({
+      action: "translate",
+      lyrics,
+      sourceLanguage: $("sourceLanguage").value.trim() || "English",
+      targetLanguage: $("targetLanguage").value.trim(),
+      mode: $("translationMode").value
+    });
+    const translated = result.text || result.lyrics || "";
+    if (!translated) throw new Error("The AI returned no translation.");
+    $("translatedLyrics").value = translated;
+    showStatus("translatorStatus", "Translation complete. Review the language and dialect before publishing.");
+  } catch (e) {
+    showStatus("translatorStatus", "Translation error: " + e.message);
+  } finally {
+    setBusy(button, false, "🌍 TRANSLATE LYRICS");
   }
+});
 
-  return true;
+function previewVocal(file) {
+  if (!file) return;
+  const allowed = file.type.startsWith("audio/") || /\.(mp3|wav|m4a|aac|ogg|webm|flac)$/i.test(file.name);
+  if (!allowed) throw new Error("Choose a supported audio file.");
+  if (file.size > 50 * 1024 * 1024) throw new Error("The maximum vocal file size is 50 MB.");
+  selectedVocalFile = file;
+  if (vocalPreviewUrl) URL.revokeObjectURL(vocalPreviewUrl);
+  vocalPreviewUrl = URL.createObjectURL(file);
+  $("vocalPreview").src = vocalPreviewUrl;
+  $("vocalPreviewArea").classList.remove("hidden");
+  showStatus("vocalStatus", "Vocal is ready. Save it privately when you are ready.");
 }
+$("vocalUpload").addEventListener("change", event => {
+  try { previewVocal(event.target.files?.[0]); }
+  catch (e) { showStatus("vocalStatus", e.message); event.target.value = ""; }
+});
+$("recordButton").addEventListener("click", async () => {
+  try {
+    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) throw new Error("Recording is not supported in this browser. Try Chrome.");
+    recordingStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: false } });
+    recordedChunks = [];
+    let options = {};
+    if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) options.mimeType = "audio/webm;codecs=opus";
+    else if (MediaRecorder.isTypeSupported("audio/webm")) options.mimeType = "audio/webm";
+    recorder = new MediaRecorder(recordingStream, options);
+    recorder.addEventListener("dataavailable", event => { if (event.data?.size) recordedChunks.push(event.data); });
+    recorder.addEventListener("stop", () => {
+      const type = recorder.mimeType || "audio/webm";
+      const blob = new Blob(recordedChunks, { type });
+      const ext = type.includes("ogg") ? "ogg" : "webm";
+      const file = new File([blob], "sequence-vocal-" + Date.now() + "." + ext, { type });
+      try { previewVocal(file); showStatus("recordingStatus", "Recording finished."); }
+      catch (e) { showStatus("recordingStatus", e.message); }
+      recordingStream?.getTracks().forEach(t => t.stop());
+      recordingStream = null;
+      $("recordButton").disabled = false;
+      $("stopRecordButton").classList.add("hidden");
+    });
+    recorder.start();
+    $("recordButton").disabled = true;
+    $("stopRecordButton").classList.remove("hidden");
+    showStatus("recordingStatus", "Recording your voice… Press STOP RECORDING when finished.");
+  } catch (e) {
+    showStatus("recordingStatus", "Recording could not start: " + e.message);
+    recordingStream?.getTracks().forEach(t => t.stop());
+    recordingStream = null;
+  }
+});
+$("stopRecordButton").addEventListener("click", () => {
+  if (recorder && recorder.state === "recording") recorder.stop();
+});
 
-// --------------------------------------------
-// CLEAN UP MICROPHONE WHEN LEAVING
-// --------------------------------------------
+$("saveVocalButton").addEventListener("click", async () => {
+  const button = $("saveVocalButton");
+  setBusy(button, true, "SAVE MY VOCAL PRIVATELY", "SAVING VOCAL…");
+  try {
+    if (!selectedVocalFile) throw new Error("Upload or record your vocal first.");
+    const signedIn = await refreshSession();
+    if (!signedIn) throw new Error("Please log in first.");
+    const rawExt = selectedVocalFile.name.split(".").pop() || "webm";
+    const extension = rawExt.toLowerCase().replace(/[^a-z0-9]/g, "") || "webm";
+    const safeName = ($("vocalTitle").value.trim() || "vocal").toLowerCase().replace(/[^a-z0-9_-]+/g, "-").slice(0,50);
+    const path = currentUser.id + "/vocals/" + Date.now() + "-" + safeName + "." + extension;
+    const { data, error } = await db.storage.from("ai-studio").upload(path, selectedVocalFile, {
+      contentType: selectedVocalFile.type || "audio/webm",
+      upsert: false,
+      cacheControl: "3600"
+    });
+    if (error) throw error;
+    showStatus("vocalStatus", "Your vocal has been saved privately.\nStorage path: " + data.path);
+  } catch (e) {
+    showStatus("vocalStatus", "Vocal upload failed: " + e.message + "\nIf the bucket exists, check its Storage policies allow this signed-in user to upload only under their own user-ID folder.");
+  } finally {
+    setBusy(button, false, "SAVE MY VOCAL PRIVATELY");
+  }
+});
 
+$("roexCheckButton").addEventListener("click", async () => {
+  const button = $("roexCheckButton");
+  setBusy(button, true, "CHECK ROEX CONNECTION", "CHECKING ROEX…");
+  try {
+    const signedIn = await refreshSession();
+    if (!signedIn) throw new Error("Please sign in first.");
+    const { data, error } = await db.functions.invoke("swift-api", { body: {} });
+    if (error) {
+      let message = error.message || "RoEx connection check failed.";
+      try { const detail = await error.context.json(); message = detail.error || detail.message || message; } catch (_) {}
+      throw new Error(message);
+    }
+    if (!data?.success) throw new Error(data?.error || "The swift-api function did not confirm RoEx access.");
+    showStatus("roexStatus", "RoEx connection check returned success. Account details: " + JSON.stringify(data.account || {}));
+  } catch (e) {
+    showStatus("roexStatus", "RoEx check failed: " + e.message);
+  } finally {
+    setBusy(button, false, "CHECK ROEX CONNECTION");
+  }
+});
+
+$("soundverseCheckButton").addEventListener("click", async () => {
+  const button = $("soundverseCheckButton");
+  setBusy(button, true, "CHECK SOUNDVERSE CONNECTION (NO GENERATION)", "CHECKING…");
+  try {
+    const result = await invokeAI({ action: "soundverse_check" });
+    showStatus("soundverseCheckStatus", result.message || "Soundverse connection check succeeded. No generation was started.");
+  } catch (e) {
+    showStatus("soundverseCheckStatus", "Soundverse check failed: " + e.message);
+  } finally {
+    setBusy(button, false, "CHECK SOUNDVERSE CONNECTION (NO GENERATION)");
+  }
+});
+$("soundverseGenerateButton").addEventListener("click", async () => {
+  const button = $("soundverseGenerateButton");
+  setBusy(button, true, "GENERATE INSTRUMENTAL", "SENDING REQUEST…");
+  try {
+    const prompt = $("instrumentPrompt").value.trim();
+    if (!prompt) throw new Error("Describe the instrumental first.");
+    const result = await invokeAI({
+      action: "soundverse_generate",
+      prompt,
+      requestId: crypto.randomUUID(),
+      versions: 1,
+      license: 1
+    });
+    $("soundverseJobId").value = result.job_id || "";
+    showStatus("soundverseJobStatus", "Soundverse job created.\nJob ID: " + result.job_id + "\nStatus: " + (result.status || "queued") + "\nThis is a provider generation request and may incur costs.");
+  } catch (e) {
+    showStatus("soundverseJobStatus", "Generation request failed: " + e.message);
+  } finally {
+    setBusy(button, false, "GENERATE INSTRUMENTAL");
+  }
+});
+$("soundverseStatusButton").addEventListener("click", async () => {
+  const button = $("soundverseStatusButton");
+  setBusy(button, true, "CHECK GENERATION STATUS", "CHECKING STATUS…");
+  try {
+    const job_id = $("soundverseJobId").value.trim();
+    if (!job_id) throw new Error("Enter the Soundverse job ID first.");
+    const result = await invokeAI({ action: "soundverse_status", job_id });
+    const assets = result.assets || [];
+    $("soundverseAssets").textContent = "Status: " + result.status + "\n" + (assets.length ? assets.map((a,i) => `${i+1}. file_id: ${a.file_id} | role: ${a.role || "unknown"} | type: ${a.mime_type || "unknown"}`).join("\n") : "No audio assets have been returned yet.") + (result.error ? "\nProvider message: " + result.error : "");
+    $("soundverseAssets").classList.remove("hidden");
+    if (assets[0]?.file_id) $("soundverseFileId").value = assets[0].file_id;
+  } catch (e) {
+    showStatus("soundverseAssets", "Status check failed: " + e.message);
+  } finally {
+    setBusy(button, false, "CHECK GENERATION STATUS");
+  }
+});
+$("soundverseSaveButton").addEventListener("click", async () => {
+  const button = $("soundverseSaveButton");
+  setBusy(button, true, "SAVE GENERATED AUDIO TO PRIVATE STORAGE", "SAVING AUDIO…");
+  try {
+    const file_id = $("soundverseFileId").value.trim();
+    if (!file_id) throw new Error("Enter a file ID from the generation status first.");
+    const result = await invokeAI({ action: "soundverse_save", file_id });
+    let message = "Audio saved to your private storage.\nPath: " + (result.path || "saved");
+    if (result.signed_url) {
+      $("soundversePlayer").src = result.signed_url;
+      $("soundversePlayerArea").classList.remove("hidden");
+      message += "\nTemporary playback link created (expires after 1 hour).";
+    } else if (result.message) message += "\n" + result.message;
+    showStatus("soundverseSaveStatus", message);
+  } catch (e) {
+    showStatus("soundverseSaveStatus", "Save failed: " + e.message);
+  } finally {
+    setBusy(button, false, "SAVE GENERATED AUDIO TO PRIVATE STORAGE");
+  }
+});
+
+db = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+if (db) {
+  db.auth.onAuthStateChange((_event, session) => {
+    currentUser = session?.user || null;
+    if (currentUser) {
+      setConnection("Signed in as " + (currentUser.email || "your account"), true);
+      checkAdminAccess();
+    } else {
+      setConnection("Not logged in. Sign in on the main website, then return here.");
+      $("adminTools").classList.add("hidden");
+    }
+  });
+  connectStudio();
+} else {
+  setConnection("Supabase library did not load. Reload the page when connected to the internet.");
+}
 window.addEventListener("pagehide", () => {
-  if (mediaRecorder && mediaRecorder.state === "recording") {
-    mediaRecorder.stop();
-  }
-
-  if (recordingStream) {
-    recordingStream.getTracks().forEach(track => track.stop());
-  }
-
-  if (vocalPreviewURL) {
-    URL.revokeObjectURL(vocalPreviewURL);
-  }
+  if (recorder?.state === "recording") recorder.stop();
+  recordingStream?.getTracks().forEach(t => t.stop());
+  if (vocalPreviewUrl) URL.revokeObjectURL(vocalPreviewUrl);
 });
-
-// --------------------------------------------
-// FINAL INITIALIZATION
-// --------------------------------------------
-
-checkStudioElements();
-
-console.log("SEQUENCE LIZ MUSIC AI Studio loaded.");
-
-// ============================================
-// END OF JAVASCRIPT
-// ============================================
-
 </script>
 </body>
 </html>

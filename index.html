@@ -1242,25 +1242,6 @@ async function openPage(page){
 
 }else if(page==="artist"||page==="earnings"){
 
-      const downloadUrl = URL.createObjectURL(data);
-      const link = document.createElement("a");
-      link.href = downloadUrl;
-      link.download = "sequence-liz-processed.wav";
-      link.click();
-
-      setTimeout(() => URL.revokeObjectURL(downloadUrl), 10000);
-
-      message.textContent = "Audio processed successfully!";
-    } catch (error) {
-      console.error(error);
-      message.textContent = "Processing failed: " + error.message;
-    } finally {
-      button.disabled = false;
-    }
-  };
-
-}else if(page==="artist"||page==="earnings"){
-
   const titles={
     artist:"Artist Dashboard",
     earnings:"Earnings & Withdrawals"

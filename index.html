@@ -1262,16 +1262,15 @@ async function openPage(page){
 }else if(page==="artist"||page==="earnings"){
 
   const titles={
-   upload:"Upload Music / Video",
-   artist:"Artist Dashboard",
-   earnings:"Earnings & Withdrawals"
+    artist:"Artist Dashboard",
+    earnings:"Earnings & Withdrawals"
   };
 
   section(titles[page],`
-   <div class="card">
-    <h3>${titles[page]}</h3>
-    <p class="muted">Your artist workspace is ready for its feature integration.</p>
-   </div>
+    <div class="card">
+      <h3>${titles[page]}</h3>
+      <p class="muted">Your artist workspace is ready for its feature integration.</p>
+    </div>
   `);
 
  }else if(page==="settings"){

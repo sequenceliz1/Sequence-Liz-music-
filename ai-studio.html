@@ -100,6 +100,12 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
     <div id="vocalPreviewArea" class="hidden"><label>Listen to your selected vocal</label><audio id="vocalPreview" controls></audio></div>
     <label for="vocalTitle">Recording name (optional)</label><input id="vocalTitle" maxlength="120" placeholder="e.g. My new song vocal">
     <button class="primary" id="saveVocalButton" type="button">SAVE MY VOCAL PRIVATELY</button>
+    <button class="secondary" id="processVocalButton" type="button">PROCESS MY VOCAL</button>
+<div class="status hidden" id="processVocalStatus" role="status"></div>
+<div id="processedVocalArea" class="hidden">
+  <label>Listen to your processed vocal</label>
+  <audio id="processedVocalPreview" controls></audio>
+</div>
     <div class="status hidden" id="vocalStatus" role="status"></div>
     <div class="notice">Saving a vocal does not start AI production or charge you. It only stores your recording in the private <b>ai-studio</b> bucket. Your bucket policies must allow each signed-in user to upload only inside their own user-ID folder.</div>
   </section>

@@ -358,6 +358,48 @@ $("saveVocalButton").addEventListener("click", async () => {
     setBusy(button, false, "SAVE MY VOCAL PRIVATELY");
   }
 });
+  $("processVocalButton").addEventListener("click", async () => {
+  const button = $("processVocalButton");
+
+  setBusy(button, true, "PROCESS MY VOCAL", "PROCESSING VOCAL…");
+
+  try {
+    if (!selectedVocalFile) {
+      throw new Error("Please upload or record your vocal first.");
+    }
+
+    const signedIn = await refreshSession();
+    if (!signedIn) throw new Error("Please log in first.");
+
+    const formData = new FormData();
+    formData.append("file", selectedVocalFile);
+
+    showStatus("processVocalStatus", "Processing your vocal. Please wait...");
+
+    const { data, error } = await db.functions.invoke("process-audio", {
+      body: formData,
+      responseType: "blob"
+    });
+
+    if (error) throw error;
+
+    if (!(data instanceof Blob) || data.size === 0) {
+      throw new Error("No processed audio was returned.");
+    }
+
+    const audioUrl = URL.createObjectURL(data);
+
+    $("processedVocalPreview").src = audioUrl;
+    $("processedVocalArea").classList.remove("hidden");
+
+    showStatus("processVocalStatus", "Your vocal has been processed successfully. You can listen below.");
+
+  } catch (e) {
+    showStatus("processVocalStatus", "Processing failed: " + e.message);
+  } finally {
+    setBusy(button, false, "PROCESS MY VOCAL");
+  }
+});
 
 $("roexCheckButton").addEventListener("click", async () => {
   const button = $("roexCheckButton");

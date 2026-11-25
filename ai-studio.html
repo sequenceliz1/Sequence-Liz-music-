@@ -101,6 +101,12 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
     <label for="vocalTitle">Recording name (optional)</label><input id="vocalTitle" maxlength="120" placeholder="e.g. My new song vocal">
     <button class="primary" id="saveVocalButton" type="button">SAVE MY VOCAL PRIVATELY</button>
     <button class="secondary" id="processVocalButton" type="button">PROCESS MY VOCAL</button>
+    <button class="primary" id="audoCleanupButton" type="button">TEST AUDO VOCAL CLEANUP</button>
+<div class="status hidden" id="audoCleanupStatus" role="status"></div>
+<div id="audoCleanupArea" class="hidden">
+  <label>Listen to Audo's cleaned vocal</label>
+  <audio id="audoCleanupPreview" controls></audio>
+</div>
 <div class="status hidden" id="processVocalStatus" role="status"></div>
 <div id="processedVocalArea" class="hidden">
   <label>Listen to your processed vocal</label>

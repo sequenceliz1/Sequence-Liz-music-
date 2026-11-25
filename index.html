@@ -1174,7 +1174,74 @@ async function openPage(page){
    </div>
   `);
 
- }else if(page==="upload"||page==="artist"||page==="earnings"){
+ }else if(page==="upload"){
+
+  section("Upload Music / Video",`
+    <div class="card">
+      <h3>Audio Processing Studio</h3>
+      <p class="muted">Upload your vocal or audio recording for processing.</p>
+
+      <input
+        id="processAudioFile"
+        type="file"
+        accept=".wav,.flac,.ogg,audio/*"
+        style="width:100%;margin:15px 0;color:white"
+      >
+
+      <button type="button" id="processAudioBtn">
+        Process My Audio
+      </button>
+
+      <p id="processAudioMessage" class="muted"></p>
+    </div>
+  `);
+
+  $("processAudioBtn").onclick = async () => {
+    const file = $("processAudioFile").files[0];
+    const message = $("processAudioMessage");
+    const button = $("processAudioBtn");
+
+    if (!file) {
+      message.textContent = "Please select an audio file first.";
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    button.disabled = true;
+    message.textContent = "Processing your audio. Please wait...";
+
+    try {
+      const { data, error } = await db.functions.invoke(
+        "process-audio",
+        { body: formData }
+      );
+
+      if (error) throw error;
+
+      if (!(data instanceof Blob) || data.size === 0) {
+        throw new Error("No processed audio was returned.");
+      }
+
+      const downloadUrl = URL.createObjectURL(data);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = "sequence-liz-processed.wav";
+      link.click();
+
+      setTimeout(() => URL.revokeObjectURL(downloadUrl), 10000);
+
+      message.textContent = "Audio processed successfully!";
+    } catch (error) {
+      console.error(error);
+      message.textContent = "Processing failed: " + error.message;
+    } finally {
+      button.disabled = false;
+    }
+  };
+
+}else if(page==="artist"||page==="earnings"){
 
   const titles={
    upload:"Upload Music / Video",

@@ -410,7 +410,7 @@ $("saveVocalButton").addEventListener("click", async () => {
 $("audoCleanupButton").addEventListener("click", async () => {
   const button = $("audoCleanupButton");
 
-  setBusy(button, true, "TEST AUDO VOCAL CLEANUP", "CLEANING VOCAL…");
+  setBusy(button, true, "TEST AUDO VOCAL CLEANUP", "CHECKING AUDO RESULT…");
 
   try {
     if (!selectedVocalFile) {
@@ -426,36 +426,114 @@ $("audoCleanupButton").addEventListener("click", async () => {
     const formData = new FormData();
     formData.append("file", selectedVocalFile);
 
-    showStatus("audoCleanupStatus", "Sending your vocal to Audo. Please wait…");
+    showStatus(
+      "audoCleanupStatus",
+      "Connecting to Audo and retrieving the processed vocal…"
+    );
 
     const { data, error } = await db.functions.invoke("audo-cleanup", {
       body: formData,
       responseType: "blob"
     });
 
-    if (error) throw error;
+    if (error) {
+      let message = error.message || "The Audo request failed.";
 
-    if (!(data instanceof Blob) || data.size === 0) {
-      throw new Error("Audo returned no audio file.");
+      if (error.context) {
+        try {
+          const response = error.context.clone
+            ? error.context.clone()
+            : error.context;
+
+          const details = await response.json();
+
+          message += " " + (
+            details.details ||
+            details.error ||
+            JSON.stringify(details)
+          );
+        } catch (_) {}
+      }
+
+      throw new Error(message);
     }
 
-    if (data.type.includes("application/json")) {
-      const details = await data.text();
-      throw new Error("Audo response: " + details);
+    let audioBlob;
+
+    if (data && typeof data.arrayBuffer === "function") {
+      if (data.type && (
+        data.type.includes("application/json") ||
+        data.type.includes("text/")
+      )) {
+        const details = await data.text();
+        let message = details;
+
+        try {
+          const parsed = JSON.parse(details);
+          message =
+            parsed.error ||
+            parsed.details ||
+            JSON.stringify(parsed);
+        } catch (_) {}
+
+        throw new Error("Audo response: " + message);
+      }
+
+      audioBlob = data;
+
+    } else if (data instanceof ArrayBuffer) {
+      audioBlob = new Blob(
+        [data],
+        { type: selectedVocalFile.type || "audio/wav" }
+      );
+
+    } else if (ArrayBuffer.isView(data)) {
+      audioBlob = new Blob(
+        [data],
+        { type: selectedVocalFile.type || "audio/wav" }
+      );
+
+    } else if (data && typeof data === "object") {
+      throw new Error(
+        "Audo returned information instead of an audio file: " +
+        JSON.stringify(data).slice(0, 1000)
+      );
+
+    } else {
+      throw new Error(
+        "Unexpected response from Audo. Response type: " +
+        typeof data
+      );
     }
 
-    const audioUrl = URL.createObjectURL(data);
+    if (!audioBlob || audioBlob.size === 0) {
+      throw new Error("Audo returned an empty audio file.");
+    }
+
+    const oldUrl = $("audoCleanupPreview").src;
+
+    if (oldUrl && oldUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(oldUrl);
+    }
+
+    const audioUrl = URL.createObjectURL(audioBlob);
 
     $("audoCleanupPreview").src = audioUrl;
     $("audoCleanupArea").classList.remove("hidden");
 
     showStatus(
       "audoCleanupStatus",
-      "Audo cleanup completed. Listen and compare this result with your original vocal."
+      "Audo returned the processed audio successfully. Play it below and compare it with your original vocal."
     );
 
   } catch (e) {
-    showStatus("audoCleanupStatus", "Audo cleanup failed: " + e.message);
+    console.error("Audo cleanup error:", e);
+
+    showStatus(
+      "audoCleanupStatus",
+      "Audo cleanup failed: " + e.message
+    );
+
   } finally {
     setBusy(button, false, "TEST AUDO VOCAL CLEANUP");
   }

@@ -407,7 +407,60 @@ $("saveVocalButton").addEventListener("click", async () => {
   }
 });
 
-$("roexCheckButton").addEventListener("click", async () => {
+$("audoCleanupButton").addEventListener("click", async () => {
+  const button = $("audoCleanupButton");
+
+  setBusy(button, true, "TEST AUDO VOCAL CLEANUP", "CLEANING VOCAL…");
+
+  try {
+    if (!selectedVocalFile) {
+      throw new Error("Please upload or record your vocal first.");
+    }
+
+    const signedIn = await refreshSession();
+
+    if (!signedIn) {
+      throw new Error("Please log in first.");
+    }
+
+    const formData = new FormData();
+    formData.append("file", selectedVocalFile);
+
+    showStatus("audoCleanupStatus", "Sending your vocal to Audo. Please wait…");
+
+    const { data, error } = await db.functions.invoke("audo-cleanup", {
+      body: formData,
+      responseType: "blob"
+    });
+
+    if (error) throw error;
+
+    if (!(data instanceof Blob) || data.size === 0) {
+      throw new Error("Audo returned no audio file.");
+    }
+
+    if (data.type.includes("application/json")) {
+      const details = await data.text();
+      throw new Error("Audo response: " + details);
+    }
+
+    const audioUrl = URL.createObjectURL(data);
+
+    $("audoCleanupPreview").src = audioUrl;
+    $("audoCleanupArea").classList.remove("hidden");
+
+    showStatus(
+      "audoCleanupStatus",
+      "Audo cleanup completed. Listen and compare this result with your original vocal."
+    );
+
+  } catch (e) {
+    showStatus("audoCleanupStatus", "Audo cleanup failed: " + e.message);
+  } finally {
+    setBusy(button, false, "TEST AUDO VOCAL CLEANUP");
+  }
+});
+  $("roexCheckButton").addEventListener("click", async () => {
   const button = $("roexCheckButton");
   setBusy(button, true, "CHECK ROEX CONNECTION", "CHECKING ROEX…");
   try {

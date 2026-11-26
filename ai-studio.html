@@ -642,7 +642,55 @@ $("soundverseSaveButton").addEventListener("click", async () => {
   }
 });
 
-db = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+$("checkDisbandBtn").addEventListener("click", async () => {
+  const button = $("checkDisbandBtn");
+  setBusy(button, true, "CHECK DISBAND ACCOUNT", "CHECKING ACCOUNT…");
+
+  try {
+    const signedIn = await refreshSession();
+    if (!signedIn) throw new Error("Please sign in first.");
+
+    const { data, error } = await db.functions.invoke(
+      "disband-status",
+      { body: {} }
+    );
+
+    if (error) {
+      let message = error.message || "Disband account check failed.";
+
+      try {
+        if (error.context) {
+          const details = await error.context.clone().json();
+          message = details.error || details.message || message;
+        }
+      } catch (_) {}
+
+      throw new Error(message);
+    }
+
+    if (!data || data.success !== true) {
+      throw new Error(data?.error || "Disband did not confirm the account.");
+    }
+
+    const balance = data.balance || {};
+    const limits = data.limits || {};
+
+    showStatus(
+      "disbandStatusMessage",
+      "DISBAND CONNECTION SUCCESSFUL\n\n" +
+      "Free credits: " + (balance.free ?? "Unavailable") + "\n" +
+      "Purchased credits: " + (balance.bought ?? "Unavailable") + "\n" +
+      "Total credits: " + (balance.total ?? "Unavailable") + "\n\n" +
+      "Account limits:\n" + JSON.stringify(limits, null, 2) +
+      "\n\n" + (data.notice || "Read-only account check completed.")
+    );
+  } catch (e) {
+    showStatus("disbandStatusMessage", "DISBAND CHECK FAILED: " + e.message);
+  } finally {
+    setBusy(button, false, "CHECK DISBAND ACCOUNT");
+  }
+});
+  db = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 if (db) {
   db.auth.onAuthStateChange((_event, session) => {
     currentUser = session?.user || null;

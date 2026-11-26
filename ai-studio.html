@@ -131,6 +131,18 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
   </section>
 
   <section class="panel hidden" id="adminTools">
+    <div class="panel" id="disbandAdminCard">
+  <h3>Disband AI Engine</h3>
+  <p>Check your Disband account balance and usage limits.</p>
+
+  <button type="button" id="checkDisbandBtn">
+    CHECK DISBAND ACCOUNT
+  </button>
+
+  <div id="disbandStatusMessage" aria-live="polite">
+    Account not checked yet.
+  </div>
+    </div>
     <h2>Super Admin — Soundverse Tools</h2>
     <p class="help">This section appears only when the signed-in account passes the database <code>is_super_admin()</code> check. The Edge Function also checks admin permission on every request.</p>
     <button class="secondary" id="soundverseCheckButton" type="button">CHECK SOUNDVERSE CONNECTION (NO GENERATION)</button>

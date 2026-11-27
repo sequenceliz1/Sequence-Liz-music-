@@ -557,8 +557,9 @@ $("audoCleanupButton").addEventListener("click", async () => {
   try {
     const signedIn = await refreshSession();
     if (!signedIn) throw new Error("Please sign in first.");
-    const { data, error } = await db.functions.invoke("swift-api", { body: {} });
-    if (error) {
+    const { data, error } = await db.functions.invoke("swift-api", {
+  body: { action: "check_roex_account" }
+});
       let message = error.message || "RoEx connection check failed.";
       try { const detail = await error.context.json(); message = detail.error || detail.message || message; } catch (_) {}
       throw new Error(message);

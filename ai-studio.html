@@ -554,18 +554,34 @@ $("audoCleanupButton").addEventListener("click", async () => {
   $("roexCheckButton").addEventListener("click", async () => {
   const button = $("roexCheckButton");
   setBusy(button, true, "CHECK ROEX CONNECTION", "CHECKING ROEX…");
+
   try {
     const signedIn = await refreshSession();
     if (!signedIn) throw new Error("Please sign in first.");
+
     const { data, error } = await db.functions.invoke("swift-api", {
-  body: { action: "check_roex_account" }
-});
+      body: { action: "check_roex_account" }
+    });
+
+    if (error) {
       let message = error.message || "RoEx connection check failed.";
-      try { const detail = await error.context.json(); message = detail.error || detail.message || message; } catch (_) {}
+      try {
+        const detail = await error.context.json();
+        message = detail.error || detail.message || message;
+      } catch (_) {}
       throw new Error(message);
     }
-    if (!data?.success) throw new Error(data?.error || "The swift-api function did not confirm RoEx access.");
-    showStatus("roexStatus", "RoEx connection check returned success. Account details: " + JSON.stringify(data.account || {}));
+
+    if (!data?.success) {
+      throw new Error(data?.error || "The swift-api function did not confirm RoEx access.");
+    }
+
+    showStatus(
+      "roexStatus",
+      "RoEx connection check returned success. Account details: " +
+      JSON.stringify(data.account || {})
+    );
+
   } catch (e) {
     showStatus("roexStatus", "RoEx check failed: " + e.message);
   } finally {

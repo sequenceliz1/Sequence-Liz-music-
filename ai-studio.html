@@ -660,13 +660,23 @@ $("soundverseSaveButton").addEventListener("click", async () => {
   }
 });
 
+<script>
 $("checkDisbandBtn").addEventListener("click", async () => {
   const button = $("checkDisbandBtn");
-  setBusy(button, true, "CHECK DISBAND ACCOUNT", "CHECKING ACCOUNT…");
+
+  setBusy(
+    button,
+    true,
+    "CHECK DISBAND ACCOUNT",
+    "CHECKING ACCOUNT…"
+  );
 
   try {
     const signedIn = await refreshSession();
-    if (!signedIn) throw new Error("Please sign in first.");
+
+    if (!signedIn) {
+      throw new Error("Please sign in first.");
+    }
 
     const { data, error } = await db.functions.invoke(
       "disband-status",
@@ -679,7 +689,11 @@ $("checkDisbandBtn").addEventListener("click", async () => {
       try {
         if (error.context) {
           const details = await error.context.clone().json();
-          message = details.error || details.message || message;
+
+          message =
+            details.error ||
+            details.message ||
+            message;
         }
       } catch (_) {}
 
@@ -687,7 +701,10 @@ $("checkDisbandBtn").addEventListener("click", async () => {
     }
 
     if (!data || data.success !== true) {
-      throw new Error(data?.error || "Disband did not confirm the account.");
+      throw new Error(
+        data?.error ||
+        "Disband did not confirm the account."
+      );
     }
 
     const balance = data.balance || {};
@@ -699,36 +716,101 @@ $("checkDisbandBtn").addEventListener("click", async () => {
       "Free credits: " + (balance.free ?? "Unavailable") + "\n" +
       "Purchased credits: " + (balance.bought ?? "Unavailable") + "\n" +
       "Total credits: " + (balance.total ?? "Unavailable") + "\n\n" +
-      "Account limits:\n" + JSON.stringify(limits, null, 2) +
-      "\n\n" + (data.notice || "Read-only account check completed.")
+      "Account limits:\n" +
+      JSON.stringify(limits, null, 2) +
+      "\n\n" +
+      (data.notice || "Read-only account check completed.")
     );
+
   } catch (e) {
-    showStatus("disbandStatusMessage", "DISBAND CHECK FAILED: " + e.message);
+
+    showStatus(
+      "disbandStatusMessage",
+      "DISBAND CHECK FAILED: " +
+      (e.message || "Unknown error")
+    );
+
   } finally {
-    setBusy(button, false, "CHECK DISBAND ACCOUNT");
+
+    setBusy(
+      button,
+      false,
+      "CHECK DISBAND ACCOUNT"
+    );
   }
 });
-  db = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+
+// SUPABASE CONNECTION
+
+db = window.supabase
+  ? window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    )
+  : null;
+
+
+// AUTHENTICATION MONITOR
+
 if (db) {
+
   db.auth.onAuthStateChange((_event, session) => {
+
     currentUser = session?.user || null;
+
     if (currentUser) {
-      setConnection("Signed in as " + (currentUser.email || "your account"), true);
+
+      setConnection(
+        "Signed in as " +
+        (currentUser.email || "your account"),
+        true
+      );
+
       checkAdminAccess();
+
     } else {
-      setConnection("Not logged in. Sign in on the main website, then return here.");
+
+      setConnection(
+        "Not logged in. Sign in on the main website, then return here."
+      );
+
       $("adminTools").classList.add("hidden");
+
     }
+
   });
+
   connectStudio();
+
 } else {
-  setConnection("Supabase library did not load. Reload the page when connected to the internet.");
+
+  setConnection(
+    "Supabase library did not load. Reload the page when connected to the internet."
+  );
+
 }
+
+
+// PAGE CLEANUP
+
 window.addEventListener("pagehide", () => {
-  if (recorder?.state === "recording") recorder.stop();
-  recordingStream?.getTracks().forEach(t => t.stop());
-  if (vocalPreviewUrl) URL.revokeObjectURL(vocalPreviewUrl);
+
+  if (recorder?.state === "recording") {
+    recorder.stop();
+  }
+
+  recordingStream
+    ?.getTracks()
+    .forEach(track => track.stop());
+
+  if (vocalPreviewUrl) {
+    URL.revokeObjectURL(vocalPreviewUrl);
+    vocalPreviewUrl = null;
+  }
+
 });
+
 </script>
 </body>
 </html>

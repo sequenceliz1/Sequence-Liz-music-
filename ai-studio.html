@@ -405,7 +405,8 @@ $("saveVocalButton").addEventListener("click", async () => {
       throw new Error("No processed audio was returned.");
     }
 
-    const audioUrl = URL.createObjectURL(data);
+    const playableAudio = new Blob([data], { type: "audio/wav" });
+const audioUrl = URL.createObjectURL(playableAudio);
 
     $("processedVocalPreview").src = audioUrl;
     $("processedVocalArea").classList.remove("hidden");

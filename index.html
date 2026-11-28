@@ -2,231 +2,563 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#101018">
-<meta name="description" content="SEQUENCE LIZ MUSIC — Music, creators and community.">
+
 <title>SEQUENCE LIZ MUSIC</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 :root{
- --bg:#0b0b12;
- --panel:#171725;
- --panel2:#222033;
- --line:#343047;
- --text:#f8f5ff;
- --muted:#aaa5bb;
- --purple:#b18aff;
- --pink:#f28acb;
- --cyan:#74e3dc;
+ --bg:#101018;
+ --panel:#1b1b27;
+ --panel2:#242435;
+ --text:#f7f7fb;
+ --muted:#a9a9bb;
+ --accent:#c49aff;
+ --line:#343447;
+ --good:#62d69a;
+ --bad:#ff7777;
 }
-*{box-sizing:border-box}
+
+*{
+ box-sizing:border-box;
+}
+
 body{
  margin:0;
- background:radial-gradient(ellipse at 5% 0%,#30224b,transparent 35%),var(--bg);
+ background:var(--bg);
  color:var(--text);
- font:15px system-ui,Arial,sans-serif;
+ font:15px Arial,sans-serif;
 }
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-button:disabled{opacity:.5;cursor:not-allowed}
-.hidden{display:none!important}
-.brand{font-weight:950;letter-spacing:.09em}
-.brand span{color:var(--purple)}
-.muted,.tiny{color:var(--muted)}
-.tiny{font-size:12px}
-.btn{
- border:0;border-radius:12px;padding:12px 16px;
- background:linear-gradient(120deg,var(--purple),var(--pink));
- color:#160f22;font-weight:800;
+
+button,input,textarea,select{
+ font:inherit;
 }
-.btn.alt,.icon{
- background:#29273a;color:var(--text);
+
+button{
+ cursor:pointer;
+ border:0;
+ border-radius:10px;
+ padding:11px 15px;
+ background:var(--accent);
+ color:#171321;
+ font-weight:700;
+}
+
+button:disabled{
+ opacity:.5;
+ cursor:not-allowed;
+}
+
+button.secondary{
+ background:var(--panel2);
+ color:var(--text);
  border:1px solid var(--line);
 }
-.icon{border-radius:12px;padding:10px}
+
+.hidden{
+ display:none!important;
+}
+
+.muted{
+ color:var(--muted);
+}
+
+.wrap{
+ max-width:1100px;
+ margin:auto;
+ padding:18px;
+}
+
+.brand{
+ font-weight:900;
+ letter-spacing:1px;
+}
+
+.brand span{
+ color:var(--accent);
+}
+
+/* AUTHENTICATION */
+
+.auth-screen{
+ min-height:100vh;
+ display:grid;
+ place-items:center;
+ padding:20px;
+ background:
+ radial-gradient(circle at top,#302345,#101018 55%);
+}
+
+.auth-card{
+ width:min(440px,100%);
+ background:rgba(27,27,39,.96);
+ padding:26px;
+ border:1px solid var(--line);
+ border-radius:20px;
+ box-shadow:0 20px 70px #0008;
+}
+
+.auth-card h1{
+ margin-top:20px;
+}
+
 .field{
- width:100%;padding:13px;border-radius:12px;
- background:#10101a;border:1px solid var(--line);
- color:white;outline:0;
+ display:block;
+ margin:13px 0;
 }
-.field:focus{border-color:var(--purple)}
-label{
- display:block;margin:12px 0 7px;
- font-size:13px;color:#ddd6ee;
+
+.field label{
+ display:block;
+ margin-bottom:7px;
+ color:var(--muted);
 }
-.card{
- background:linear-gradient(145deg,#201e30,#151521);
+
+.field input,
+.field textarea,
+.field select{
+ width:100%;
+ padding:12px;
+ border-radius:10px;
  border:1px solid var(--line);
- border-radius:19px;padding:18px;
+ background:#11111a;
+ color:var(--text);
 }
-.eyebrow{
- font-size:11px;letter-spacing:.16em;
- text-transform:uppercase;color:var(--cyan);
- font-weight:850;
+
+.password-row{
+ display:flex;
+ gap:8px;
 }
-.auth{
- min-height:100vh;display:grid;
- place-items:center;padding:18px;
+
+.password-row input{
+ flex:1;
+ min-width:0;
 }
-.authbox{width:min(100%,440px)}
-.auth h1{font-size:30px;margin:12px 0}
-.tabs{display:flex;gap:8px;margin:20px 0}
-.tabs button{flex:1}
-.check{
- display:flex;gap:9px;line-height:1.5;
- color:var(--muted);font-size:13px;
+
+.password-row button{
+ min-width:48px;
+ padding:10px;
+ font-size:18px;
 }
-.check input{accent-color:var(--purple);margin-top:4px}
-.top{
- position:sticky;top:0;z-index:20;
- display:flex;justify-content:space-between;
- align-items:center;padding:13px 17px;
- background:#0c0b13ed;backdrop-filter:blur(15px);
+
+.auth-actions{
+ display:flex;
+ gap:10px;
+ flex-wrap:wrap;
+ margin-top:16px;
+}
+
+.auth-actions button{
+ flex:1;
+}
+
+/* TERMS AGREEMENT */
+
+.terms-agreement{
+ margin:18px 0;
+ line-height:1.6;
+}
+
+.terms-agreement input{
+ width:20px;
+ height:20px;
+ accent-color:var(--accent);
+ vertical-align:middle;
+}
+
+/* TERMS MODAL */
+
+.terms-modal{
+ position:fixed;
+ inset:0;
+ z-index:9999;
+ background:rgba(0,0,0,.85);
+ display:grid;
+ place-items:center;
+ padding:15px;
+}
+
+.terms-modal.hidden{
+ display:none!important;
+}
+
+.terms-box{
+ background:var(--panel);
+ border:1px solid var(--accent);
+ border-radius:15px;
+ padding:20px;
+ width:100%;
+ max-width:650px;
+ max-height:85vh;
+ overflow-y:auto;
+ line-height:1.7;
+}
+
+.terms-box h2{
+ color:var(--accent);
+}
+
+/* HEADER */
+
+header{
+ position:sticky;
+ top:0;
+ z-index:10;
+ background:#14141ef2;
  border-bottom:1px solid var(--line);
+ backdrop-filter:blur(10px);
 }
-.layout{
- display:grid;grid-template-columns:240px minmax(0,1fr);
- max-width:1500px;margin:auto;
+
+.topbar{
+ max-width:1100px;
+ margin:auto;
+ padding:12px 18px;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:12px;
 }
-.side{
- position:sticky;top:60px;
- height:calc(100vh - 60px);overflow:auto;
- padding:16px;border-right:1px solid var(--line);
+
+.top-actions{
+ display:flex;
+ gap:8px;
+ align-items:center;
 }
-.navlabel{
- font-size:10px;letter-spacing:.16em;
- color:#777287;font-weight:900;
- margin:18px 9px 7px;
+
+.restart-btn{
+ background:var(--panel2);
+ color:white;
+ border:1px solid var(--line);
+ padding:8px 11px;
 }
-.nav{
- width:100%;display:block;text-align:left;
- padding:11px;border:0;border-radius:11px;
- background:transparent;color:#cbc5d8;margin:3px 0;
+
+.dots{
+ font-size:24px;
+ min-width:45px;
+ padding:7px;
+ background:var(--panel2);
+ color:white;
 }
-.nav.active,.nav:hover{
- background:#2b2640;color:white;
+
+.menu{
+ position:absolute;
+ right:15px;
+ top:62px;
+ width:min(330px,calc(100vw - 30px));
+ max-height:80vh;
+ overflow:auto;
+ background:#20202d;
+ border:1px solid var(--line);
+ border-radius:15px;
+ padding:12px;
+ box-shadow:0 18px 45px #0009;
 }
+
+.menu h4{
+ color:var(--accent);
+ margin:12px 8px 5px;
+}
+
+.menu button{
+ display:block;
+ width:100%;
+ text-align:left;
+ background:transparent;
+ color:var(--text);
+ font-weight:500;
+ padding:10px;
+ border-radius:8px;
+}
+
+.menu button:hover{
+ background:var(--panel2);
+}
+
+/* MAIN CONTENT */
+
 main{
- padding:24px;max-width:1200px;
- width:100%;margin:auto;min-width:0;
+ max-width:1100px;
+ margin:auto;
+ padding:18px;
+ min-height:45vh;
 }
-.hero{
- padding:28px;border-radius:23px;
- border:1px solid #59466e;
- background:linear-gradient(115deg,#382650,#1c2b40 70%,#16353b);
+
+.page-title{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:12px;
+ flex-wrap:wrap;
 }
-.hero h1{
- font-size:clamp(28px,5vw,45px);
- max-width:720px;margin:12px 0;
-}
-.hero p{line-height:1.6;max-width:650px;color:#e0d8ed}
-.head{
- display:flex;align-items:center;
- justify-content:space-between;margin:25px 0 13px;
-}
+
 .grid{
  display:grid;
- grid-template-columns:repeat(auto-fill,minmax(155px,1fr));
- gap:13px;
+ grid-template-columns:repeat(
+  auto-fill,
+  minmax(230px,1fr)
+ );
+ gap:14px;
 }
-.song{
- background:#191927;border:1px solid var(--line);
- border-radius:16px;padding:10px;min-width:0;
+
+.card{
+ background:var(--panel);
+ border:1px solid var(--line);
+ border-radius:15px;
+ padding:14px;
 }
-.song img{
- width:100%;aspect-ratio:1;
- object-fit:cover;border-radius:11px;background:#302a42;
+
+.song-art{
+ width:100%;
+ aspect-ratio:1/1;
+ object-fit:cover;
+ border-radius:11px;
+ background:var(--panel2);
 }
-.song h3{
- font-size:14px;white-space:nowrap;
- overflow:hidden;text-overflow:ellipsis;margin:9px 0 3px;
+
+.artist-line{
+ display:flex;
+ align-items:center;
+ gap:9px;
+ margin:9px 0;
 }
-.song p{font-size:12px;color:var(--muted);margin:0 0 9px}
-.song button{padding:8px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:13px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.stat strong{font-size:23px;display:block;margin-top:8px}
-.familyfeed{
- display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:14px;
+
+.avatar{
+ width:34px;
+ height:34px;
+ border-radius:50%;
+ object-fit:cover;
+ background:var(--panel2);
+ border:1px solid var(--line);
 }
-.post{
- min-height:430px;padding:20px;border-radius:22px;
- background:linear-gradient(155deg,#402653,#1b3341);
- display:flex;flex-direction:column;justify-content:space-between;
+
+.song-title{
+ font-weight:800;
+ margin:8px 0 3px;
 }
-.post .symbol{font-size:58px;text-align:center}
-.modal{
- position:fixed;inset:0;z-index:60;
- background:#000b;display:grid;place-items:center;padding:18px;
-}
-.modalbox{
- width:min(100%,650px);max-height:85vh;overflow:auto;
- background:#191826;border:1px solid var(--line);
- border-radius:20px;padding:22px;
-}
-.player{
- position:fixed;z-index:30;bottom:0;left:0;right:0;
- padding:9px 14px;background:#12121df5;
- border-top:1px solid var(--line);backdrop-filter:blur(16px);
-}
-.playerin{
- max-width:1200px;margin:auto;
- display:grid;grid-template-columns:1fr 1.4fr 1fr;
- gap:14px;align-items:center;
-}
-.now{display:flex;gap:9px;align-items:center;min-width:0}
-.now img{width:45px;height:45px;object-fit:cover;border-radius:8px}
-.now strong,.now small{
- display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.now small{font-size:11px;color:var(--muted)}
-.controls{text-align:center}
+
 .row{
- display:flex;justify-content:center;align-items:center;gap:12px;
+ display:flex;
+ gap:9px;
+ align-items:center;
+ flex-wrap:wrap;
 }
-.play{
- border:0;border-radius:50%;width:36px;height:36px;font-weight:900;
+
+.row>*{
+ flex:1;
 }
-.seek{
- display:flex;gap:8px;align-items:center;
- font-size:10px;color:var(--muted);
+
+.notice{
+ padding:12px;
+ border-radius:10px;
+ background:#252238;
+ color:#ded4ff;
+ margin:12px 0;
 }
-input[type=range]{width:100%;accent-color:var(--purple)}
-.extra{display:flex;justify-content:end;gap:8px}
-.extra select{
- background:#242335;color:white;
- border:1px solid var(--line);padding:7px;border-radius:9px;
+
+.small{
+ font-size:12px;
 }
-.toast{
- position:fixed;z-index:90;bottom:105px;left:50%;
- transform:translateX(-50%);padding:12px 17px;
- border-radius:12px;background:#f6f0ff;color:#181321;
- font-weight:750;max-width:90%;
+
+.danger{
+ color:var(--bad);
 }
-@media(max-width:850px){
- .layout{display:block}
- .side{
-  display:none;position:fixed;z-index:25;
-  top:60px;bottom:0;left:0;width:280px;
-  height:auto;background:#11111b;
- }
- .side.open{display:block}
- main{padding:17px 13px}
- .playerin{grid-template-columns:1fr auto}
- .controls{grid-column:1/-1;grid-row:2}
- .extra{display:none}
- .player{padding:7px 10px}
- .familyfeed{grid-template-columns:1fr}
- .familyaside{display:none}
- .stats{grid-template-columns:repeat(2,1fr)}
+
+.text-content{
+ white-space:pre-wrap;
+ line-height:1.6;
+ overflow-wrap:anywhere;
 }
+
+.lyrics-box{
+ margin-top:10px;
+ padding:12px;
+ background:#15151f;
+ border:1px solid var(--line);
+ border-radius:10px;
+}
+
+.lyrics-box summary{
+ cursor:pointer;
+ color:var(--accent);
+ font-weight:700;
+}
+
+/* MUSIC PLAYER */
+
+.player{
+ position:relative;
+ width:100%;
+ padding:20px 15px;
+ background:#171722;
+ border-top:1px solid var(--line);
+}
+
+.full-player{
+ max-width:650px;
+ margin:auto;
+}
+
+.player-top{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin-bottom:15px;
+}
+
+.player-cover-wrap{
+ width:min(65vw,260px);
+ margin:15px auto;
+ aspect-ratio:1/1;
+ padding:6px;
+ background:#ffffff12;
+ border:1px solid #ffffff20;
+ border-radius:18px;
+}
+
+.player-cover{
+ width:100%;
+ height:100%;
+ display:block;
+ object-fit:cover;
+ border-radius:13px;
+ background:#292438;
+}
+
+.player-song-info{
+ text-align:center;
+ margin:15px 0;
+}
+
+.player-song-info h2{
+ font-size:22px;
+ margin:0 0 8px;
+ overflow-wrap:anywhere;
+}
+
+.player-song-info p{
+ color:#c8b8db;
+ margin:0;
+}
+
+.player-actions{
+ display:flex;
+ justify-content:center;
+ gap:18px;
+ margin:15px 0;
+}
+
+.player-actions button{
+ background:transparent;
+ color:white;
+ font-size:22px;
+}
+
+.player-progress{
+ margin:15px 0;
+}
+
+.player-progress input{
+ width:100%;
+ accent-color:var(--accent);
+}
+
+.player-times{
+ display:flex;
+ justify-content:space-between;
+ color:#c5bfd0;
+ font-size:12px;
+}
+
+.player-controls{
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ gap:12px;
+ flex-wrap:wrap;
+ margin:18px 0;
+}
+
+.player-controls button{
+ border-radius:50%;
+ width:48px;
+ height:48px;
+ background:#ffffff12;
+ color:white;
+ border:1px solid #ffffff25;
+ font-size:18px;
+}
+
+.player-controls #playBtn{
+ width:62px;
+ height:62px;
+ background:var(--accent);
+ color:#171020;
+ font-size:25px;
+}
+
+.player-options{
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ gap:12px;
+ flex-wrap:wrap;
+ margin:15px 0;
+}
+
+.player-options select,
+.player-options button{
+ background:#242435;
+ color:white;
+ border:1px solid var(--line);
+ padding:10px 14px;
+ border-radius:20px;
+}
+
+.player-lyrics{
+ margin-top:20px;
+ padding:15px;
+ background:#ffffff0d;
+ border:1px solid #ffffff18;
+ border-radius:15px;
+}
+
+.player-lyrics summary{
+ color:#d8baff;
+ font-weight:bold;
+ cursor:pointer;
+}
+
+.player-lyrics #currentLyrics{
+ text-align:center;
+ line-height:1.9;
+ padding:15px 5px;
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+}
+
+footer{
+ padding:20px;
+ text-align:center;
+ color:var(--muted);
+ font-size:12px;
+}
+
 @media(max-width:480px){
- .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
- .hero{padding:20px}
- .two{grid-template-columns:1fr}
- .brand{font-size:13px}
+
+ .auth-card{
+  padding:20px;
+ }
+
+ .player-song-info h2{
+  font-size:20px;
+ }
+
+ .player-controls{
+  gap:7px;
+ }
+
 }
 </style>
 </head>
@@ -234,1620 +566,2205 @@ input[type=range]{width:100%;accent-color:var(--purple)}
 <body>
 
 <!-- LOGIN AND REGISTRATION -->
-<div id="authScreen" class="auth">
- <div class="authbox card">
 
-  <div class="brand" style="font-size:23px">
-   SEQUENCE <span>LIZ</span> MUSIC
+<section id="authScreen" class="auth-screen">
+
+ <div class="auth-card">
+
+  <div class="brand">
+   SEQUENCE <span>LIZ MUSIC</span>
   </div>
-
-  <div class="eyebrow">Music • Creators • Community</div>
 
   <h1 id="authHeading">Welcome back</h1>
-  <p class="muted">
-   A home for music, creativity and genuine connection.
-  </p>
 
-  <div class="tabs">
-   <button class="btn" id="loginTab">Log in</button>
-   <button class="btn alt" id="signupTab">Create account</button>
-  </div>
+  <p class="muted">
+   Log in or create your SEQUENCE LIZ MUSIC account.
+  </p>
 
   <div id="signupFields" class="hidden">
-   <label>Display name</label>
-   <input class="field" id="username" placeholder="Your name">
 
-   <label>Account type</label>
-   <select class="field" id="role">
-    <option value="listener">Listener</option>
-    <option value="artist">Artist / Creator</option>
-   </select>
+   <div class="field">
+    <label for="username">Username / display name</label>
+    <input
+     id="username"
+     autocomplete="nickname"
+     placeholder="Your name"
+    >
+   </div>
+
+   <div class="field">
+    <label for="role">Account type</label>
+    <select id="role">
+     <option value="listener">Listener</option>
+     <option value="artist">Artist</option>
+    </select>
+   </div>
+
   </div>
 
-  <label>Email address</label>
-  <input class="field" id="email" type="email"
-   autocomplete="email" placeholder="you@example.com">
-
-  <label>Password</label>
-  <div style="display:flex;gap:8px">
-   <input class="field" id="password" type="password"
-    autocomplete="current-password">
-   <button class="icon" id="togglePassword" type="button">Show</button>
+  <div class="field">
+   <label for="email">Email address</label>
+   <input
+    id="email"
+    type="email"
+    autocomplete="email"
+    placeholder="you@example.com"
+   >
   </div>
 
-  <div id="termsCheck" class="hidden" style="margin-top:13px">
-   <label class="check">
+  <div class="field">
+
+   <label for="password">Password</label>
+
+   <div class="password-row">
+
+    <input
+     id="password"
+     type="password"
+     autocomplete="current-password"
+     placeholder="Password"
+    >
+
+    <button
+     class="secondary"
+     id="togglePassword"
+     type="button"
+     aria-label="Show password"
+     aria-pressed="false"
+    >👁</button>
+
+   </div>
+
+  </div>
+
+  <div class="auth-actions" id="loginActions">
+   <button id="loginBtn" type="button">Log in</button>
+   <button class="secondary" id="showSignup" type="button">
+    Create account
+   </button>
+  </div>
+
+  <div class="auth-actions hidden" id="signupActions">
+   <button id="signupBtn" type="button">Register</button>
+   <button class="secondary" id="showLogin" type="button">
+    Back to login
+   </button>
+  </div>
+
+  <p>
+   <button class="secondary" id="forgotBtn" type="button">
+    Forgot password?
+   </button>
+  </p>
+
+  <div id="termsAgreement" class="terms-agreement hidden">
+
+   <label>
     <input type="checkbox" id="agreeTerms">
-    <span>
-     I agree to the
-     <a href="#" id="termsLink" style="color:var(--purple)">
-      Terms & Conditions
-     </a>
-     and Privacy Policy.
-    </span>
+    I agree to the
    </label>
+
+   <a href="#" id="termsLink" style="color:var(--accent)">
+    Terms & Conditions
+   </a>
+
+   and Privacy Policy.
+
   </div>
 
-  <button class="btn" id="loginBtn"
-   style="width:100%;margin-top:18px">Log in</button>
+  <p id="authMessage" class="muted" role="status"></p>
 
-  <button class="btn hidden" id="signupBtn"
-   style="width:100%;margin-top:18px">Create my account</button>
-
-  <button class="btn alt" id="forgotBtn"
-   style="width:100%;margin-top:9px">Forgot password?</button>
-
-  <p id="authMessage" class="tiny"></p>
  </div>
+
+</section>
+
+
+<!-- TERMS AND CONDITIONS MODAL -->
+
+<div
+ id="termsModal"
+ class="terms-modal hidden"
+ role="dialog"
+ aria-modal="true"
+ aria-labelledby="termsTitle"
+>
+
+ <div class="terms-box">
+
+  <h2 id="termsTitle">SEQUENCE LIZ MUSIC</h2>
+
+  <h3>Terms & Conditions</h3>
+
+  <h4>1. Introduction</h4>
+  <p>
+   By creating an account or using SEQUENCE LIZ MUSIC,
+   you agree to these Terms and our Privacy Policy.
+  </p>
+
+  <h4>2. Account Security</h4>
+  <p>
+   You must provide accurate information and protect
+   your login details.
+  </p>
+
+  <h4>3. Creator Responsibilities</h4>
+  <p>
+   You must own or have permission to upload, distribute
+   and monetise music, videos, artwork and lyrics.
+  </p>
+
+  <h4>4. Revenue Sharing</h4>
+  <p>
+   Proposed eligible music earnings allocation:
+   80% creator and 20% platform.
+   Proposed eligible SEQUENCE FAMILY allocation:
+   90% creator and 10% platform.
+   These proposals are subject to final platform terms
+   and verified revenue.
+  </p>
+
+  <h4>5. Royalties</h4>
+  <p>
+   Earnings depend on verified activity, eligible revenue,
+   applicable fees, refunds and fraud checks.
+  </p>
+
+  <h4>6. Withdrawals</h4>
+  <p>
+   Proposed minimum withdrawal is US$10 or its displayed
+   equivalent. Verification and applicable fees may apply.
+  </p>
+
+  <h4>7. Copyright</h4>
+  <p>
+   You retain ownership of content you own. You grant the
+   platform permission to host and process content as
+   necessary to provide its services.
+  </p>
+
+  <h4>8. Community Rules</h4>
+  <p>
+   Harassment, threats, impersonation, scams and unlawful
+   content are prohibited.
+  </p>
+
+  <h4>9. Private Communication</h4>
+  <p>
+   Messaging and communication features must not be used
+   for fraud, harassment or unlawful activity.
+  </p>
+
+  <h4>10. AI Tools</h4>
+  <p>
+   You must have permission to use all vocals, images,
+   lyrics and other material submitted to AI tools.
+  </p>
+
+  <h4>11. Promotion</h4>
+  <p>
+   Promotional services are subject to payment confirmation,
+   approval and availability. Specific results are not
+   guaranteed.
+  </p>
+
+  <h4>12. Account Restrictions</h4>
+  <p>
+   Accounts may be restricted for fraud, copyright
+   infringement, abuse or serious violations.
+  </p>
+
+  <h4>13. Service Availability</h4>
+  <p>
+   Technical problems and third-party service interruptions
+   may temporarily affect the platform.
+  </p>
+
+  <h4>14. Privacy</h4>
+  <p>
+   Account and usage information may be used to operate
+   and secure the platform in accordance with applicable
+   data-protection requirements.
+  </p>
+
+  <h4>15. Changes</h4>
+  <p>
+   These Terms may be updated as the platform develops.
+  </p>
+
+  <h4>16. Contact</h4>
+  <p>
+   Use the official Contact Us options displayed on
+   SEQUENCE LIZ MUSIC for assistance.
+  </p>
+
+  <p class="muted">
+   This is draft platform wording and should receive
+   qualified legal review before commercial launch.
+  </p>
+
+  <button
+   id="closeTerms"
+   type="button"
+   style="width:100%;margin-top:15px"
+  >
+   Close Terms
+  </button>
+
+ </div>
+
 </div>
 
-<!-- MAIN PLATFORM -->
+
+<!-- MAIN APPLICATION -->
+
 <div id="app" class="hidden">
 
- <header class="top">
-  <div style="display:flex;gap:10px;align-items:center">
-   <button class="icon" id="mobileMenu">☰</button>
-   <div class="brand">SEQUENCE <span>LIZ</span> MUSIC</div>
+ <header>
+
+  <div class="topbar">
+
+   <div class="brand">
+    SEQUENCE <span>LIZ MUSIC</span>
+   </div>
+
+   <span id="welcomeUser" class="muted"></span>
+
+   <div class="top-actions">
+
+    <button
+     class="restart-btn"
+     id="restartBtn"
+     type="button"
+     title="Restart platform"
+    >↻</button>
+
+    <button
+     class="dots"
+     id="menuBtn"
+     type="button"
+     aria-label="Open menu"
+    >⋮</button>
+
+   </div>
+
   </div>
 
-  <div>
-   <span class="tiny" id="welcomeUser"></span>
-   <button class="icon" id="searchTop">⌕</button>
-   <button class="icon" id="menuBtn">⋮</button>
-  </div>
+  <nav id="menu" class="menu hidden">
+
+   <h4>MUSIC</h4>
+   <button data-page="home">Artist Music</button>
+   <button data-page="discover">Discover & Search</button>
+   <button data-page="charts">Music Charts</button>
+   <button data-page="favourites">Favourite Songs</button>
+
+   <h4>VIDEOS & SHOWS</h4>
+   <button data-page="videos">Artist Videos</button>
+   <button data-page="promote">Promote Your Song</button>
+   <button data-page="shows">Watch Shows / YouTube</button>
+
+   <h4>SEQUENCE FAMILY</h4>
+   <button data-page="family">Family Community</button>
+   <button data-page="chats">Private Chats</button>
+   <button data-page="familycharts">Family Charts</button>
+
+   <h4>AI CREATION</h4>
+   <button data-page="studio">AI Music Studio</button>
+   <button data-page="pictureai">AI Picture-to-Video</button>
+   <button data-page="creations">My Purchased AI Creations</button>
+
+   <h4>MY ACCOUNT</h4>
+   <button data-page="profile">My Profile</button>
+   <button data-page="upload">Upload Music / Video</button>
+   <button data-page="artist">Artist Dashboard</button>
+   <button data-page="earnings">Earnings & Withdrawals</button>
+   <button data-page="settings">Account Settings</button>
+
+   <h4>HELP</h4>
+   <button data-page="terms">Terms & Conditions</button>
+   <button data-page="privacy">Privacy Policy</button>
+   <button data-page="help">Help & Support</button>
+
+   <button id="restartMenuBtn" type="button">↻ Restart platform</button>
+   <button id="logoutBtn" type="button">Log out</button>
+
+  </nav>
+
  </header>
 
- <div class="layout">
+ <main id="content"></main>
 
-  <aside class="side" id="sidebar">
+ <!-- MUSIC PLAYER -->
 
-   <div class="navlabel">MUSIC WORLD</div>
-   <button class="nav active" data-page="home">♫ Artist Music</button>
-   <button class="nav" data-page="discover">⌕ Discover & Search</button>
-   <button class="nav" data-page="charts">♛ Music Charts</button>
-   <button class="nav" data-page="favourites">♡ Favourite Songs</button>
-   <button class="nav" data-page="videos">▻ Artist Videos</button>
-   <button class="nav" data-page="shows">▣ Watch Shows</button>
+ <div class="player">
 
-   <div class="navlabel">SEQUENCE FAMILY</div>
-   <button class="nav" data-page="family">◉ Family Community</button>
-   <button class="nav" data-page="chats">✉ Private Chats</button>
-   <button class="nav" data-page="familycharts">✧ Family Charts</button>
+  <div class="full-player">
 
-   <div class="navlabel">CREATE & EARN</div>
-   <button class="nav" data-page="studio">✦ AI Music Studio</button>
-   <button class="nav" data-page="pictureai">▧ AI Picture-to-Video</button>
-   <button class="nav" data-page="creations">▤ My AI Creations</button>
-   <button class="nav" data-page="upload">↑ Upload Music / Video</button>
-   <button class="nav" data-page="dashboard">▥ Artist Dashboard</button>
-   <button class="nav" data-page="earnings">＄ Earnings & Withdrawals</button>
-   <button class="nav" data-page="promote">↗ Promote Your Song</button>
-
-   <div class="navlabel">YOUR ACCOUNT</div>
-   <button class="nav" data-page="profile">♙ My Profile</button>
-   <button class="nav" data-page="settings">⚙ Settings</button>
-   <button class="nav" data-page="help">? Help & Support</button>
-   <button class="nav" id="termsMenu">▤ Terms & Privacy</button>
-   <button class="nav" id="logoutBtn">⇥ Log out</button>
-
-   <p class="tiny">
-    Creator earnings depend on verified revenue, eligibility and platform rules.
-   </p>
-  </aside>
-
-  <main id="content"></main>
-
- </div>
-</div>
-
-<!-- TERMS MODAL -->
-<div id="termsModal" class="modal hidden">
- <div class="modalbox">
-
-  <div class="head">
-   <h2>Terms & Community Principles</h2>
-   <button class="icon" id="closeTerms">✕</button>
-  </div>
-
-  <p>
-   SEQUENCE LIZ MUSIC supports music discovery, creator publishing
-   and community participation. Provide accurate account information,
-   respect other people and upload only content you own or are
-   authorised to use.
-  </p>
-
-  <h3>Content and rights</h3>
-  <p>
-   You retain rights you own. By uploading, you give the platform
-   permission to host, process, stream and display your content to
-   provide the service. Do not upload copyright material without
-   permission, impersonate others or distribute unlawful content.
-  </p>
-
-  <h3>Community safety</h3>
-  <p>
-   Harassment, threats, hate, spam, manipulation, fake engagement,
-   scams and abuse are prohibited. Content may be reviewed or removed
-   after reports or policy checks.
-  </p>
-
-  <h3>Earnings and payments</h3>
-  <p>
-   Displayed earnings are estimates until verified. Payouts depend
-   on eligible activity, actual distributable revenue, fraud checks,
-   identity and payment verification, minimum thresholds, fees,
-   taxes and available providers. No earning amount or stream rate
-   is guaranteed.
-  </p>
-
-  <h3>AI tools and privacy</h3>
-  <p>
-   Only submit material you have permission to use. AI services may
-   have provider terms, usage limits and payment requirements.
-   Account, content and activity data may be processed to operate
-   and secure the service. Protect your password.
-  </p>
-
-  <h3>Availability</h3>
-  <p>
-   Features may change during development. Some services require
-   separate integrations and may not be available in every country.
-   These draft terms require legal review before public launch.
-  </p>
-
-  <button class="btn" id="closeTermsBottom">I understand</button>
-
- </div>
-</div>
-
-<div id="toast" class="toast hidden"></div>
-
-<!-- MUSIC PLAYER -->
-<div id="player" class="player hidden">
- <div class="playerin">
-
-  <div class="now">
-   <img id="playerCover" alt="Cover">
-   <div style="min-width:0">
-    <strong id="playerTitle">Choose a song</strong>
-    <small id="playerArtist">SEQUENCE LIZ MUSIC</small>
-   </div>
-   <button class="icon" id="playerLike">♡</button>
-  </div>
-
-  <div class="controls">
-   <div class="row">
-    <button class="icon" id="prevBtn">|◀</button>
-    <button class="play" id="playBtn">▶</button>
-    <button class="icon" id="nextBtn">▶|</button>
-    <button class="icon" id="repeatBtn">↻</button>
+   <div class="player-top">
+    <strong>NOW PLAYING</strong>
+    <button id="playerMoreBtn" type="button">⋮</button>
    </div>
 
-   <div class="seek">
-    <span id="currentTime">0:00</span>
-    <input id="seekBar" type="range" min="0" max="100" value="0">
-    <span id="duration">0:00</span>
+   <div class="player-cover-wrap">
+    <img
+     id="nowCover"
+     class="player-cover"
+     src="https://placehold.co/600x600/292438/ffffff?text=SEQUENCE+LIZ"
+     alt="Song artwork"
+    >
    </div>
-  </div>
 
-  <div class="extra">
-   <select id="speedSelect">
-    <option value="1">1×</option>
-    <option value="1.25">1.25×</option>
-    <option value="1.5">1.5×</option>
-    <option value="2">2×</option>
-   </select>
-   <button class="icon" id="lyricsBtn">Lyrics</button>
+   <div class="player-song-info">
+    <h2 id="nowTitle">Nothing playing</h2>
+    <p id="nowArtist">SEQUENCE LIZ MUSIC</p>
+   </div>
+
+   <div class="player-actions">
+    <button id="likeSongBtn" type="button">♡</button>
+    <button id="shareSongBtn" type="button">↗</button>
+    <button id="downloadSongBtn" type="button">↓</button>
+   </div>
+
+   <div class="player-progress">
+
+    <input
+     id="seek"
+     type="range"
+     min="0"
+     max="100"
+     value="0"
+     aria-label="Song progress"
+    >
+
+    <div class="player-times">
+     <span id="elapsedTime">0:00</span>
+     <span id="timeLabel">0:00 / 0:00</span>
+    </div>
+
+   </div>
+
+   <div class="player-controls">
+
+    <button id="shuffleBtn" type="button">🔀</button>
+    <button id="prevBtn" type="button">|◀</button>
+    <button id="playBtn" type="button">▶</button>
+    <button id="nextBtn" type="button">▶|</button>
+    <button id="repeatBtn" type="button">🔁</button>
+
+   </div>
+
+   <div class="player-options">
+
+    <select id="speed" aria-label="Playback speed">
+     <option value=".5">0.5×</option>
+     <option value=".75">0.75×</option>
+     <option value="1" selected>1× Normal</option>
+     <option value="1.25">1.25×</option>
+     <option value="1.5">1.5×</option>
+     <option value="2">2×</option>
+    </select>
+
+    <button id="repeatTextBtn" type="button">
+     Repeat: Off
+    </button>
+
+   </div>
+
+   <div class="player-lyrics">
+    <details>
+     <summary>♪ Lyrics</summary>
+     <div id="currentLyrics" class="text-content muted">
+      No lyrics supplied for this song.
+     </div>
+    </details>
+   </div>
+
   </div>
 
  </div>
+
+ <audio id="audio"></audio>
+
 </div>
 
-<audio id="audio" preload="metadata"></audio>
+
 <script>
-"use strict";
 
-/* =========================================
-   SUPABASE CONNECTION
-========================================= */
+// ==========================================
+// PART 1: CORE SETUP
+// ==========================================
 
 const SUPABASE_URL =
-"https://wehxrlxyqiidivvinjwj.supabase.co";
+ "https://wehxrlxyqiidivvinjwj.supabase.co";
 
 const SUPABASE_ANON_KEY =
-"sb_publishable__U5zTR-UcFxxiq_uAHMVzA_G5F8lWrs";
+ "sb_publishable__U5zTR-UcFxxiq_uAHMVzA_G5F8lWrs";
 
-const db = window.supabase?.createClient
- ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
- : null;
+const db =
+ window.supabase?.createClient
+  ? window.supabase.createClient(
+     SUPABASE_URL,
+     SUPABASE_ANON_KEY
+    )
+  : null;
+
 
 const $ = id => document.getElementById(id);
 
+
 let currentUser = null;
+let profile = null;
 let tracks = [];
-let currentIndex = -1;
+let playIndex = -1;
 let repeat = false;
-let authMode = "login";
+let currentPage = "home";
+let shuffleEnabled = false;
 
-const fallbackCover =
-"data:image/svg+xml;charset=UTF-8," +
-encodeURIComponent(
-'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">' +
-'<defs><linearGradient id="g"><stop stop-color="#7652a8"/>' +
-'<stop offset="1" stop-color="#1b3447"/></linearGradient></defs>' +
-'<rect width="400" height="400" fill="url(#g)"/>' +
-'<circle cx="200" cy="190" r="105" fill="none" stroke="white" stroke-width="8"/>' +
-'<circle cx="200" cy="190" r="32" fill="white"/>' +
-'<text x="200" y="350" font-size="23" text-anchor="middle" fill="white">SEQUENCE LIZ</text>' +
-'</svg>'
-);
 
-function safe(value = "") {
- return String(value).replace(/[&<>"']/g, c => ({
+const BUCKETS = {
+ music: "music",
+ covers: "track-covers",
+ profiles: "profile-images",
+ community: "community-media",
+ chat: "private-chat-media"
+};
+
+
+// ==========================================
+// GENERAL HELPERS
+// ==========================================
+
+function msg(text){
+ $("authMessage").textContent = text;
+}
+
+
+function safe(value = ""){
+ return String(value).replace(/[&<>"']/g, character => ({
   "&":"&amp;",
   "<":"&lt;",
   ">":"&gt;",
   '"':"&quot;",
   "'":"&#39;"
- }[c]));
+ }[character]));
 }
 
-function toast(message) {
- $("toast").textContent = message;
- $("toast").classList.remove("hidden");
 
- clearTimeout(toast.timer);
-
- toast.timer = setTimeout(() => {
-  $("toast").classList.add("hidden");
- }, 3300);
+function section(title, body){
+ $("content").innerHTML =
+  `<div class="page-title"><h2>${safe(title)}</h2></div>${body}`;
 }
 
-function msg(message) {
- $("authMessage").textContent = message;
-}
 
-function fmt(seconds) {
- if (!Number.isFinite(seconds)) return "0:00";
-
- return Math.floor(seconds / 60) + ":" +
- String(Math.floor(seconds % 60)).padStart(2, "0");
-}
-
-function showAuth() {
+function showAuth(){
  $("authScreen").classList.remove("hidden");
  $("app").classList.add("hidden");
- $("player").classList.add("hidden");
 }
 
-function showApp() {
+
+function showApp(){
  $("authScreen").classList.add("hidden");
  $("app").classList.remove("hidden");
- $("player").classList.remove("hidden");
 
  $("welcomeUser").textContent =
- currentUser?.email || "";
+  profile?.display_name || currentUser?.email || "";
 }
 
-/* =========================================
-   LOGIN AND REGISTRATION
-========================================= */
 
-function setAuthMode(mode) {
- authMode = mode;
+// ==========================================
+// LOAD USER PROFILE
+// ==========================================
 
- const signup = mode === "signup";
+async function loadProfile(){
 
- $("signupFields").classList.toggle("hidden", !signup);
- $("termsCheck").classList.toggle("hidden", !signup);
+ if(!db || !currentUser)return;
 
- $("loginBtn").classList.toggle("hidden", signup);
- $("signupBtn").classList.toggle("hidden", !signup);
- $("forgotBtn").classList.toggle("hidden", signup);
+ const {data,error} = await db
+  .from("profiles")
+  .select("*")
+  .eq("id",currentUser.id)
+  .maybeSingle();
 
- $("authHeading").textContent = signup
-  ? "Create your SEQUENCE account"
-  : "Welcome back";
+ if(error){
+  console.warn("Profile lookup:",error.message);
+ }
 
- $("loginTab").classList.toggle("alt", signup);
- $("signupTab").classList.toggle("alt", !signup);
+ profile = data || null;
 
- msg("");
+ if(!profile){
+
+  const metadata = currentUser.user_metadata || {};
+
+  const newProfile = {
+   id: currentUser.id,
+   display_name:
+    metadata.display_name ||
+    currentUser.email?.split("@")[0] ||
+    "User",
+   role: metadata.role === "artist"
+    ? "artist"
+    : "listener"
+  };
+
+  const {data:created,error:createError} = await db
+   .from("profiles")
+   .insert(newProfile)
+   .select()
+   .single();
+
+  if(createError){
+   console.warn("Profile creation:",createError.message);
+   profile = newProfile;
+  }else{
+   profile = created;
+  }
+
+ }
+
 }
 
-$("loginTab").onclick = () => setAuthMode("login");
-$("signupTab").onclick = () => setAuthMode("signup");
+
+// ==========================================
+// PASSWORD SHOW / HIDE
+// ==========================================
 
 $("togglePassword").onclick = () => {
- const password = $("password");
 
- password.type =
-  password.type === "password" ? "text" : "password";
+ const passwordInput = $("password");
 
- $("togglePassword").textContent =
-  password.type === "password" ? "Show" : "Hide";
+ const show = passwordInput.type === "password";
+
+ passwordInput.type = show ? "text" : "password";
+
+ $("togglePassword").textContent = show ? "🙈" : "👁";
+
+ $("togglePassword").setAttribute(
+  "aria-label",
+  show ? "Hide password" : "Show password"
+ );
+
+ $("togglePassword").title =
+  show ? "Hide password" : "Show password";
+
+ $("togglePassword").setAttribute(
+  "aria-pressed",
+  String(show)
+ );
+
 };
 
-$("loginBtn").onclick = async () => {
- if (!db) {
-  msg("Account service unavailable. Reload the page.");
-  return;
- }
+// =====================
+ // ==========================================
+// PART 2: AUTHENTICATION, TERMS AND MENU
+// ==========================================
 
- const email = $("email").value.trim();
- const password = $("password").value;
+function showSignupForm() {
+  if ($("authHeading")) {
+    $("authHeading").textContent = "Create your account";
+  }
 
- if (!email || !password) {
-  msg("Enter your email and password.");
-  return;
- }
+  if ($("signupFields")) {
+    $("signupFields").style.display = "block";
+  }
 
- $("loginBtn").disabled = true;
- msg("Signing in…");
+  if ($("loginActions")) {
+    $("loginActions").style.display = "none";
+  }
 
- try {
-  const { error } = await db.auth.signInWithPassword({
-   email,
-   password
-  });
+  if ($("signupActions")) {
+    $("signupActions").style.display = "flex";
+  }
 
-  if (error) msg(error.message);
+  if ($("agreeTerms")) {
+    $("agreeTerms").checked = false;
+  }
 
- } catch (error) {
-  msg(error.message);
+  msg("");
+}
 
- } finally {
-  $("loginBtn").disabled = false;
- }
-};
+function showLoginForm() {
+  if ($("authHeading")) {
+    $("authHeading").textContent = "Welcome back";
+  }
 
-$("signupBtn").onclick = async () => {
- if (!db) {
-  msg("Account service unavailable.");
-  return;
- }
+  if ($("signupFields")) {
+    $("signupFields").style.display = "none";
+  }
 
- const name = $("username").value.trim();
- const email = $("email").value.trim();
- const password = $("password").value;
- const role = $("role").value;
+  if ($("signupActions")) {
+    $("signupActions").style.display = "none";
+  }
 
- if (!name || !email || !password) {
-  msg("Complete all fields.");
-  return;
- }
+  if ($("loginActions")) {
+    $("loginActions").style.display = "flex";
+  }
 
- if (password.length < 6) {
-  msg("Password must contain at least 6 characters.");
-  return;
- }
+  msg("");
+}
 
- if (!$("agreeTerms").checked) {
-  msg("Agree to the Terms before registering.");
-  return;
- }
+$("showSignup")?.addEventListener("click", showSignupForm);
+$("showLogin")?.addEventListener("click", showLoginForm);
 
- $("signupBtn").disabled = true;
- msg("Creating account…");
 
- try {
-  const { data, error } = await db.auth.signUp({
-   email,
-   password,
-   options: {
-    emailRedirectTo:
-     "https://sequenceliz1.github.io/Sequence-Liz-music-/",
+// ------------------------------------------
+// CREATE ACCOUNT
+// ------------------------------------------
 
-    data: {
-     display_name: name,
-     role: role
+$("signupBtn")?.addEventListener("click", async () => {
+  if (!db) {
+    msg("Connection error. Please refresh and try again.", true);
+    return;
+  }
+
+  const name = $("username")?.value.trim() || "";
+  const email = $("email")?.value.trim() || "";
+  const password = $("password")?.value || "";
+  const role = $("role")?.value || "listener";
+  const agreed = $("agreeTerms")?.checked;
+
+  if (!name || !email || !password) {
+    msg("Please fill in your name, email and password.", true);
+    return;
+  }
+
+  if (!agreed) {
+    msg("Please agree to the Terms before creating your account.", true);
+    return;
+  }
+
+  if (password.length < 8) {
+    msg("Your password must contain at least 8 characters.", true);
+    return;
+  }
+
+  if (!["listener", "artist"].includes(role)) {
+    msg("Please select a valid account type.", true);
+    return;
+  }
+
+  const button = $("signupBtn");
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Creating account...";
+  }
+
+  try {
+    const { data, error } = await db.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo:
+          "https://sequenceliz1.github.io/Sequence-Liz-music-/",
+
+        data: {
+          display_name: name,
+          role: role
+        }
+      }
+    });
+
+    if (error) throw error;
+
+    if (data.user && !data.session) {
+      msg(
+        "Your account has been created. Please check your email to confirm your account."
+      );
+    } else if (data.session) {
+      currentUser = data.user;
+      await loadProfile();
+      showApp();
+      await loadTracks();
+      msg("");
     }
-   }
+
+  } catch (error) {
+    msg(error.message || "Account creation failed.", true);
+
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.textContent = "Create account";
+    }
+  }
+});
+
+
+// ------------------------------------------
+// LOGIN
+// ------------------------------------------
+
+$("loginBtn")?.addEventListener("click", async () => {
+  if (!db) {
+    msg("Connection error. Please refresh and try again.", true);
+    return;
+  }
+
+  const email = $("email")?.value.trim() || "";
+  const password = $("password")?.value || "";
+
+  if (!email || !password) {
+    msg("Enter your email and password.", true);
+    return;
+  }
+
+  const button = $("loginBtn");
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Logging in...";
+  }
+
+  try {
+    const { data, error } = await db.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) throw error;
+
+    currentUser = data.user;
+
+    await loadProfile();
+
+    showApp();
+
+    await loadTracks();
+
+    msg("");
+
+  } catch (error) {
+    msg(error.message || "Login failed.", true);
+
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.textContent = "Log in";
+    }
+  }
+});
+
+
+// ------------------------------------------
+// FORGOT PASSWORD
+// ------------------------------------------
+
+$("forgotBtn")?.addEventListener("click", async () => {
+  if (!db) {
+    msg("Connection error. Please refresh and try again.", true);
+    return;
+  }
+
+  const email = $("email")?.value.trim() || "";
+
+  if (!email) {
+    msg("Enter your email address first.", true);
+    return;
+  }
+
+  try {
+    const { error } = await db.auth.resetPasswordForEmail(email, {
+      redirectTo:
+        "https://sequenceliz1.github.io/Sequence-Liz-music-/"
+    });
+
+    if (error) throw error;
+
+    msg("Password reset instructions have been sent to your email.");
+
+  } catch (error) {
+    msg(error.message || "Could not send the reset email.", true);
+  }
+});
+
+
+// ------------------------------------------
+// TERMS MODAL
+// ------------------------------------------
+
+function openTerms() {
+  if ($("termsModal")) {
+    $("termsModal").style.display = "flex";
+  }
+}
+
+function closeTermsModal() {
+  if ($("termsModal")) {
+    $("termsModal").style.display = "none";
+  }
+}
+
+$("termsLink")?.addEventListener("click", event => {
+  event.preventDefault();
+  openTerms();
+});
+
+$("closeTerms")?.addEventListener("click", closeTermsModal);
+
+$("termsModal")?.addEventListener("click", event => {
+  if (event.target === $("termsModal")) {
+    closeTermsModal();
+  }
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") {
+    closeTermsModal();
+  }
+});
+
+
+// ------------------------------------------
+// THREE-DOT MENU
+// ------------------------------------------
+
+function closeMenu() {
+  if ($("menu")) {
+    $("menu").style.display = "none";
+  }
+}
+
+$("menuBtn")?.addEventListener("click", event => {
+  event.stopPropagation();
+
+  const menu = $("menu");
+
+  if (!menu) return;
+
+  menu.style.display =
+    menu.style.display === "block" ? "none" : "block";
+});
+
+document.addEventListener("click", event => {
+  const menu = $("menu");
+  const menuButton = $("menuBtn");
+
+  if (
+    menu &&
+    !menu.contains(event.target) &&
+    !menuButton?.contains(event.target)
+  ) {
+    closeMenu();
+  }
+});
+
+
+// ------------------------------------------
+// MENU PAGE BUTTONS
+// ------------------------------------------
+
+document.querySelectorAll("[data-page]").forEach(button => {
+  button.addEventListener("click", () => {
+    const page = button.dataset.page;
+
+    closeMenu();
+
+    if (typeof openPage === "function") {
+      openPage(page);
+    }
   });
+});
 
-  if (error) {
-   msg(error.message);
-  } else if (data.session) {
-   msg("Account created.");
-  } else {
-   msg("Check your email to confirm your account.");
-  }
 
- } catch (error) {
-  msg(error.message);
+// ------------------------------------------
+// RESTART
+// ------------------------------------------
 
- } finally {
-  $("signupBtn").disabled = false;
- }
-};
+$("restartBtn")?.addEventListener("click", () => {
+  window.location.reload();
+});
 
-$("forgotBtn").onclick = async () => {
- if (!db) {
-  msg("Account service unavailable.");
-  return;
- }
+$("restartMenuBtn")?.addEventListener("click", () => {
+  window.location.reload();
+});
 
- const email = $("email").value.trim();
 
- if (!email) {
-  msg("Enter your email first.");
-  return;
- }
+// ------------------------------------------
+// LOG OUT
+// ------------------------------------------
 
- const { error } = await db.auth.resetPasswordForEmail(
-  email,
-  {
-   redirectTo:
-    "https://sequenceliz1.github.io/Sequence-Liz-music-/"
-  }
- );
+$("logoutBtn")?.addEventListener("click", async () => {
+  if (!db) return;
 
- msg(
-  error
-   ? error.message
-   : "Reset email requested. Check Inbox and Spam."
- );
-};
-
-/* =========================================
-   TERMS MODAL
-========================================= */
-
-function termsOpen() {
- $("termsModal").classList.remove("hidden");
-}
-
-$("termsLink").onclick = event => {
- event.preventDefault();
- termsOpen();
-};
-
-$("termsMenu").onclick = termsOpen;
-
-$("closeTerms").onclick =
-$("closeTermsBottom").onclick = () => {
- $("termsModal").classList.add("hidden");
-};
-
-$("termsModal").onclick = event => {
- if (event.target === $("termsModal")) {
-  $("termsModal").classList.add("hidden");
- }
-};
-
-/* =========================================
-   MUSIC STORAGE AND TRACKS
-========================================= */
-
-function coverUrl(path) {
- if (!path || !db) return fallbackCover;
-
- return db.storage
-  .from("track-covers")
-  .getPublicUrl(path).data.publicUrl;
-}
-
-async function loadTracks() {
- if (!db) return;
-
- try {
-  const { data, error } = await db
-   .from("tracks")
-   .select(
-    "id,title,artist_name,audio_path,cover_path,lyrics,created_at,status"
-   )
-   .order("created_at", { ascending: false })
-   .limit(100);
-
-  if (error) {
-   console.warn("Tracks:", error.message);
-   tracks = [];
-   return;
-  }
-
-  tracks = (data || []).filter(track =>
-   ["approved", "published", "live"].includes(
-    String(track.status || "").toLowerCase()
-   )
+  const confirmed = window.confirm(
+    "Are you sure you want to log out?"
   );
 
- } catch (error) {
-  console.warn(error);
+  if (!confirmed) return;
+
+  const { error } = await db.auth.signOut();
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  currentUser = null;
+  profile = null;
   tracks = [];
- }
+  playIndex = -1;
+
+  showAuth();
+  showLoginForm();
+});
+
+
+// ==========================================
+// END OF PART 2
+// ==========================================
+ // ==========================================
+// PART 3: MUSIC AND FAVOURITES
+// ==========================================
+
+function publicUrl(bucket, path) {
+  if (!db || !path) return "";
+
+  const { data } = db.storage
+    .from(bucket)
+    .getPublicUrl(path);
+
+  return data?.publicUrl || "";
 }
 
-async function audioUrl(path) {
- if (!path || !db) return null;
 
- const { data, error } = await db
-  .storage
-  .from("music")
-  .createSignedUrl(path, 3600);
-
- if (error) {
-  console.warn(error.message);
-  return null;
- }
-
- return data.signedUrl;
-}
-
-/* =========================================
-   MUSIC CARDS
-========================================= */
-
-function songCard(track) {
- const index = tracks.indexOf(track);
-
- return `
- <article class="song">
-
-  <img
-   src="${safe(coverUrl(track.cover_path))}"
-   onerror="this.src='${fallbackCover}'"
-   alt="Cover artwork"
-  >
-
-  <h3>${safe(track.title || "Untitled")}</h3>
-
-  <p>${safe(track.artist_name || "Independent artist")}</p>
-
-  <button class="btn" onclick="playTrack(${index})">
-   ▶ Play
-  </button>
-
-  <button
-   class="icon"
-   onclick="toggleFavourite('${safe(track.id)}')"
-  >
-   ♡
-  </button>
-
- </article>
- `;
-}
-
-function songGrid(list) {
- if (!list.length) {
-  return `
-  <div class="card">
-   <h3>No approved music is showing yet.</h3>
-   <p class="muted">
-    Published tracks visible to your account will appear here.
-   </p>
-  </div>
-  `;
- }
-
- return `
- <div class="grid">
-  ${list.map(songCard).join("")}
- </div>
- `;
-}
-
-/* =========================================
-   HOME PAGE
-========================================= */
-
-function homePage() {
- return `
-
- <section class="hero">
-
-  <div class="eyebrow">
-   Your sound. Your people. Your stage.
-  </div>
-
-  <h1>
-   Where music moves people and creativity finds its community.
-  </h1>
-
-  <p>
-   Discover fresh sounds, follow artists, grow your audience
-   and connect with the SEQUENCE FAMILY in one creative space.
-  </p>
-
-  <button class="btn" onclick="openPage('discover')">
-   Explore music
-  </button>
-
-  <button class="btn alt" onclick="openPage('family')">
-   Enter SEQUENCE FAMILY
-  </button>
-
- </section>
-
- <div class="head">
-  <h2>Latest music</h2>
-
-  <button class="btn alt" onclick="openPage('discover')">
-   Discover all
-  </button>
- </div>
-
- ${songGrid(tracks.slice(0, 12))}
-
- <div class="head">
-  <h2>Made for creators</h2>
- </div>
-
- <div class="two">
-
-  <div class="card">
-   <span class="eyebrow">CREATE</span>
-   <h3>Bring your music to life</h3>
-
-   <p class="muted">
-    Manage releases, share your story and build a listener community.
-   </p>
-
-   <button class="btn alt" onclick="openPage('dashboard')">
-    Artist dashboard
-   </button>
-  </div>
-
-  <div class="card">
-   <span class="eyebrow">CONNECT</span>
-   <h3>Meet SEQUENCE FAMILY</h3>
-
-   <p class="muted">
-    A space for stories, creativity and genuine interaction.
-   </p>
-
-   <button class="btn alt" onclick="openPage('family')">
-    Explore Family
-   </button>
-  </div>
-
- </div>
- `;
-}
-
-/* =========================================
-   SEQUENCE FAMILY
-========================================= */
-
-function familyPage() {
- return `
-
- <div class="hero">
-
-  <div class="eyebrow">
-   A different kind of social space
-  </div>
-
-  <h1>SEQUENCE FAMILY</h1>
-
-  <p>
-   Stories, short films, music moments and conversations —
-   a community built around creativity, respect and real connection.
-  </p>
-
-  <button class="btn"
-   onclick="toast('Family publishing needs its database and media policies connected.')">
-   Create a post
-  </button>
-
- </div>
-
- <div class="head">
-  <h2>Community spotlight</h2>
-  <span class="tiny">Preview experience</span>
- </div>
-
- <div class="familyfeed">
-
-  <div class="post">
-
-   <div class="eyebrow">
-    SEQUENCE FAMILY • COMMUNITY
-   </div>
-
-   <div class="symbol">▶</div>
-
-   <div>
-    <h2>Every creator has a story.</h2>
-
-    <p>
-     Share your moment. Discover another perspective.
-    </p>
-
-    <button class="icon"
-     onclick="toast('Likes need the Family backend.')">
-     ♡ Like
-    </button>
-
-    <button class="icon"
-     onclick="toast('Comments need the Family backend.')">
-     ▢ Comment
-    </button>
-
-    <button class="icon"
-     onclick="toast('Sharing will be enabled with posts.')">
-     ↗ Share
-    </button>
-   </div>
-
-  </div>
-
-  <aside class="card familyaside">
-   <h3>Family values</h3>
-
-   <p class="muted">
-    Respect • Originality • Safety • Opportunity
-   </p>
-
-   <hr style="border-color:var(--line)">
-
-   <h3>Creator opportunity</h3>
-
-   <p class="muted">
-    Eligible contributions may earn when supported by
-    verified revenue and clear rules.
-   </p>
-
-   <button class="btn alt" onclick="openPage('earnings')">
-    How earning works
-   </button>
-  </aside>
-
- </div>
- `;
-}
-
-/* =========================================
-   GENERAL PAGE BUILDER
-========================================= */
-
-function page(title, kicker, body) {
- return `
- <div class="eyebrow">${safe(kicker)}</div>
- <h1>${safe(title)}</h1>
- <div class="card">${body}</div>
- `;
-}
-
-/* =========================================
-   PLATFORM NAVIGATION
-========================================= */
-
-function openPage(pageName) {
-
- document.querySelectorAll(".nav[data-page]").forEach(button => {
-  button.classList.toggle(
-   "active",
-   button.dataset.page === pageName
-  );
- });
-
- $("sidebar").classList.remove("open");
-
- let html = "";
-
- switch (pageName) {
-
-  case "home":
-   html = homePage();
-   break;
-
-  case "discover":
-   html = `
-   <div class="eyebrow">Find your next favourite</div>
-   <h1>Discover & Search</h1>
-
-   <div class="card">
-    <input
-     class="field"
-     placeholder="Search songs or artists…"
-     oninput="filterMusic(this.value)"
-    >
-   </div>
-
-   <div id="results" style="margin-top:16px">
-    ${songGrid(tracks)}
-   </div>
-   `;
-   break;
-
-  case "charts":
-   html = page(
-    "Music Charts",
-    "The pulse of the platform",
-    `
-    <p class="muted">
-     Charts will rank eligible music using verified listening
-     activity and anti-fraud checks.
-    </p>
-
-    ${songGrid(tracks.slice(0, 20))}
-    `
-   );
-   break;
-
-  case "favourites": {
-   let ids = JSON.parse(
-    localStorage.getItem("slm_favourites") || "[]"
-   );
-
-   html = page(
-    "Favourite Songs",
-    "Your personal collection",
-    songGrid(
-     tracks.filter(track =>
-      ids.includes(String(track.id))
-     )
-    )
-   );
-
-   break;
+// ------------------------------------------
+// FAVOURITES
+// ------------------------------------------
+
+function getFavourites() {
+  try {
+    return JSON.parse(
+      localStorage.getItem("sequenceLizFavourites") || "[]"
+    );
+  } catch {
+    return [];
   }
-
-  case "family":
-   html = familyPage();
-   break;
-
-  case "videos":
-   html = page(
-    "Artist Videos",
-    "Visual stories",
-    `
-    <p>
-     Music videos will appear here after the video table,
-     storage bucket and publishing workflow are connected.
-    </p>
-    `
-   );
-   break;
-
-  case "shows":
-   html = page(
-    "Watch Shows",
-    "Shows & featured channels",
-    `
-    <p>
-     Curated shows and approved external channels
-     will be presented here.
-    </p>
-    `
-   );
-   break;
-
-  case "chats":
-   html = page(
-    "Private Chats",
-    "Connect with people",
-    `
-    <p class="muted">
-     Private messaging requires secure conversation membership,
-     realtime subscriptions, media access policies and report controls.
-     Those services are not connected in this file yet.
-    </p>
-    `
-   );
-   break;
-
-  case "familycharts":
-   html = page(
-    "Family Charts",
-    "Community recognition",
-    `
-    <p class="muted">
-     Rankings will use genuine engagement and anti-manipulation
-     checks after the Family service is connected.
-    </p>
-    `
-   );
-   break;
-
-  case "studio":
-   html = page(
-    "AI Music Studio",
-    "Your voice. Your production.",
-    `
-    <p>
-     Plan a production using your real recorded vocals,
-     lyrics and instrumental preferences. AI singer voice
-     replacement is not part of the intended workflow.
-    </p>
-
-    <p class="muted">
-     Provider generation, preview limits, payment and downloads
-     must be connected through secure server-side functions
-     before generation can work.
-    </p>
-
-    <button class="btn"
-     onclick="toast('AI provider is not connected from this page yet.')">
-     Open production workspace
-    </button>
-    `
-   );
-   break;
-
-  case "pictureai":
-   html = page(
-    "AI Picture-to-Video",
-    "Turn a still image into a moving story",
-    `
-    <p class="muted">
-     Image/video generation, moderation, preview and paid export
-     need provider and billing integration.
-    </p>
-
-    <button class="btn"
-     onclick="toast('Picture-to-video provider is not connected yet.')">
-     Start a creation
-    </button>
-    `
-   );
-   break;
-
-  case "creations":
-   html = page(
-    "My AI Creations",
-    "Your creative library",
-    `
-    <p class="muted">
-     Purchased assets will appear here when job ownership
-     and secure download records are connected.
-    </p>
-    `
-   );
-   break;
-
-  case "upload":
-   html = page(
-    "Upload Music / Video",
-    "Publish your work",
-    `
-    <p>
-     This is the release form design. Upload is not activated
-     until the existing table columns, bucket policies and
-     publishing workflow are connected.
-    </p>
-
-    <label>Release title</label>
-    <input class="field" id="releaseTitle"
-     placeholder="Song or video title">
-
-    <label>Artist name</label>
-    <input class="field" id="releaseArtist"
-     placeholder="Artist name">
-
-    <label>Lyrics / description</label>
-    <textarea class="field" rows="4"
-     placeholder="Add lyrics, credits or description"></textarea>
-
-    <label>Audio or video</label>
-    <input class="field" type="file" accept="audio/*,video/*">
-
-    <label>Cover artwork</label>
-    <input class="field" type="file" accept="image/*">
-
-    <p class="tiny">
-     Draft, review, scheduling and publishing must be handled
-     by a secure upload service.
-    </p>
-
-    <button class="btn"
-     onclick="toast('Upload awaits schema and storage verification.')">
-     Save release draft
-    </button>
-    `
-   );
-   break;
-
-  case "dashboard":
-   html = page(
-    "Artist Dashboard",
-    "Build your music journey",
-    `
-    <div class="stats">
-
-     <div class="card stat">
-      Published tracks
-      <strong>${tracks.length}</strong>
-     </div>
-
-     <div class="card stat">
-      Listeners
-      <strong>—</strong>
-     </div>
-
-     <div class="card stat">
-      Streams
-      <strong>—</strong>
-     </div>
-
-     <div class="card stat">
-      Followers
-      <strong>—</strong>
-     </div>
-
-    </div>
-
-    <p class="muted">
-     Analytics will display verified platform data only.
-    </p>
-
-    <button class="btn alt" onclick="openPage('promote')">
-     Promote your song
-    </button>
-    `
-   );
-   break;
-
-  case "earnings":
-   html = page(
-    "Earnings & Withdrawals",
-    "Transparent creator rewards",
-    `
-    <p>
-     Everyone who contributes genuine value to the platform
-     should have an opportunity to earn.
-    </p>
-
-    <p class="muted">
-     Balances, revenue splits, fees, exchange rates and withdrawals
-     must be calculated server-side from verified distributable
-     revenue. No earnings are promised by this preview.
-    </p>
-
-    <div class="two">
-     <div class="card">
-      Available balance
-      <h2>—</h2>
-     </div>
-
-     <div class="card">
-      Pending balance
-      <h2>—</h2>
-     </div>
-    </div>
-    `
-   );
-   break;
-
-  case "promote":
-   html = page(
-    "Promote Your Song",
-    "Reach new listeners",
-    `
-    <p class="muted">
-     Choose a published song, audience, geography, campaign
-     duration and budget. Campaigns start only after verified
-     payment and approval.
-    </p>
-
-    <button class="btn"
-     onclick="toast('Campaign payments and delivery are not connected yet.')">
-     Plan a campaign
-    </button>
-    `
-   );
-   break;
-
-  case "profile":
-   html = page(
-    "My Profile",
-    "Your identity on the platform",
-    `
-    <p>
-     <b>Email:</b>
-     ${safe(currentUser?.email || "")}
-    </p>
-
-    <p>
-     <b>Display name:</b>
-     ${safe(currentUser?.user_metadata?.display_name || "Not set")}
-    </p>
-
-    <p>
-     <b>Account type:</b>
-     ${safe(currentUser?.user_metadata?.role || "listener")}
-    </p>
-
-    <p class="tiny">
-     Profile editing will connect to the verified profiles schema.
-    </p>
-    `
-   );
-   break;
-
-  case "settings":
-   html = page(
-    "Settings",
-    "Your account preferences",
-    `
-    <p class="muted">
-     Use Forgot password on the login screen for password recovery.
-     Other settings will be connected through verified account workflows.
-    </p>
-    `
-   );
-   break;
-
-  case "help":
-   html = page(
-    "Help & Support",
-    "We are here to help",
-    `
-    <p>
-     Official phone, WhatsApp and TikTok support links should be
-     configured by the platform administrator before launch.
-    </p>
-    `
-   );
-   break;
-
-  default:
-   html = homePage();
- }
-
- $("content").innerHTML = html;
-
- window.scrollTo({
-  top: 0,
-  behavior: "smooth"
- });
 }
 
-window.openPage = openPage;
+function saveFavourites(list) {
+  localStorage.setItem(
+    "sequenceLizFavourites",
+    JSON.stringify(list)
+  );
+}
 
-/* =========================================
-   MUSIC SEARCH
-========================================= */
-
-window.filterMusic = query => {
- const term = query.toLowerCase();
-
- const list = tracks.filter(track =>
-  (track.title || "").toLowerCase().includes(term) ||
-  (track.artist_name || "").toLowerCase().includes(term)
- );
-
- $("results").innerHTML = songGrid(list);
-};
-
-/* =========================================
-   FAVOURITE SONGS
-========================================= */
+function isFavourite(id) {
+  return getFavourites().includes(String(id));
+}
 
 function toggleFavourite(id) {
- let ids = JSON.parse(
-  localStorage.getItem("slm_favourites") || "[]"
- );
+  const favourites = getFavourites();
+  const songId = String(id);
 
- const key = String(id);
+  const index = favourites.indexOf(songId);
 
- ids = ids.includes(key)
-  ? ids.filter(item => item !== key)
-  : [...ids, key];
+  if (index >= 0) {
+    favourites.splice(index, 1);
+  } else {
+    favourites.push(songId);
+  }
 
- localStorage.setItem(
-  "slm_favourites",
-  JSON.stringify(ids)
- );
+  saveFavourites(favourites);
 
- toast(
-  ids.includes(key)
-   ? "Added to favourites"
-   : "Removed from 
-   /* =========================================
-   MUSIC PLAYER
-========================================= */
-
-const audio = $("audio");
-
-function updatePlayer(track) {
- $("playerTitle").textContent =
-  track.title || "Untitled";
-
- $("playerArtist").textContent =
-  track.artist_name || "Independent artist";
-
- $("playerCover").src =
-  coverUrl(track.cover_path);
+  if (typeof openPage === "function") {
+    if (currentPage === "favourites") {
+      openPage("favourites");
+    } else {
+      document.querySelectorAll(
+        `[data-favourite="${songId}"]`
+      ).forEach(button => {
+        button.textContent = isFavourite(songId)
+          ? "♥"
+          : "♡";
+      });
+    }
+  }
 }
 
-async function playTrack(index) {
- if (!Number.isInteger(index) ||
-     index < 0 || index >= tracks.length) {
-  toast("This song is unavailable.");
-  return;
- }
+window.toggleFavourite = toggleFavourite;
 
- const track = tracks[index];
 
- const url = await audioUrl(track.audio_path);
+// ------------------------------------------
+// LOAD APPROVED MUSIC
+// ------------------------------------------
 
- if (!url) {
-  toast("Unable to load this song.");
-  return;
- }
+async function loadTracks() {
+  if (!db) return;
 
- currentIndex = index;
+  const container = $("content");
 
- audio.src = url;
- audio.playbackRate = Number($("speedSelect").value);
+  if (container && currentPage === "home") {
+    container.innerHTML = section(
+      "Artist Music",
+      "Loading music..."
+    );
+  }
 
- updatePlayer(track);
+  try {
+    const { data, error } = await db
+      .from("tracks")
+      .select(`
+        id,
+        title,
+        artist_name,
+        description,
+        audio_path,
+        cover_path,
+        lyrics,
+        created_at,
+        artist_id
+      `)
+      .eq("status", "approved")
+      .order("created_at", { ascending: false })
+      .limit(100);
 
- $("playBtn").textContent = "Ⅱ";
+    if (error) throw error;
 
- try {
-  await audio.play();
- } catch (error) {
-  $("playBtn").textContent = "▶";
-  toast("Playback could not start. Tap Play again.");
- }
+    tracks = data || [];
+
+    if (currentPage === "home") {
+      renderMusicPage(tracks);
+    }
+
+  } catch (error) {
+    console.error("Music loading error:", error);
+
+    if (container && currentPage === "home") {
+      container.innerHTML = section(
+        "Artist Music",
+        "Music could not be loaded. Please check your Supabase database settings."
+      );
+    }
+  }
+}
+
+
+// ------------------------------------------
+// SONG CARD
+// ------------------------------------------
+
+function trackCard(track) {
+  const cover = publicUrl(
+    BUCKETS.covers,
+    track.cover_path
+  );
+
+  const favourite = isFavourite(track.id);
+
+  const card = document.createElement("article");
+  card.className = "track-card";
+
+  card.innerHTML = `
+    <div class="track-cover">
+      ${
+        cover
+          ? `<img src="${safe(cover)}" alt="Song cover">`
+          : `<div class="cover-placeholder">♫</div>`
+      }
+    </div>
+
+    <div class="track-info">
+      <h3>${safe(track.title || "Untitled song")}</h3>
+      <p>${safe(track.artist_name || "Unknown artist")}</p>
+      <p>${safe(track.description || "")}</p>
+    </div>
+
+    <div class="track-actions">
+      <button type="button" data-play="${safe(track.id)}">
+        Play
+      </button>
+
+      <button
+        type="button"
+        data-favourite="${safe(track.id)}"
+        aria-label="Add to favourites"
+      >
+        ${favourite ? "♥" : "♡"}
+      </button>
+    </div>
+  `;
+
+  card.querySelector("[data-play]")?.addEventListener(
+    "click",
+    () => {
+      const index = tracks.findIndex(
+        item => String(item.id) === String(track.id)
+      );
+
+      if (index >= 0) {
+        playTrack(index);
+      }
+    }
+  );
+
+  card.querySelector("[data-favourite]")?.addEventListener(
+    "click",
+    () => toggleFavourite(track.id)
+  );
+
+  return card;
+}
+
+
+// ------------------------------------------
+// DISPLAY MUSIC
+// ------------------------------------------
+
+function renderMusicPage(list) {
+  const container = $("content");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  const heading = document.createElement("div");
+  heading.innerHTML = `
+    <h2>Artist Music</h2>
+    <p>Discover music from SEQUENCE LIZ MUSIC artists.</p>
+  `;
+
+  container.appendChild(heading);
+
+  const grid = document.createElement("div");
+  grid.className = "tracks-list";
+
+  if (!list || list.length === 0) {
+    grid.innerHTML = `
+      <p>No approved songs are available yet.</p>
+    `;
+  } else {
+    list.forEach(track => {
+      grid.appendChild(trackCard(track));
+    });
+  }
+
+  container.appendChild(grid);
+}
+
+
+// ------------------------------------------
+// PLAY SONG
+// ------------------------------------------
+
+function playTrack(index) {
+  if (!Array.isArray(tracks) || !tracks[index]) {
+    return;
+  }
+
+  const track = tracks[index];
+
+  const audio = $("audio");
+
+  if (!audio) {
+    alert("The audio player could not be found.");
+    return;
+  }
+
+  const audioUrl = publicUrl(
+    BUCKETS.music,
+    track.audio_path
+  );
+
+  if (!audioUrl) {
+    alert("This song does not have a valid audio file.");
+    return;
+  }
+
+  playIndex = index;
+
+  audio.src = audioUrl;
+  audio.load();
+
+  if ($("nowTitle")) {
+    $("nowTitle").textContent = track.title || "Untitled song";
+  }
+
+  if ($("nowArtist")) {
+    $("nowArtist").textContent =
+      track.artist_name || "Unknown artist";
+  }
+
+  if ($("nowCover")) {
+    const coverUrl = publicUrl(
+      BUCKETS.covers,
+      track.cover_path
+    );
+
+    $("nowCover").src = coverUrl || "";
+    $("nowCover").style.display = coverUrl ? "block" : "none";
+  }
+
+  if ($("currentLyrics")) {
+    $("currentLyrics").textContent =
+      track.lyrics || "No lyrics have been added.";
+  }
+
+  audio.play().catch(error => {
+    console.error("Playback error:", error);
+    alert("Tap the play button to start this song.");
+  });
+
+  if ($("playBtn")) {
+    $("playBtn").textContent = "Ⅱ";
+  }
 }
 
 window.playTrack = playTrack;
 
-$("playBtn").onclick = async () => {
- if (!audio.src) {
-  if (tracks.length) {
-   await playTrack(0);
-  } else {
-   toast("No playable songs are available yet.");
-  }
-  return;
- }
 
- if (audio.paused) {
+// ==========================================
+// END OF PART 3
+// ==========================================
+ // ==========================================
+// PART 4: PLATFORM PAGES AND UPLOAD
+// ==========================================
+
+
+// ------------------------------------------
+// PAGE NAVIGATION
+// ------------------------------------------
+
+async function openPage(page) {
+  currentPage = page;
+
+  const container = $("content");
+  if (!container) return;
+
+  closeMenu();
+
+  if (page === "home") {
+    await loadTracks();
+    return;
+  }
+
+  if (page === "discover") {
+    await loadTracks();
+
+    container.innerHTML = `
+      <h2>Discover & Search</h2>
+      <p>Find songs and artists on SEQUENCE LIZ MUSIC.</p>
+
+      <input
+        id="musicSearch"
+        type="search"
+        placeholder="Search songs or artists..."
+      >
+
+      <div id="searchResults" class="tracks-list"></div>
+    `;
+
+    const search = $("musicSearch");
+    const results = $("searchResults");
+
+    function searchMusic() {
+      const term = search.value.trim().toLowerCase();
+
+      const matches = tracks.filter(track =>
+        `${track.title} ${track.artist_name}`
+          .toLowerCase()
+          .includes(term)
+      );
+
+      results.innerHTML = "";
+
+      matches.forEach(track => {
+        results.appendChild(trackCard(track));
+      });
+
+      if (!matches.length) {
+        results.textContent = "No matching songs found.";
+      }
+    }
+
+    search.addEventListener("input", searchMusic);
+    searchMusic();
+
+    return;
+  }
+
+  if (page === "charts") {
+    await loadTracks();
+
+    const popular = [...tracks];
+
+    container.innerHTML = `
+      <h2>Music Charts</h2>
+      <p>Approved songs currently available on the platform.</p>
+      <div id="chartSongs" class="tracks-list"></div>
+    `;
+
+    const list = $("chartSongs");
+
+    popular.forEach(track => {
+      list.appendChild(trackCard(track));
+    });
+
+    return;
+  }
+
+  if (page === "favourites") {
+    await loadTracks();
+
+    const favourites = getFavourites();
+
+    const saved = tracks.filter(track =>
+      favourites.includes(String(track.id))
+    );
+
+    container.innerHTML = `
+      <h2>Favourite Songs</h2>
+      <div id="favouriteSongs" class="tracks-list"></div>
+    `;
+
+    const list = $("favouriteSongs");
+
+    if (!saved.length) {
+      list.textContent = "You have not added any favourites yet.";
+    } else {
+      saved.forEach(track => {
+        list.appendChild(trackCard(track));
+      });
+    }
+
+    return;
+  }
+
+  if (page === "upload") {
+    showUploadPage();
+    return;
+  }
+
+  if (page === "profile") {
+    showProfilePage();
+    return;
+  }
+
+  if (page === "dashboard") {
+    showDashboardPage();
+    return;
+  }
+
+  if (page === "earnings") {
+    showEarningsPage();
+    return;
+  }
+
+  if (page === "terms") {
+    openTerms();
+    return;
+  }
+
+  const pages = {
+    videos: [
+      "Artist Videos",
+      "Video publishing needs a configured video database and storage setup."
+    ],
+
+    shows: [
+      "Watch Shows / YouTube",
+      "Video programmes and external video links will appear here when configured."
+    ],
+
+    family: [
+      "SEQUENCE FAMILY",
+      "The community area requires its posting, media and moderation services to be connected."
+    ],
+
+    chats: [
+      "Private Chats",
+      "Private messaging requires configured chat policies and realtime services."
+    ],
+
+    "family-charts": [
+      "Family Charts",
+      "Community rankings will appear here when verified activity tracking is connected."
+    ],
+
+    "ai-studio": [
+      "AI Music Studio",
+      "AI production requires a connected provider, secure server-side processing and payment verification."
+    ],
+
+    "picture-ai": [
+      "AI Picture-to-Video",
+      "Picture-to-video generation requires a connected provider and payment system."
+    ],
+
+    purchased: [
+      "My Purchased AI Creations",
+      "Your purchased creations will appear here when the purchase records are connected."
+    ],
+
+    privacy: [
+      "Privacy",
+      "Your account information and activity should be handled according to the platform privacy policy."
+    ],
+
+    help: [
+      "Help & Support",
+      "Contact the SEQUENCE LIZ MUSIC support team for assistance."
+    ],
+
+    settings: [
+      "Settings",
+      "Account and application settings."
+    ]
+  };
+
+  const selected = pages[page];
+
+  if (selected) {
+    container.innerHTML = section(
+      selected[0],
+      selected[1]
+    );
+    return;
+  }
+
+  container.innerHTML = section(
+    "SEQUENCE LIZ MUSIC",
+    "This section is not available yet."
+  );
+}
+
+
+// ------------------------------------------
+// UPLOAD MUSIC PAGE
+// ------------------------------------------
+
+function showUploadPage() {
+  const container = $("content");
+  if (!container) return;
+
+  if (!currentUser) {
+    container.innerHTML = section(
+      "Upload Music",
+      "Please log in first."
+    );
+    return;
+  }
+
+  if (
+    profile?.role !== "artist" &&
+    profile?.role !== "admin"
+  ) {
+    container.innerHTML = section(
+      "Upload Music",
+      "Music uploads are currently available to artist accounts."
+    );
+    return;
+  }
+
+  container.innerHTML = `
+    <h2>Upload Music</h2>
+
+    <p>
+      Submit your music for review.
+      Approved songs can appear in Artist Music.
+    </p>
+
+    <form id="musicUploadForm">
+
+      <label for="uploadTitle">Song title</label>
+      <input
+        id="uploadTitle"
+        type="text"
+        required
+        maxlength="150"
+      >
+
+      <label for="uploadDescription">Description</label>
+      <textarea
+        id="uploadDescription"
+        rows="3"
+      ></textarea>
+
+      <label for="uploadLyrics">Lyrics</label>
+      <textarea
+        id="uploadLyrics"
+        rows="6"
+      ></textarea>
+
+      <label for="uploadAudio">Audio file</label>
+      <input
+        id="uploadAudio"
+        type="file"
+        accept="audio/*"
+        required
+      >
+
+      <label for="uploadCover">Cover artwork</label>
+      <input
+        id="uploadCover"
+        type="file"
+        accept="image/*"
+      >
+
+      <button id="submitMusic" type="submit">
+        Submit Music
+      </button>
+
+      <p id="uploadMessage" aria-live="polite"></p>
+
+    </form>
+  `;
+
+  $("musicUploadForm")?.addEventListener(
+    "submit",
+    uploadMusic
+  );
+}
+
+
+// ------------------------------------------
+// SAVE MUSIC TO SUPABASE
+// ------------------------------------------
+
+async function uploadMusic(event) {
+  event.preventDefault();
+
+  if (!db || !currentUser) {
+    alert("Please log in again.");
+    return;
+  }
+
+  const title = $("uploadTitle")?.value.trim();
+  const description =
+    $("uploadDescription")?.value.trim() || "";
+
+  const lyrics =
+    $("uploadLyrics")?.value.trim() || "";
+
+  const audioFile =
+    $("uploadAudio")?.files?.[0];
+
+  const coverFile =
+    $("uploadCover")?.files?.[0];
+
+  const message = $("uploadMessage");
+  const button = $("submitMusic");
+
+  if (!title || !audioFile) {
+    if (message) {
+      message.textContent =
+        "Please enter a song title and select an audio file.";
+    }
+    return;
+  }
+
+  if (!audioFile.type.startsWith("audio/")) {
+    if (message) {
+      message.textContent = "Please select a valid audio file.";
+    }
+    return;
+  }
+
+  if (
+    coverFile &&
+    !coverFile.type.startsWith("image/")
+  ) {
+    if (message) {
+      message.textContent = "Please select a valid image for the cover.";
+    }
+    return;
+  }
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Uploading...";
+  }
+
+  let audioPath = null;
+  let coverPath = null;
+
   try {
-   await audio.play();
-   $("playBtn").textContent = "Ⅱ";
+    const safeTitle = title
+      .replace(/[^a-zA-Z0-9_-]/g, "_")
+      .slice(0, 60);
+
+    const unique = Date.now();
+
+    audioPath =
+      `${currentUser.id}/${unique}_${safeTitle}`;
+
+    const audioUpload = await db.storage
+      .from(BUCKETS.music)
+      .upload(audioPath, audioFile, {
+        cacheControl: "3600",
+        upsert: false
+      });
+
+    if (audioUpload.error) {
+      throw audioUpload.error;
+    }
+
+    if (coverFile) {
+      const extension =
+        coverFile.name.split(".").pop() || "jpg";
+
+      coverPath =
+        `${currentUser.id}/${unique}_cover.${extension}`;
+
+      const coverUpload = await db.storage
+        .from(BUCKETS.covers)
+        .upload(coverPath, coverFile, {
+          cacheControl: "3600",
+          upsert: false
+        });
+
+      if (coverUpload.error) {
+        throw coverUpload.error;
+      }
+    }
+
+    const { error } = await db
+      .from("tracks")
+      .insert({
+        artist_id: currentUser.id,
+        title: title,
+        artist_name:
+          profile?.display_name ||
+          currentUser.user_metadata?.display_name ||
+          "Artist",
+        description: description,
+        audio_path: audioPath,
+        cover_path: coverPath,
+        lyrics: lyrics,
+        status: "pending"
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    if (message) {
+      message.textContent =
+        "Your music has been submitted for review.";
+    }
+
+    $("musicUploadForm")?.reset();
+
   } catch (error) {
-   toast("Playback could not start.");
+    console.error("Upload error:", error);
+
+    // Remove uploaded files if the database insert failed.
+    if (audioPath) {
+      await db.storage
+        .from(BUCKETS.music)
+        .remove([audioPath])
+        .catch(() => {});
+    }
+
+    if (coverPath) {
+      await db.storage
+        .from(BUCKETS.covers)
+        .remove([coverPath])
+        .catch(() => {});
+    }
+
+    if (message) {
+      message.textContent =
+        error.message || "Music upload failed.";
+    }
+
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.textContent = "Submit Music";
+    }
   }
- } else {
-  audio.pause();
-  $("playBtn").textContent = "▶";
- }
-};
+}
 
-$("prevBtn").onclick = () => {
- if (!tracks.length) return;
 
- const nextIndex =
-  currentIndex <= 0
-   ? tracks.length - 1
-   : currentIndex - 1;
+// ------------------------------------------
+// PROFILE PAGE
+// ------------------------------------------
 
- playTrack(nextIndex);
-};
+function showProfilePage() {
+  const container = $("content");
+  if (!container) return;
 
-$("nextBtn").onclick = () => {
- if (!tracks.length) return;
+  container.innerHTML = `
+    <h2>My Profile</h2>
 
- const nextIndex =
-  currentIndex >= tracks.length - 1
-   ? 0
-   : currentIndex + 1;
+    <p>
+      <strong>Name:</strong>
+      ${safe(profile?.display_name || "Not set")}
+    </p>
 
- playTrack(nextIndex);
-};
+    <p>
+      <strong>Email:</strong>
+      ${safe(currentUser?.email || "")}
+    </p>
 
-$("repeatBtn").onclick = () => {
- repeat = !repeat;
+    <p>
+      <strong>Account type:</strong>
+      ${safe(profile?.role || "listener")}
+    </p>
+  `;
+}
 
- audio.loop = repeat;
 
- $("repeatBtn").style.color =
-  repeat ? "var(--cyan)" : "white";
+// ------------------------------------------
+// ARTIST DASHBOARD
+// ------------------------------------------
 
- toast(repeat ? "Repeat enabled" : "Repeat disabled");
-};
+function showDashboardPage() {
+  const container = $("content");
+  if (!container) return;
 
-$("speedSelect").onchange = () => {
- audio.playbackRate = Number($("speedSelect").value);
-};
+  if (
+    profile?.role !== "artist" &&
+    profile?.role !== "admin"
+  ) {
+    container.innerHTML = section(
+      "Artist Dashboard",
+      "This dashboard is available to artist accounts."
+    );
+    return;
+  }
 
-audio.onplay = () => {
- $("playBtn").textContent = "Ⅱ";
-};
+  const myTracks = tracks.filter(track =>
+    String(track.artist_id) === String(currentUser?.id)
+  );
 
-audio.onpause = () => {
- $("playBtn").textContent = "▶";
-};
+  container.innerHTML = `
+    <h2>Artist Dashboard</h2>
 
-audio.ontimeupdate = () => {
- if (!Number.isFinite(audio.duration) ||
-     audio.duration <= 0) return;
+    <p>Welcome, ${safe(profile?.display_name || "Artist")}.</p>
 
- $("seekBar").value =
-  (audio.currentTime / audio.duration) * 100;
+    <p>Your approved and submitted songs are listed below.</p>
 
- $("currentTime").textContent =
-  fmt(audio.currentTime);
+    <p><strong>Available songs:</strong> ${myTracks.length}</p>
 
- $("duration").textContent =
-  fmt(audio.duration);
-};
+    <button id="dashboardUploadBtn" type="button">
+      Upload Music
+    </button>
 
-audio.onloadedmetadata = () => {
- $("duration").textContent =
-  fmt(audio.duration);
-};
+    <div id="dashboardTracks" class="tracks-list"></div>
+  `;
 
-$("seekBar").oninput = () => {
- if (Number.isFinite(audio.duration) &&
-     audio.duration > 0) {
-  audio.currentTime =
-   (Number($("seekBar").value) / 100) * audio.duration;
- }
-};
+  $("dashboardUploadBtn")?.addEventListener(
+    "click",
+    () => openPage("upload")
+  );
 
-audio.onended = () => {
- if (repeat) return;
+  const list = $("dashboardTracks");
 
- if (currentIndex < tracks.length - 1) {
-  playTrack(currentIndex + 1);
- } else {
-  $("playBtn").textContent = "▶";
- }
-};
+  myTracks.forEach(track => {
+    list.appendChild(trackCard(track));
+  });
+}
 
-/* =========================================
-   LYRICS DISPLAY
-========================================= */
 
-$("lyricsBtn").onclick = () => {
- if (currentIndex < 0) {
-  toast("Play a song first.");
-  return;
- }
+// ------------------------------------------
+// EARNINGS PAGE
+// ------------------------------------------
 
- const track = tracks[currentIndex];
+function showEarningsPage() {
+  const container = $("content");
+  if (!container) return;
 
- const modal = document.createElement("div");
+  container.innerHTML = `
+    <h2>Earnings & Withdrawals</h2>
 
- modal.className = "modal";
+    <p>
+      Your verified earnings and withdrawal history
+      will appear here after the royalty and wallet
+      services are connected.
+    </p>
 
- modal.innerHTML = `
-  <div class="modalbox">
+    <p>
+      Earnings must be calculated from verified revenue
+      and platform records. This page does not create
+      or promise a balance.
+    </p>
+  `;
+}
 
-   <div class="head">
-    <h2>Song Lyrics</h2>
-    <button class="icon" id="lyricsClose">✕</button>
-   </div>
 
-   <h3>${safe(track.title || "Untitled")}</h3>
+// ==========================================
+// END OF PART 4
+// ==========================================
+ // ==========================================
+// PART 5: PLAYER AND APP STARTUP
+// ==========================================
 
-   <p class="muted">
-    ${safe(track.artist_name || "Artist")}
-   </p>
+const audioPlayer = $("audio");
 
-   <div style="
-    white-space:pre-wrap;
-    line-height:1.9;
-    padding:12px 0;
-   ">
-    ${safe(track.lyrics || "Lyrics have not been provided for this song.")}
-   </div>
 
-   <button class="btn" id="lyricsDone">Close</button>
+// ------------------------------------------
+// FORMAT PLAYBACK TIME
+// ------------------------------------------
 
-  </div>
- `;
+function formatTime(seconds) {
+  if (!Number.isFinite(seconds) || seconds < 0) {
+    return "0:00";
+  }
 
- document.body.appendChild(modal);
+  const minutes = Math.floor(seconds / 60);
+  const remaining = Math.floor(seconds % 60);
 
- modal.querySelector("#lyricsClose").onclick =
- modal.querySelector("#lyricsDone").onclick = () => {
-  modal.remove();
- };
+  return `${minutes}:${String(remaining).padStart(2, "0")}`;
+}
 
- modal.onclick = event => {
-  if (event.target === modal) modal.remove();
- };
-};
 
-/* =========================================
-   PLAYER FAVOURITE BUTTON
-========================================= */
+// ------------------------------------------
+// PLAY / PAUSE
+// ------------------------------------------
 
-$("playerLike").onclick = () => {
- if (currentIndex < 0) {
-  toast("Choose a song first.");
-  return;
- }
+function updatePlayButton() {
+  if (!$("playBtn") || !audioPlayer) return;
 
- const track = tracks[currentIndex];
+  $("playBtn").textContent =
+    audioPlayer.paused ? "▶" : "Ⅱ";
+}
 
- toggleFavourite(track.id);
+$("playBtn")?.addEventListener("click", () => {
+  if (!audioPlayer || !audioPlayer.src) {
+    alert("Choose a song first.");
+    return;
+  }
 
- $("playerLike").textContent = "♥";
-};
-
-/* =========================================
-   NAVIGATION BUTTONS
-========================================= */
-
-document.querySelectorAll(".nav[data-page]").forEach(button => {
- button.addEventListener("click", () => {
-  openPage(button.dataset.page);
- });
+  if (audioPlayer.paused) {
+    audioPlayer.play().catch(error => {
+      console.error(error);
+    });
+  } else {
+    audioPlayer.pause();
+  }
 });
 
-$("mobileMenu").onclick = () => {
- $("sidebar").classList.toggle("open");
-};
+audioPlayer?.addEventListener("play", updatePlayButton);
+audioPlayer?.addEventListener("pause", updatePlayButton);
 
-$("menuBtn").onclick = () => {
- $("sidebar").classList.toggle("open");
-};
 
-$("searchTop").onclick = () => {
- openPage("discover");
-};
+// ------------------------------------------
+// SEEK BAR
+// ------------------------------------------
 
-/* =========================================
-   LOGOUT
-========================================= */
+audioPlayer?.addEventListener("timeupdate", () => {
+  if (!audioPlayer.duration) return;
 
-$("logoutBtn").onclick = async () => {
- if (!db) return;
+  const percentage =
+    (audioPlayer.currentTime / audioPlayer.duration) * 100;
 
- const confirmed = confirm(
-  "Are you sure you want to log out?"
- );
-
- if (!confirmed) return;
-
- const { error } = await db.auth.signOut();
-
- if (error) {
-  toast(error.message);
- }
-};
-
-/* =========================================
-   PASSWORD RECOVERY
-========================================= */
-
-let recoveryMode = false;
-
-async function showPasswordRecovery() {
- recoveryMode = true;
-
- const newPassword = prompt(
-  "Enter your new password (at least 6 characters):"
- );
-
- if (newPassword === null) return;
-
- if (newPassword.length < 6) {
-  toast("Password must contain at least 6 characters.");
-  return;
- }
-
- const { error } = await db.auth.updateUser({
-  password: newPassword
- });
-
- if (error) {
-  toast(error.message);
- } else {
-  toast("Your password has been updated.");
- }
-
- recoveryMode = false;
-}
-
-/* =========================================
-   AUTHENTICATED ACCOUNT
-========================================= */
-
-async function loadAccount() {
- if (!db || !currentUser) return;
-
- $("welcomeUser").textContent =
-  currentUser.user_metadata?.display_name ||
-  currentUser.email ||
-  "Welcome";
-
- await loadTracks();
-
- showApp();
-
- openPage("home");
-}
-
-/* =========================================
-   SUPABASE SESSION LISTENER
-========================================= */
-
-if (!db) {
- showAuth();
- msg("Supabase could not be loaded. Check your internet connection.");
-} else {
-
- db.auth.onAuthStateChange(async (event, session) => {
-
-  if (event === "PASSWORD_RECOVERY") {
-   setTimeout(showPasswordRecovery, 300);
-   return;
+  if ($("seek")) {
+    $("seek").value = percentage;
   }
 
-  if (session?.user) {
-   currentUser = session.user;
+  if ($("elapsedTime")) {
+    $("elapsedTime").textContent =
+      formatTime(audioPlayer.currentTime);
+  }
 
-   setTimeout(() => {
-    loadAccount();
-   }, 0);
+  if ($("timeLabel")) {
+    $("timeLabel").textContent =
+      formatTime(audioPlayer.duration);
+  }
+});
 
+$("seek")?.addEventListener("input", () => {
+  if (
+    audioPlayer &&
+    Number.isFinite(audioPlayer.duration)
+  ) {
+    audioPlayer.currentTime =
+      (Number($("seek").value) / 100) *
+      audioPlayer.duration;
+  }
+});
+
+
+// ------------------------------------------
+// PLAYBACK SPEED
+// ------------------------------------------
+
+$("speed")?.addEventListener("change", () => {
+  if (!audioPlayer) return;
+
+  const speed = Number($("speed").value);
+
+  if (
+    Number.isFinite(speed) &&
+    speed >= 0.5 &&
+    speed <= 2
+  ) {
+    audioPlayer.playbackRate = speed;
+  }
+});
+
+
+// ------------------------------------------
+// NEXT SONG
+// ------------------------------------------
+
+function playNext() {
+  if (!tracks.length) return;
+
+  if (shuffleEnabled && tracks.length > 1) {
+    let nextIndex = playIndex;
+
+    while (nextIndex === playIndex) {
+      nextIndex = Math.floor(Math.random() * tracks.length);
+    }
+
+    playTrack(nextIndex);
+    return;
+  }
+
+  const nextIndex = playIndex + 1;
+
+  if (nextIndex < tracks.length) {
+    playTrack(nextIndex);
+  } else if (repeat) {
+    playTrack(0);
   } else {
-   currentUser = null;
+    audioPlayer?.pause();
+  }
+}
 
-   audio.pause();
-   audio.removeAttribute("src");
-   audio.load();
+$("nextBtn")?.addEventListener("click", playNext);
 
-   showAuth();
-   setAuthMode("login");
+
+// ------------------------------------------
+// PREVIOUS SONG
+// ------------------------------------------
+
+function playPrevious() {
+  if (!tracks.length) return;
+
+  if (
+    audioPlayer &&
+    audioPlayer.currentTime > 3
+  ) {
+    audioPlayer.currentTime = 0;
+    return;
   }
 
- });
+  const previousIndex =
+    playIndex > 0 ? playIndex - 1 : tracks.length - 1;
 
+  playTrack(previousIndex);
 }
 
-/* =========================================
-   INITIAL PAGE STARTUP
-========================================= */
+$("prevBtn")?.addEventListener("click", playPrevious);
 
-async function startPlatform() {
 
- if (!db) {
-  showAuth();
-  return;
- }
+// ------------------------------------------
+// AUTOMATIC NEXT SONG
+// ------------------------------------------
 
- const { data, error } = await db.auth.getSession();
+audioPlayer?.addEventListener("ended", () => {
+  if (repeat && playIndex >= 0) {
+    audioPlayer.currentTime = 0;
+    audioPlayer.play();
+  } else {
+    playNext();
+  }
+});
 
- if (error) {
-  console.warn("Session:", error.message);
-  showAuth();
-  return;
- }
 
- if (data.session?.user) {
-  currentUser = data.session.user;
-  await loadAccount();
- } else {
-  showAuth();
-  setAuthMode("login");
- }
+// ------------------------------------------
+// SHUFFLE
+// ------------------------------------------
 
+$("shuffleBtn")?.addEventListener("click", () => {
+  shuffleEnabled = !shuffleEnabled;
+
+  $("shuffleBtn").textContent =
+    shuffleEnabled ? "🔀 On" : "🔀";
+});
+
+
+// ------------------------------------------
+// REPEAT
+// ------------------------------------------
+
+function updateRepeatButtons() {
+  if ($("repeatBtn")) {
+    $("repeatBtn").textContent =
+      repeat ? "🔁 On" : "🔁";
+  }
+
+  if ($("repeatTextBtn")) {
+    $("repeatTextBtn").textContent =
+      repeat ? "Repeat: On" : "Repeat: Off";
+  }
 }
 
-startPlatform();
+function toggleRepeat() {
+  repeat = !repeat;
+  updateRepeatButtons();
+}
+
+$("repeatBtn")?.addEventListener("click", toggleRepeat);
+$("repeatTextBtn")?.addEventListener("click", toggleRepeat);
+
+
+// ------------------------------------------
+// LIKE CURRENT SONG
+// ------------------------------------------
+
+$("likeSongBtn")?.addEventListener("click", () => {
+  if (playIndex < 0 || !tracks[playIndex]) {
+    alert("Choose a song first.");
+    return;
+  }
+
+  toggleFavourite(tracks[playIndex].id);
+
+  $("likeSongBtn").textContent =
+    isFavourite(tracks[playIndex].id) ? "♥" : "♡";
+});
+
+
+// ------------------------------------------
+// SHARE CURRENT SONG
+// ------------------------------------------
+
+$("shareSongBtn")?.addEventListener("click", async () => {
+  if (playIndex < 0 || !tracks[playIndex]) {
+    alert("Choose a song first.");
+    return;
+  }
+
+  const track = tracks[playIndex];
+
+  const shareData = {
+    title: track.title || "SEQUENCE LIZ MUSIC",
+    text: `Listen to ${track.title} by ${track.artist_name} on SEQUENCE LIZ MUSIC.`,
+    url: window.location.href
+  };
+
+  try {
+    if (navigator.share) {
+      await navigator.share(shareData);
+    } else {
+      await navigator.clipboard.writeText(shareData.url);
+      alert("Page link copied.");
+    }
+  } catch (error) {
+    console.log("Sharing cancelled or unavailable.", error);
+  }
+});
+
+
+// ------------------------------------------
+// OFFLINE SAVE
+// ------------------------------------------
+
+// This button does not download the song to the phone.
+// A real 30-day in-platform offline library requires
+// a secure server-side entitlement and storage system.
+
+$("downloadSongBtn")?.addEventListener("click", () => {
+  alert(
+    "In-platform offline saving is not connected yet. " +
+    "Your song has not been downloaded to your phone."
+  );
+});
+
+
+// ------------------------------------------
+// SUPABASE AUTH STATE
+// ------------------------------------------
+
+async function handleSignedInUser(user) {
+  if (!user) return;
+
+  currentUser = user;
+
+  await loadProfile();
+
+  showApp();
+
+  await loadTracks();
+}
+
+if (db) {
+  db.auth.onAuthStateChange(async (event, session) => {
+    if (event === "PASSWORD_RECOVERY") {
+      const newPassword = window.prompt(
+        "Enter your new password (at least 8 characters):"
+      );
+
+      if (newPassword && newPassword.length >= 8) {
+        const { error } = await db.auth.updateUser({
+          password: newPassword
+        });
+
+        if (error) {
+          alert(error.message);
+        } else {
+          alert("Your password has been updated.");
+        }
+      } else if (newPassword !== null) {
+        alert("Password must contain at least 8 characters.");
+      }
+
+      return;
+    }
+
+    if (event === "SIGNED_IN" && session?.user) {
+      await handleSignedInUser(session.user);
+    }
+
+    if (event === "SIGNED_OUT") {
+      currentUser = null;
+      profile = null;
+      tracks = [];
+      playIndex = -1;
+
+      showAuth();
+      showLoginForm();
+    }
+  });
+}
+
+
+// ------------------------------------------
+// INITIAL APP CHECK
+// ------------------------------------------
+
+async function startApp() {
+  if (!db) {
+    showAuth();
+    msg(
+      "Supabase could not connect. Check the project URL and publishable key.",
+      true
+    );
+    return;
+  }
+
+  try {
+    const { data, error } = await db.auth.getSession();
+
+    if (error) throw error;
+
+    if (data?.session?.user) {
+      await handleSignedInUser(data.session.user);
+    } else {
+      showAuth();
+      showLoginForm();
+    }
+
+  } catch (error) {
+    console.error("Startup error:", error);
+
+    showAuth();
+
+    msg(
+      "Could not check your login session. Please refresh the page.",
+      true
+    );
+  }
+}
+
+startApp();
+
+
+// ==========================================
+// END OF JAVASCRIPT
+// ==========================================
 
 </script>
-
 </body>
 </html>

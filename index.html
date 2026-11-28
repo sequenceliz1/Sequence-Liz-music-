@@ -375,4 +375,226 @@ function updateSplitTotal(){const total=[...document.querySelectorAll(".credit-p
 async function uploadTrack(e){e.preventDefault();if(!db||!currentUser){$("uploadStatus").textContent="Please log in again.";return;}const audioFile=$("releaseAudio").files[0],coverFile=$("releaseCover").files[0],title=$("releaseTitle").value.trim(),artist=$("releaseArtist").value.trim();if(!audioFile||!title||!artist){$("uploadStatus").textContent="Complete the required fields.";return;}if(!$("rightsCheck").checked){$("uploadStatus").textContent="Confirm your upload rights first.";return;}const rows=[...document.querySelectorAll("#creditRows [data-credit-row]")];const contributors=rows.map((r,i)=>({display_name:i===0?artist:r.querySelector(".credit-name").value.trim(),role:i===0?"main_artist":r.querySelector(".credit-role").value,email:i===0?null:(r.querySelector(".credit-email").value.trim()||null),split_percent:Number(r.querySelector(".credit-percent").value)}));const total=contributors.reduce((a,c)=>a+c.split_percent,0);if(Math.abs(total-100)>0.0001){$("uploadStatus").textContent="Contributor shares must total exactly 100%.";return;}if(contributors.some(c=>!c.display_name||!Number.isFinite(c.split_percent)||c.split_percent<=0)){$("uploadStatus").textContent="Check each contributor name and share.";return;}const btn=e.submitter;btn.disabled=true;let audioPath=null,coverPath=null;const clean=f=>f.name.replace(/[^a-zA-Z0-9._-]/g,"_");try{if(audioFile.size>100*1024*1024)throw new Error("Audio file exceeds 100 MB.");$("uploadStatus").textContent="Uploading audio…";audioPath=`${currentUser.id}/${Date.now()}-${clean(audioFile)}`;let up=await db.storage.from("music").upload(audioPath,audioFile,{upsert:false,contentType:audioFile.type||"audio/mpeg"});if(up.error)throw up.error;if(coverFile){if(coverFile.size>10*1024*1024)throw new Error("Cover artwork exceeds 10 MB.");coverPath=`${currentUser.id}/${Date.now()}-${clean(coverFile)}`;let cp=await db.storage.from("track-covers").upload(coverPath,coverFile,{upsert:false,contentType:coverFile.type||"image/jpeg"});if(cp.error)throw cp.error;}$("uploadStatus").textContent="Saving song and locked royalty shares…";const created=await db.rpc("slm_create_track_with_royalty_splits",{p_title:title,p_artist_name:artist,p_description:(`Genre: ${$("releaseGenre").value}. `+$("releaseDescription").value.trim()),p_audio_path:audioPath,p_cover_path:coverPath,p_lyrics:$("releaseLyrics").value.trim(),p_rights_confirmed:true,p_contributors:contributors});if(created.error)throw created.error;const trackId=created.data;try{const g=await db.from("slm_tracks").update({genre:$("releaseGenre").value}).eq("id",trackId);if(g.error)console.warn("Genre column migration still needed:",g.error.message);}catch(gErr){console.warn(gErr);}$("uploadStatus").textContent="Song submitted for review. Contributor shares are recorded; invited contributors must accept or claim their credits.";toast("Song submitted for review.");e.target.reset();const rowsEl=$("creditRows");rowsEl.innerHTML=creditRow(true);updateSplitTotal();}catch(err){console.error("Upload:",err);$("uploadStatus").textContent="Upload failed: "+(err.message||"Unknown error");if(audioPath)await db.storage.from("music").remove([audioPath]).catch(()=>{});if(coverPath)await db.storage.from("track-covers").remove([coverPath]).catch(()=>{});}finally{btn.disabled=false;}}
 async function bindFamily(){await renderFamily();$("familyForm").addEventListener("submit",async e=>{e.preventDefault();const text=$("familyText").value.trim(),file=$("familyMedia").files[0];if(!text&&!file){$("familyStatus").textContent="Write a post or choose media.";return;}const btn=e.submitter;btn.disabled=true;let path=null,type=null;try{if(file){type=file.type.startsWith("video/")?"video":"image";path=`${currentUser.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;const up=await db.storage.from("family-media").upload(path,file,{upsert:false,contentType:file.type});if(up.error)throw up.error;}const{error}=await db.from("slm_family_posts").insert({user_id:currentUser.id,body:text,media_path:path,media_type:type});if(error)throw error;$("familyText").value="";$("familyMedia").value="";$("familyStatus").textContent="Your post has been published to the Family feed.";await renderFamily();}catch(err){$("familyStatus").textContent="Post failed: "+err.message;}finally{btn.disabled=false;}});}
 async function renderFamily(){const el=$("familyFeed");if(!el)return;el.innerHTML='<p class="muted">Loading posts…</p>';try{const{data,error}=await db.from("slm_family_posts").select("*").order("created_at",{ascending:false}).limit(50);if(error)throw error;const posts=data||[];const ids=[...new Set(posts.map(p=>p.user_id))];let profiles={};if(ids.length){const pr=await db.from("slm_profiles").select("id,display_name").in("id",ids);if(!pr.error)for(const x of pr.data||[])profiles[x.id]=x.display_name;}el.innerHTML=posts.length?posts.map(p=>{const url=p.media_path?d
- 
+ async function loadRecentChats(){
+ const el=$("recentChats");
+ if(!el)return;
+ el.innerHTML='<p class="tiny muted">Private chat backend connection is still required.</p>';
+}
+async function searchContacts(){
+ const el=$("contactResults");
+ if(!el)return;
+ const q=$("contactSearch").value.trim();
+ if(q.length<2){el.innerHTML='<p class="tiny muted">Type at least two characters to search.</p>';return;}
+ el.innerHTML='<p class="tiny muted">Contact search will be enabled when the private-chat backend is installed.</p>';
+}
+async function sendChatMessage(){
+ if(!selectedUserForChat()){
+  $("chatStatus").textContent="Choose a person before sending a message.";
+  return;
+ }
+ $("chatStatus").textContent="Private messaging is not connected yet. Your message has not been sent.";
+}
+function selectedUserForChat(){return selectedChatUser;}
+async function saveDistribution(e){
+ e.preventDefault();
+ const song=$("distTrack").value;
+ const platforms=[...document.querySelectorAll('[name="distPlatform"]:checked')].map(x=>x.value);
+ if(!song){$("distStatus").textContent="Choose a song.";return;}
+ if(!platforms.length){$("distStatus").textContent="Select at least one platform.";return;}
+ const request={song_id:song,platforms,artist_name:$("distArtist").value.trim(),release_date:$("distReleaseDate").value,notes:$("distNotes").value.trim(),status:"draft",created_at:new Date().toISOString()};
+ saveLocal("slm_distribution_drafts",request);
+ $("distStatus").textContent="Distribution request saved as a local draft. It has not been sent to a distributor or published.";
+}
+async function saveProfile(e){
+ e.preventDefault();
+ const name=$("profileName").value.trim();
+ if(!name){$("profileStatus").textContent="Enter a display name.";return;}
+ try{
+  const{error}=await db.auth.updateUser({data:{display_name:name}});
+  if(error)throw error;
+  currentUser=(await db.auth.getUser()).data.user;
+  $("profileStatus").textContent="Display name updated.";
+  $("welcomeUser").textContent=name;
+ }catch(err){$("profileStatus").textContent="Could not update profile: "+err.message;}
+}
+async function requestPasswordReset(){
+ try{
+  const{error}=await db.auth.resetPasswordForEmail(currentUser.email,{redirectTo:SITE_URL});
+  if(error)throw error;
+  $("settingsStatus").textContent="Password reset email requested. Check your inbox and Spam folder.";
+ }catch(err){$("settingsStatus").textContent=err.message;}
+}
+async function loadArtistDashboard(){
+ const mine=tracks.filter(t=>String(t.artist_id)===String(currentUser.id));
+ const published=mine.filter(t=>String(t.status).toLowerCase()==="published");
+ const pending=mine.filter(t=>["pending","processing","review"].includes(String(t.status).toLowerCase()));
+ $("myReleaseCount").textContent=mine.length;
+ $("myPublishedCount").textContent=published.length;
+ $("myPendingCount").textContent=pending.length;
+ $("myReleaseRows").innerHTML=mine.length?mine.map(t=>`<div class="listitem"><b>${safe(t.title)}</b><span class="pill">${safe(t.status||"Unspecified")}</span></div>`).join(""):'<p class="muted">You have not uploaded any releases yet.</p>';
+}
+async function loadEarnings(){
+ $("availableBalance").textContent="Not connected";
+ $("pendingBalance").textContent="Not connected";
+ $("earningsStatus").textContent="Verified revenue and royalty settlement must be connected before wallet balances can be displayed.";
+}
+async function requestWithdrawal(e){
+ e.preventDefault();
+ const amount=Number($("withdrawAmount").value);
+ if(!Number.isFinite(amount)||amount<=0){$("withdrawStatus").textContent="Enter a valid amount.";return;}
+ $("withdrawStatus").textContent="Withdrawal requests are not connected to a secure payout service yet. No money has been requested or transferred.";
+}
+async function loadCollaborations(){
+ const el=$("collabList");
+ try{
+  const{data,error}=await db.from("slm_track_contributors").select("*").or(`contributor_user_id.eq.${currentUser.id},created_by.eq.${currentUser.id}`).limit(100);
+  if(error)throw error;
+  el.innerHTML=data?.length?data.map(c=>`<div class="listitem"><b>${safe(c.display_name||c.contributor_name||"Contributor credit")}</b><span class="pill">${safe(c.role||"Contributor")}</span><div class="tiny muted">Share: ${safe(c.split_percent??c.royalty_share_percent??"Not specified")}%</div></div>`).join(""):'<p class="muted">No contributor credits were found for this account.</p>';
+  $("collabStatus").textContent="Contributor credits loaded.";
+ }catch(err){$("collabStatus").textContent="Contributor credits could not be loaded: "+err.message;}
+}
+async function searchCreditClaims(e){
+ e.preventDefault();
+ const name=$("creditSearchName").value.trim();
+ if(!name){$("creditSearchResults").textContent="Enter the name shown on the song credit.";return;}
+ $("creditSearchResults").textContent="Credit search and claim submission will be enabled after the claim workflow is connected.";
+}
+async function loadAdminDashboard(){
+ if(!isAdmin){$("adminStatus").textContent="Access denied. This account is not verified as an administrator.";return;}
+ $("adminStatus").textContent="Checking available platform records…";
+ const checks=[
+  ["adminMembers","slm_profiles"],
+  ["adminTracks","slm_tracks"],
+  ["adminFamily","slm_family_posts"],
+  ["adminStreams","slm_stream_events"],
+  ["adminAllocations","slm_track_royalty_allocations"],
+  ["adminPayouts","slm_withdrawal_requests"],
+  ["adminAiJobs","slm_ai_jobs"],
+  ["adminDistribution","slm_distribution_requests"]
+ ];
+ const results=await Promise.all(checks.map(async([id,table])=>{
+  try{
+   const{count,error}=await db.from(table).select("*",{count:"exact",head:true});
+   if(error)throw error;
+   $(id).textContent=Number.isFinite(count)?count:"—";
+   return null;
+  }catch(err){$(id).textContent="—";return table+": "+err.message;}
+ }));
+ const errors=results.filter(Boolean);
+ $("adminStatus").textContent=errors.length?"Some monitoring tables are not installed or are not accessible: "+errors.join(" | "):"Available monitoring counts loaded. Financial actions remain protected and are not performed from this page.";
+ $("adminWithdrawalRows").textContent="Secure withdrawal review service is not connected.";
+ $("adminRoyaltyRows").textContent="Royalty allocation review is read-only and requires the completed backend permissions.";
+}
+async function playTrack(index){
+ if(!Number.isInteger(index)||index<0||index>=tracks.length)return;
+ const t=tracks[index];
+ const url=await audioUrl(t.audio_path);
+ if(!url){toast("The audio file could not be opened. Check the music storage bucket and access policy.");return;}
+ currentIndex=index;
+ $("audio").src=url;
+ $("trackTitle").textContent=t.title||"Untitled";
+ $("trackArtist").textContent=t.artist_name||"Independent artist";
+ $("trackCover").src=coverUrl(t.cover_path);
+ $("trackCover").onerror=()=>{$("trackCover").src=fallbackCover;};
+ $("player").classList.remove("hidden");
+ try{await $("audio").play();$("playPauseBtn").textContent="Ⅱ";}catch(err){toast("Tap Play to start audio.");$("playPauseBtn").textContent="▶";}
+}
+function playNext(){
+ if(!tracks.length)return;
+ let next=currentIndex+1;
+ if(next>=tracks.length)next=repeat?currentIndex:0;
+ playTrack(next);
+}
+function playPrevious(){
+ if(!tracks.length)return;
+ if($("audio").currentTime>3){$("audio").currentTime=0;return;}
+ let prev=currentIndex-1;
+ if(prev<0)prev=tracks.length-1;
+ playTrack(prev);
+}
+$("playPauseBtn").addEventListener("click",async()=>{
+ const a=$("audio");
+ if(!a.src){if(tracks.length)await playTrack(0);else toast("No published songs are available yet.");return;}
+ if(a.paused){try{await a.play();$("playPauseBtn").textContent="Ⅱ";}catch(e){toast("Playback could not start.");}}
+ else{a.pause();$("playPauseBtn").textContent="▶";}
+});
+$("nextBtn").addEventListener("click",playNext);
+$("previousBtn").addEventListener("click",playPrevious);
+$("repeatBtn").addEventListener("click",()=>{repeat=!repeat;$("repeatBtn").classList.toggle("active",repeat);$("audio").loop=repeat;toast(repeat?"Repeat enabled":"Repeat disabled");});
+$("audio").addEventListener("ended",()=>{if(!repeat)playNext();});
+$("audio").addEventListener("timeupdate",()=>{
+ const a=$("audio");
+ $("currentTime").textContent=fmt(a.currentTime);
+ $("duration").textContent=fmt(a.duration);
+ if(Number.isFinite(a.duration)&&a.duration>0)$("seekBar").value=(a.currentTime/a.duration)*100;
+});
+$("seekBar").addEventListener("input",()=>{
+ const a=$("audio");
+ if(Number.isFinite(a.duration)&&a.duration>0)a.currentTime=(Number($("seekBar").value)/100)*a.duration;
+});
+$("speedSelect").addEventListener("change",()=>{$("audio").playbackRate=Number($("speedSelect").value)||1;});
+$("lyricsBtn").addEventListener("click",()=>{
+ const t=tracks[currentIndex];
+ if(!t){toast("Play a song to view its lyrics.");return;}
+ const lyrics=t.lyrics||"Lyrics have not been provided for this release.";
+ $("lyricsText").textContent=lyrics;
+ $("lyricsModal").classList.remove("hidden");
+});
+if($("closeLyrics"))$("closeLyrics").addEventListener("click",()=>$("lyricsModal").classList.add("hidden"));
+async function startApplication(session){
+ if(!session?.user){currentUser=null;isAdmin=false;showAuth();return;}
+ currentUser=session.user;
+ try{
+  await ensureProfile();
+ }catch(err){console.warn("Profile setup:",err.message);}
+ try{
+  const{data,error}=await db.rpc("slm_is_admin");
+  isAdmin=!error&&data===true;
+ }catch{isAdmin=false;}
+ $("adminMenuItem").classList.toggle("hidden",!isAdmin);
+ showApp();
+ await loadTracks();
+ openPage("home");
+}
+document.querySelectorAll(".nav[data-page]").forEach(b=>b.addEventListener("click",()=>openPage(b.dataset.page)));
+$("restartBtn").addEventListener("click",()=>{closeMenu();openPage("home");toast("Home screen refreshed.");});
+$("logoutBtn").addEventListener("click",async()=>{
+ closeMenu();
+ try{const{error}=await db.auth.signOut();if(error)throw error;}catch(err){toast("Sign out error: "+err.message);}
+});
+$("menuPanel").querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>openPage(b.dataset.page)));
+function checkRecoveryMode(){
+ const hash=window.location.hash||"";
+ if(hash.includes("type=recovery")){
+  setAuthMode("login");
+  $("authHeading").textContent="Choose a new password";
+  $("loginBtn").textContent="Update password";
+  $("forgotBtn").classList.add("hidden");
+  $("authForm").addEventListener("submit",async e=>{
+   if(!$("loginBtn").textContent.includes("Update password"))return;
+   e.preventDefault();
+   const password=$("password").value;
+   if(password.length<6){authMessage("Use at least 6 characters.");return;}
+   const{error}=await db.auth.updateUser({password});
+   if(error){authMessage(error.message);return;}
+   history.replaceState(null,"",window.location.pathname);
+   authMessage("Password updated. You can now log in.");
+   $("loginBtn").textContent="Log in";
+  },{once:true});
+ }
+}
+(async function boot(){
+ if(!initSupabase())return;
+ checkRecoveryMode();
+ const{data,error}=await db.auth.getSession();
+ if(error){authMessage(error.message);showAuth();return;}
+ await startApplication(data.session);
+ db.auth.onAuthStateChange(async(event,session)=>{
+  if(event==="PASSWORD_RECOVERY"){setAuthMode("login");$("authHeading").textContent="Choose a new password";return;}
+  if(event==="SIGNED_OUT"){await startApplication(null);return;}
+  if(event==="SIGNED_IN"&&session)await startApplication(session);
+ });
+})();
+</script>
+</body>
+</html>

@@ -1,1 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b0b12">
+<meta name="description" content="SEQUENCE LIZ MUSIC — music, creators and community.">
+<title>SEQUENCE LIZ MUSIC</title>
+<style>
+:root{--bg:#0b0b12;--panel:#171725;--panel2:#222033;--line:#343047;--text:#f8f5ff;--muted:#aaa5bb;--purple:#b18aff;--pink:#f28acb;--cyan:#74e3dc;--good:#83e0ad;--bad:#ff9aab}
 
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(ellipse at 5% 0%,#30224b,transparent 35%),var(--bg);color:var(--text);font:15px system-ui,Arial,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+.hidden{display:none!important}
+.brand{font-weight:950;letter-spacing:.09em}
+.brand span{color:var(--purple)}
+.muted,.tiny{color:var(--muted)}
+.tiny{font-size:12px}
+.btn{border:0;border-radius:12px;padding:12px 16px;background:linear-gradient(120deg,var(--purple),var(--pink));color:#160f22;font-weight:850}
+.btn.alt,.icon{background:#29273a;color:var(--text);border:1px solid var(--line)}
+.btn.danger{background:#512b3b;color:#fff}
+.icon{border-radius:12px;padding:10px;min-width:42px;min-height:42px}
+.field{width:100%;padding:13px;border-radius:12px;background:#10101a;border:1px solid var(--line);color:white;outline:0}
+.field:focus{border-color:var(--purple);box-shadow:0 0 0 2px #b18aff30}
+textarea.field{resize:vertical;min-height:90px}
+label{display:block;margin:12px 0 7px;font-size:13px;color:#ddd6ee}
+.card{background:linear-gradient(145deg,#201e30,#151521);border:1px solid var(--line);border-radius:19px;padding:17px}
+.eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);font-weight:850}
+.status{font-size:12px;color:var(--cyan);min-height:18px}
+.notice{padding:12px 14px;border:1px solid #5b4a77;border-radius:12px;background:#29213a;color:#e9ddff;line-height:1.5}
+.auth{min-height:100vh;display:grid;place-items:center;padding:18px}
+.authbox{width:min(100%,460px)}
+.auth h1{font-size:30px;margin:12px 0}
+.tabs{display:flex;gap:8px;margin:20px 0}
+.tabs button{flex:1}
+.check{display:flex;gap:9px;line-height:1.5;color:var(--muted);font-size:13px}
+.check input{accent-color:var(--purple);margin-top:4px;width:18px;height:18px}
+.top{position:sticky;top:0;z-index:40;display:flex;justify-content:space-between;align-items:center;padding:11px 16px;background:#0c0b13ed;backdrop-filter:blur(15px);border-bottom:1px solid var(--line)}
+.topgroup{display:flex;gap:9px;align-items:center}
+.layout{max-width:1500px;margin:auto}
+.side{display:none}
+.content{padding:22px;max-width:1200px;margin:auto;min-width:0;padding-bottom:160px}
+.hero{padding:27px;border-radius:23px;border:1px solid #59466e;background:linear-gradient(115deg,#382650,#1c2b40 70%,#16353b)}
+.hero h1{font-size:clamp(27px,5vw,45px);max-width:720px;margin:12px 0}
+.hero p{line-height:1.6;max-width:650px;color:#e0d8ed}
+.head{display:flex;align-items:center;justify-content:space-between;margin:24px 0 13px;gap:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:13px}
+.song{background:#191927;border:1px solid var(--line);border-radius:16px;padding:10px;min-width:0}
+.song img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:11px;background:#302a42}
+.song h3{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:9px 0 3px}
+.song p{font-size:12px;color:var(--muted);margin:0 0 9px}
+.song-actions{display:flex;gap:6px;flex-wrap:wrap}
+.song-actions button{padding:8px;font-size:12px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:3px 0 10px}
+.chip{white-space:nowrap;border:1px solid var(--line);background:#201e30;color:#ddd6ee;border-radius:99px;padding:9px 14px}
+.chip.active{background:var(--purple);color:#170f22;border-color:var(--purple);font-weight:800}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat strong{font-size:23px;display:block;margin-top:8px}
+.modal{position:fixed;inset:0;z-index:90;background:#000b;display:grid;place-items:center;padding:18px}
+.modalbox{width:min(100%,700px);max-height:88vh;overflow:auto;background:#191826;border:1px solid var(--line);border-radius:20px;padding:22px}
+.headrow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.menu-panel{position:absolute;right:12px;top:62px;z-index:55;width:min(92vw,350px);max-height:78vh;overflow:auto;background:#171725;border:1px solid var(--line);border-radius:17px;padding:12px;box-shadow:0 18px 50px #000a}
+.menu-panel .navlabel{font-size:10px;letter-spacing:.16em;color:#777287;font-weight:900;margin:14px 9px 6px}
+.menu-panel .nav{width:100%;display:block;text-align:left;padding:11px;border:0;border-radius:10px;background:transparent;color:#d8d1e7;margin:2px 0}
+.menu-panel .nav:hover,.menu-panel .nav.active{background:#302744;color:white}
+.player{position:fixed;z-index:35;bottom:0;left:0;right:0;padding:8px 13px;background:#12121df5;border-top:1px solid var(--line);backdrop-filter:blur(16px)}
+.playerin{max-width:1200px;margin:auto;display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:13px;align-items:center}
+.now{display:flex;gap:9px;align-items:center;min-width:0}
+.now img{width:45px;height:45px;object-fit:cover;border-radius:8px}
+.now strong,.now small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.now small{font-size:11px;color:var(--muted)}
+.controls{text-align:center}
+.row{display:flex;justify-content:center;align-items:center;gap:10px}
+.play{border:0;border-radius:50%;width:40px;height:40px;font-weight:900}
+.seek{display:flex;gap:8px;align-items:center;font-size:10px;color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--purple)}
+.extra{display:flex;justify-content:end;gap:8px}
+.extra select{background:#242335;color:white;border:1px solid var(--line);padding:7px;border-radius:9px}
+.toast{position:fixed;z-index:120;bottom:130px;left:50%;transform:translateX(-50%);padding:12px 17px;border-radius:12px;background:#f6f0ff;color:#181321;font-weight:750;max-width:90%;box-shadow:0 8px 30px #0008}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.formgrid .wide{grid-column:1/-1}
+.listitem{padding:12px;border-bottom:1px solid var(--line)}
+.listitem:last-child{border:0}
+.feed{max-width:680px;margin:auto;display:grid;gap:16px}
+.feedpost{border:1px solid var(--line);border-radius:20px;background:#171725;overflow:hidden}
+.feedbody{padding:17px;min-height:170px;white-space:pre-wrap;line-height:1.6}
+.feedmedia{width:100%;max-height:430px;object-fit:cover;background:#09090e}
+.feedactions{display:flex;gap:8px;flex-wrap:wrap;padding:12px 15px;border-top:1px solid var(--line)}
+.chatwrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:12px;min-height:430px}
+.chatlist{border:1px solid var(--line);border-radius:15px;padding:10px}
+.chatroom{border:1px solid var(--line);border-radius:15px;display:flex;flex-direction:column;min-height:430px}
+.chatmessages{padding:13px;flex:1;min-height:260px;max-height:440px;overflow:auto;display:flex;flex-direction:column;gap:9px}
+.bubble{max-width:82%;padding:10px 13px;border-radius:15px;background:#29273a;align-self:flex-start;white-space:pre-wrap;overflow-wrap:anywhere}
+.bubble.mine{align-self:flex-end;background:#47325f}
+.composer{display:flex;gap:8px;padding:11px;border-top:1px solid var(--line);align-items:flex-end}
+.composer textarea{min-height:44px;max-height:130px;resize:vertical}
+.composer .btn{min-height:44px}
+.drawer-backdrop{position:fixed;inset:0;background:#0008;z-index:49}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:5px 9px;color:var(--muted);font-size:11px}
+
+@media(max-width:760px){.content{padding:16px 12px 165px}
+.playerin{grid-template-columns:1fr auto}
+.controls{grid-column:1/-1;grid-row:2}
+.extra{display:none}
+.player{padding:7px 9px}
+.stats{grid-template-columns:repeat(2,1fr)}
+.chatwrap{grid-template-columns:1fr}
+.chatlist{max-height:150px;overflow:auto}
+.chatroom{min-height:380px}
+}
+
+@media(max-width:480px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.hero{padding:19px}
+.two,.formgrid{grid-template-columns:1fr}
+.formgrid .wide{grid-column:auto}
+.brand{font-size:13px}
+.top{padding:9px}
+.tiny.hide-mobile{display:none}
+.menu-panel{right:8px;top:57px}
+}
+
+</style>
+</head>
+<body>
+<div id="authScreen" class="auth">
+<div class="authbox card">
+ <div class="brand" style="font-size:23px">SEQUENCE <span>LIZ</span> MUSIC</div>
+<div class="eyebrow">Music • Creators • Community</div>
+<h1 id="authHeading">Welcome back</h1>
+<p class="muted">A home for music, creativity and genuine connection.</p>
+ <div class="tabs">
+<button class="btn" id="loginTab" type="button">Log in</button>
+<button class="btn alt" id="signupTab" type="button">Create account</button>
+</div>
+ <form id="authForm">
+<div id="signupFields" class="hidden">
+<label for="username">Display name</label>
+<input class="field" id="username" autocomplete="name" placeholder="Your name">
+<label for="role">Account type</label>
+<select class="field" id="role">
+<option value="listener">Listener</option>
+<option value="artist">Artist / Creator</option>
+</select>
+</div>
+ <label for="email">Email address</label>
+<input class="field" id="email" type="email" autocomplete="email" required placeholder="you@example.com">
+<label for="password">Password</label>
+<div style="display:flex;gap:8px">
+<input class="field" id="password" type="password" autocomplete="current-password" required style="min-width:0">
+<button class="icon" id="togglePassword" type="button">Show</button>
+</div>
+ <div id="termsCheck" class="hidden" style="margin-top:13px">
+<label class="check">
+<input type="checkbox" id="agreeTerms">
+<span>I agree to the <a href="#" id="termsLink" style="color:var(--purple)">Terms & Conditions</a> and Privacy Policy.</span>
+</label>
+</div>
+ <button class="btn" id="loginBtn" type="submit" style="width:100%;margin-top:18px">Log in</button>
+<button class="btn hidden" id="signupBtn" type="submit" style="width:100%;margin-top:18px">Create my account</button>
+</form>
+ <button class="btn alt" id="forgotBtn" type="button" style="width:100%;margin-top:9px">Forgot password?</button>
+<p id="authMessage" class="status" role="status">
+</p>
+<p class="tiny">Upload only content you own or are authorised to use. Protect your password.</p>
+</div>
+</div>
+<div id="app" class="hidden">
+<header class="top">
+<div class="topgroup">
+<div class="brand">SEQUENCE <span>LIZ</span> MUSIC</div>
+</div>
+<div class="topgroup">
+<span class="tiny hide-mobile" id="welcomeUser">
+</span>
+<button class="icon" id="searchTop" type="button" aria-label="Search">⌕</button>
+<button class="icon" id="menuBtn" type="button" aria-label="Open features menu" aria-expanded="false">⋮</button>
+</div>
+</header>
+<div id="menuPanel" class="menu-panel hidden" role="menu">
+ <div class="navlabel">MUSIC WORLD</div>
+<button class="nav active" data-page="home">♫ Artist Music</button>
+<button class="nav" data-page="discover">⌕ Discover & Search</button>
+<button class="nav" data-page="charts">♛ Music Charts</button>
+<button class="nav" data-page="favourites">♡ Favourite Songs</button>
+<button class="nav" data-page="videos">▻ Artist Videos</button>
+<button class="nav" data-page="shows">▣ Watch Shows / YouTube</button>
+ <div class="navlabel">SEQUENCE FAMILY</div>
+<button class="nav" data-page="family">◉ Family Community</button>
+<button class="nav" data-page="chats">✉ Private Chats</button>
+<button class="nav" data-page="familycharts">✧ Family Charts</button>
+ <div class="navlabel">CREATE & EARN</div>
+<button class="nav" data-page="studio">✦ AI Music Studio</button>
+<button class="nav" data-page="pictureai">▧ AI Picture-to-Video</button>
+<button class="nav" data-page="creations">▤ My Purchased AI Creations</button>
+<button class="nav" data-page="upload">↑ Upload Music / Video</button>
+<button class="nav" data-page="dashboard">▥ Artist Dashboard</button>
+<button class="nav" data-page="earnings">＄ Earnings & Withdrawals</button>
+<button class="nav" data-page="promote">↗ Promote Your Song</button>
+<button class="nav" data-page="distribute">⇧ Distribute Your Music</button>
+<button class="nav" data-page="collaborations">♧ Collaborations & Royalties</button>
+ <div class="navlabel">YOUR ACCOUNT</div>
+<button class="nav" data-page="profile">♙ My Profile</button>
+<button class="nav" data-page="settings">⚙ Settings</button>
+<button class="nav" data-page="help">? Help & Support</button>
+<button class="nav" id="termsMenu">▤ Terms & Privacy</button>
+<button class="nav hidden" id="adminNav" data-page="admin">♛ Super Admin Dashboard</button>
+<button class="nav" id="restartBtn">⟳ Restart app</button><button class="nav" id="logoutBtn">⇥ Log out</button>
+</div>
+<main id="content" class="content" tabindex="-1">
+</main>
+</div>
+<div id="termsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+<div class="modalbox">
+<div class="headrow">
+<h2 id="termsTitle">Terms & Community Principles</h2>
+<button class="icon" id="closeTerms" type="button">✕</button>
+</div>
+<p>SEQUENCE LIZ MUSIC supports music discovery, creator publishing and community participation. Provide accurate account information, respect other people and upload only content you own or are authorised to use.</p>
+<h3>Content and rights</h3>
+<p>You retain rights you own. By uploading, you give the platform permission to host, process, stream and display your content to provide the service. Do not upload copyright material without permission, impersonate others or distribute unlawful content.</p>
+<h3>Community safety</h3>
+<p>Harassment, threats, hate, spam, manipulation, fake engagement, scams and abuse are prohibited. Content may be reviewed or removed after reports or policy checks.</p>
+<h3>Earnings and payments</h3>
+<p>Displayed earnings are estimates until verified. Payouts depend on eligible activity, actual distributable revenue, fraud checks, identity and payment verification, minimum thresholds, fees, taxes and available providers. No earning amount or stream rate is guaranteed.</p>
+<h3>AI tools and privacy</h3>
+<p>Only submit material you have permission to use. AI services may have provider terms, usage limits and payment requirements. Account, content and activity data may be processed to operate and secure the service. Protect your password.</p>
+<h3>Availability</h3>
+<p>Some features require external services and may not yet be available. These draft terms require legal review before public launch.</p>
+<button class="btn" id="closeTermsBottom" type="button">I understand</button>
+</div>
+</div>
+<div id="toast" class="toast hidden" role="status" aria-live="polite">
+</div>
+<div id="player" class="player hidden">
+<div class="playerin">
+<div class="now">
+<img id="playerCover" alt="Cover artwork">
+<div style="min-width:0">
+<strong id="playerTitle">Choose a song</strong>
+<small id="playerArtist">SEQUENCE LIZ MUSIC</small>
+</div>
+<button class="icon" id="playerLike" type="button" aria-label="Favourite current song">♡</button>
+</div>
+<div class="controls">
+<div class="row">
+<button class="icon" id="prevBtn" type="button">|◀</button>
+<button class="play" id="playBtn" type="button">▶</button>
+<button class="icon" id="nextBtn" type="button">▶|</button>
+<button class="icon" id="repeatBtn" type="button">↻</button>
+  

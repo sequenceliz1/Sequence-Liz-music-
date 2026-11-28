@@ -252,4 +252,60 @@ input[type=range]{width:100%;accent-color:var(--purple)}
 <button class="play" id="playBtn" type="button">▶</button>
 <button class="icon" id="nextBtn" type="button">▶|</button>
 <button class="icon" id="repeatBtn" type="button">↻</button>
-  
+  </div>
+<div class="seek">
+<span id="currentTime">0:00</span>
+<input id="seekBar" type="range" min="0" max="100" value="0" aria-label="Seek song">
+<span id="duration">0:00</span>
+</div>
+</div>
+<div class="extra">
+<select id="speedSelect" aria-label="Playback speed">
+<option value="1">1×</option>
+<option value="1.25">1.25×</option>
+<option value="1.5">1.5×</option>
+<option value="2">2×</option>
+</select>
+<button class="icon" id="lyricsBtn" type="button">Lyrics</button>
+</div>
+</div>
+</div>
+<audio id="audio" preload="metadata">
+</audio>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+</script>
+<script>
+"use strict";
+const SUPABASE_URL="https://wehxrlxyqiidivvinjwj.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable__U5zTR-UcFxxiq_uAHMVzA_G5F8lWrs";
+const SITE_URL="https://sequenceliz1.github.io/Sequence-Liz-music-/";
+const $=id=>document.getElementById(id);
+let db=null,currentUser=null,tracks=[],currentIndex=-1,repeat=false,authMode="login",isAdmin=false,activeGenre="All",selectedChatUser=null,selectedChatName="",selectedConversationId=null,chatPollTimer=null;
+const fallbackCover="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><rect width="400" height="400" fill="#30224b"/><circle cx="200" cy="180" r="100" fill="none" stroke="white" stroke-width="8"/><circle cx="200" cy="180" r="30" fill="white"/><text x="200" y="340" font-size="23" text-anchor="middle" fill="white">SEQUENCE LIZ</text></svg>');
+function safe(v=""){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function toast(m){$("toast").textContent=m;$("toast").classList.remove("hidden");clearTimeout(toast.timer);toast.timer=setTimeout(()=>$("toast").classList.add("hidden"),3200);}
+function fmt(n){return Number.isFinite(n)&&n>=0?Math.floor(n/60)+":"+String(Math.floor(n%60)).padStart(2,"0"):"0:00";}
+function authMessage(m){$("authMessage").textContent=m;}
+function showAuth(){$("authScreen").classList.remove("hidden");$("app").classList.add("hidden");$("player").classList.add("hidden");}
+function showApp(){$("authScreen").classList.add("hidden");$("app").classList.remove("hidden");$("player").classList.remove("hidden");$("welcomeUser").textContent=currentUser?.user_metadata?.display_name||currentUser?.email||"";}
+function setAuthMode(mode){authMode=mode;const s=mode==="signup";$("signupFields").classList.toggle("hidden",!s);$("termsCheck").classList.toggle("hidden",!s);$("loginBtn").classList.toggle("hidden",s);$("signupBtn").classList.toggle("hidden",!s);$("forgotBtn").classList.toggle("hidden",s);$("authHeading").textContent=s?"Create your SEQUENCE account":"Welcome back";$("loginTab").classList.toggle("alt",s);$("signupTab").classList.toggle("alt",!s);authMessage("");}
+function openTerms(){$("termsModal").classList.remove("hidden");}function closeTerms(){$("termsModal").classList.add("hidden");}
+$("loginTab").addEventListener("click",()=>setAuthMode("login"));$("signupTab").addEventListener("click",()=>setAuthMode("signup"));
+$("togglePassword").addEventListener("click",()=>{const p=$("password"),show=p.type==="password";p.type=show?"text":"password";$("togglePassword").textContent=show?"Hide":"Show";});
+$("termsLink").addEventListener("click",e=>{e.preventDefault();openTerms();});$("termsMenu").addEventListener("click",openTerms);$("closeTerms").addEventListener("click",closeTerms);$("closeTermsBottom").addEventListener("click",closeTerms);$("termsModal").addEventListener("click",e=>{if(e.target===$("termsModal"))closeTerms();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeTerms();closeMenu();}});
+function initSupabase(){if(!window.supabase?.createClient){authMessage("Account service did not load. Check your connection and reload.");return false;}try{db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);return true;}catch(e){authMessage("Could not start account service: "+e.message);return false;}}
+async function login(email,password){const{error}=await db.auth.signInWithPassword({email,password});if(error)throw error;}
+async function signup(name,email,password,role){const{data,error}=await db.auth.signUp({email,password,options:{emailRedirectTo:SITE_URL,data:{display_name:name,role}}});if(error)throw error;if(!data.session)authMessage("Account created. Check your email, including Spam, to confirm before logging in.");else toast("Account created.");}
+$("authForm").addEventListener("submit",async e=>{e.preventDefault();if(!db){authMessage("Account service is unavailable. Reload and check your connection.");return;}const email=$("email").value.trim(),password=$("password").value;if(!email||!password){authMessage("Enter your email and password.");return;}const b=authMode==="signup"?$("signupBtn"):$("loginBtn");if(authMode==="signup"){const name=$("username").value.trim();if(!name){authMessage("Enter your display name.");return;}if(password.length<6){authMessage("Use at least 6 characters for your password.");return;}if(!$("agreeTerms").checked){authMessage("Please agree to the Terms & Conditions.");return;}}b.disabled=true;authMessage(authMode==="signup"?"Creating account…":"Signing in…");try{if(authMode==="signup")await signup($("username").value.trim(),email,password,$("role").value);else await login(email,password);}catch(err){authMessage(err.message||"Authentication failed.");}finally{b.disabled=false;}});
+$("forgotBtn").addEventListener("click",async()=>{const email=$("email").value.trim();if(!email){authMessage("Enter your email address first.");return;}$("forgotBtn").disabled=true;try{const{error}=await db.auth.resetPasswordForEmail(email,{redirectTo:SITE_URL});if(error)throw error;authMessage("If the account exists, a reset email has been sent. Check Inbox and Spam.");}catch(e){authMessage(e.message);}finally{$("forgotBtn").disabled=false;}});
+function closeMenu(){$("menuPanel").classList.add("hidden");$("menuBtn").setAttribute("aria-expanded","false");}
+$("menuBtn").addEventListener("click",e=>{e.stopPropagation();const open=$("menuPanel").classList.toggle("hidden");$("menuBtn").setAttribute("aria-expanded",String(!open));});document.addEventListener("click",e=>{if(!$("menuPanel").contains(e.target)&&e.target!==$("menuBtn"))closeMenu();});
+$("searchTop").addEventListener("click",()=>openPage("discover"));
+function coverUrl(path){if(!path||!db)return fallbackCover;const{data}=db.storage.from("track-covers").getPublicUrl(path);return data?.publicUrl||fallbackCover;}
+async function audioUrl(path){if(!path||!db)return null;const{data,error}=await db.storage.from("music").createSignedUrl(path,3600);if(error){console.error(error);return null;}return data?.signedUrl||null;}
+async function ensureProfile(){if(!currentUser)return;const display=currentUser.user_metadata?.display_name||currentUser.email?.split("@")[0]||"Member";const accountType=["artist","creator"].includes(currentUser.user_metadata?.role)?"artist":"listener";const{error}=await db.from("slm_profiles").upsert({id:currentUser.id,display_name:display,account_type:accountType},{onConflict:"id"});if(error)throw error;}
+async function loadTracks(){if(!db)return;try{const{data,error}=await db.from("slm_tracks").select("*").order("created_at",{ascending:false}).limit(150);if(error)throw error;tracks=(data||[]).filter(t=>String(t.status||"").toLowerCase()==="published");}catch(e){console.error("Track load",e);tracks=[];toast("Music list could not load. Check the tracks table and its SELECT policy.");}}
+function trackGenre(t){return String(t.genre||t.category||t.music_genre||t.description||"").toLowerCase();}
+function filteredTracks(){if(activeGenre==="All")return tracks;const g=activeGenre.toLowerCase();return tracks.filter(t=>trackGenre(t).includes(g)||(g==="afrobeat"&&trackGenre(t).includes("afro"))||(g==="gospel"&&/worship|christian/.test(trackGenre(t))));}
+ 

@@ -405,7 +405,19 @@ async function saveDistribution(e){
  saveLocal("slm_distribution_drafts",request);
  $("distStatus").textContent="Distribution request saved as a local draft. It has not been sent to a distributor or published.";
 }
-async function saveProfile(e){
+function setupProfile(){
+  const form=$("profileForm");
+  const field=$("profileName");
+
+  if(!form||!field)return;
+
+  field.value=
+    currentUser?.user_metadata?.display_name||
+    currentUser?.email?.split("@")[0]||"";
+
+  form.onsubmit=saveProfile;
+}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  async function saveProfile(e){
  e.preventDefault();
  const name=$("profileName").value.trim();
  if(!name){$("profileStatus").textContent="Enter a display name.";return;}
